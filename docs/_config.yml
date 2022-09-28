@@ -18,16 +18,15 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Your awesome title
-email: your-email@example.com
+title: UniFR Prototyping and fabrication course 
+#email: <name.surname>@unifr.ch
 description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  The prototype and fabrication course at University of Fribourg takes place in the university's LearningLab and aims at exposing Computer Science Master's students to modern hardware/software prototyping tools to produce convincing demos.
 baseurl: "/protofablab" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username:  jekyll
+#url: "https://nembrinj.github.io/protofablab" # the base hostname & protocol for your site, e.g. http://example.com
+#twitter_username: xxx
+github_username:  nembrinj
 
 # Build settings
 theme: minima
