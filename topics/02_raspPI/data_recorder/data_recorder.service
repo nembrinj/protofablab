@@ -1,0 +1,8 @@
+[Unit]
+Description=data recorder job
+
+[Service]
+Type=oneshot
+User=pi
+WorkingDirectory=/home/pi/data_recorder
+ExecStart=/usr/bin/python /home/pi/data_recorder/data_recorder.py

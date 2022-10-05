@@ -1,0 +1,14 @@
+[Unit]
+Description=start data server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+Restart=always
+WorkingDirectory=/home/pi/data_server
+ExecStart=/usr/bin/python3 /home/pi/data_server/data_server.py &> /home/pi/data_server/trace.log
+
+[Install]
+WantedBy=network-online.target
+
