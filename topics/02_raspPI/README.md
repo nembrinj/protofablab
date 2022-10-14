@@ -8,40 +8,25 @@ TODO:
  - [] port forwarding / firewall (Lukas)
 
 
-This tutorial will teach you, how to set up and use the `DietPi OS` on a `Raspberry Pi Zero W v1.1`.
-
-## Get Image
-
-Open the [Download Section](https://dietpi.com/#download) of the official DietPi Website. Select the Raspberry Pi in the device selection and download the `ARMv6 32-bit image`. 
-
-Unzip the 7z archive using tool like [7-Zip](https://www.7-zip.org/download.html) to extract the .img file.
+This tutorial will teach you, how to set up a web server on a `Raspberry Pi Zero W v1.1`.
 
 ## Write Image to SD-Card
 
 Open the Raspberry Pi Images.
 
-![Install a custom image](images/custom_img_1.png)
-
-As an Operating System, select `Use custom` and find your extracted .img file.
+As an Operating System, select `Raspberry Pi OS Lite (32-Bit)`.
 
 Select the SD-card in your card reader where the image will be installed. 
 
 > **WARNING**: Make sure to back up your SD-card, if you already have a Raspberry Pi installation or other data that you want to keep. This process is explained [here](https://raspberryexpert.com/how-to-backup-raspberry-pi/).
 
-Write the image to your SD-card. 
+![Advanced options](images/advanced_options.png)
 
-When this was done sucessfully, open the SD-card in your file explorer and find the configuration file `dietpi.txt`.
+In the advanced options, you can enable ssh and configure wifi, so that the raspberry pi will automatically connect to your local network.
 
-Change to following lines to enable wifi:
+We also change the hostname to `pi-server` to differentiate it from other raspberry pi on the same network.
 
-    AUTO_SETUP_NET_WIFI_ENABLED=1
-    AUTO_SETUP_NET_WIFI_COUNTRY_CODE=CH
-
-You also have to specify which wifi network to connect to. 
-This is possible in the file `dietpi-wifi.txt`.
-
-    aWIFI_SSID[0]='NameEuresWLANs'
-    aWIFI_KEY[0]='Euer WLAN-Schlüssel'
+After making sure, that your configuration is correct, flash the image to your SD-card. 
 
 You are now ready to insert the SD-card into your raspberry pi and connect it to the power.
 
@@ -49,4 +34,16 @@ You are now ready to insert the SD-card into your raspberry pi and connect it to
 
 ## Connect to your raspberry pi
 
-If you are connected to the same wireless network that you configured for your raspberry pi, you should be able to detect your device.
+If you are connected to the same wireless network that you configured for your raspberry pi, you should be able to detect your device if it had enough time to boot.
+
+    ping pi-server
+
+If you succeed in pinging the raspberry pi, you also see its ip address on the network. Note this address for later.
+
+You can now connect to your raspberry pi from the command line and log in with your password.
+
+    ssh pi@pi-server
+
+![](images/ssh_success.png)
+
+Alternatively, if you are on Windows, you can use a tool like [PuTTY](https://www.putty.org/) to open an ssh connection to the raspberry pi. There it is also possible to save multiple connections and login credentials.
