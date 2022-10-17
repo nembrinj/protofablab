@@ -1,0 +1,15 @@
+[Unit]
+Description=Start web API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Environment="API_USER=pi"
+Environment="API_PASS=protolab"
+User=pi
+Restart=always
+WorkingDirectory=/home/pi/web_api
+ExecStart=/usr/bin/python3 /home/pi/web_api/web_api.py
+
+[Install]
+WantedBy=network-online.target

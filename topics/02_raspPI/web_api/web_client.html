@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name=viewport content="width=device-width,initial-scale=1">
+    <title>My Web Client</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        #credentials {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #credentials label {
+            margin-bottom: 15px;
+        }
+
+        #actions {
+            display: inline-flex;
+            flex-direction: column;
+        }
+
+        #actions button {
+            margin-top: 15px;
+            padding: 6px 12px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>My Web Client</h1>
+
+    <div id="credentials">
+        <label>
+            Username <input id="user" type="text"/>
+        </label>
+        <label>
+            Password <input id="pass" type="password"/>
+        </label>
+    </div>
+
+    <div id="actions">
+        <button type="button" id="printButton">Print document</button>
+        <button type="button" id="lockButton">Lock door</button>
+        <button type="button" id="unlockButton">Unlock door</button>
+    </div>
+    <p id="loading" class="hidden">Loading...</p>
+</main>
+<script>
+    const apiRoot = "http://my-web-api.com"
+
+    // load credentials, if saved
+    const credentials = localStorage.getItem("credentials")
+    if (credentials) [user.value, pass.value] = atob(credentials).split(":")
+
+    printButton.addEventListener("click", async _ => post("/print"))
+    lockButton.addEventListener("click", async _ => post("/door", {action: "lock"}))
+    unlockButton.addEventListener("click", async _ => post("/door", {action: "unlock"}))
+
+    async function post(url, body = {}) {
+        // start loading
+        actions.classList.toggle("hidden")
+        loading.classList.toggle("hidden")
+
+        try {
+            // save credentials (unsafe! for demo purpose only)
+            const credentials = btoa(`${user.value}:${pass.value}`)
+            localStorage.setItem("credentials", credentials)
+
+            // send POST request to web api
+            const res = await fetch(`${apiRoot}${url}`, {
+                method: "POST",
+                body: JSON.stringify(body),
+                headers: {
+                    authorization: `Basic ${credentials}`,
+                    "content-type": "application/json",
+                },
+            })
+
+            // show response
+            alert(await res.text())
+
+        } finally {
+            // stop loading
+            actions.classList.toggle("hidden")
+            loading.classList.toggle("hidden")
+        }
+    }
+</script>
+</body>
+</html>

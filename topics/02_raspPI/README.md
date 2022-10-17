@@ -1,11 +1,11 @@
 # Raspberry Pi Tutorial
 
 TODO:
- - [] burning image to sd card and get ssh access (Lukas)
- - [] setup printer webserver (Loris)
- - [] nginx (Loris)
- - [] ssl certificate (Loris)
- - [] port forwarding / firewall (Lukas)
+ - [ ] burning image to sd card and get ssh access (Lukas)
+ - [ ] setup printer webserver (Loris)
+ - [ ] nginx (Loris)
+ - [ ] ssl certificate (Loris)
+ - [ ] port forwarding / firewall (Lukas)
 
 
 This tutorial will teach you, how to set up a web server on a `Raspberry Pi Zero W v1.1`.
@@ -47,3 +47,95 @@ You can now connect to your raspberry pi from the command line and log in with y
 ![](images/ssh_success.png)
 
 Alternatively, if you are on Windows, you can use a tool like [PuTTY](https://www.putty.org/) to open an ssh connection to the raspberry pi. There it is also possible to save multiple connections and login credentials.
+
+## Setting up the web API
+
+Why a **web** API?
+
+- A web API is easy to develop and provides an easy to trigger actions remotely.
+- Built over HTTP, which is easy to integrate in clients.
+
+On the PI:
+```sh
+# create a folder for the source code
+cd ~ && mkdir web_api
+```
+
+On the PC, edit `web_api.service` and define the `RPI_USER` and `RPI_PASS` environment variables. Then run:
+```sh
+# copy the source code and the service to the pi
+scp web_api.py web_api.service pi@pi-server:~/web_api/
+```
+
+On the PI:
+```sh
+# install the Flask framework
+sudo apt install python3-flask
+
+# create a service that runs the web API
+sudo mv ~/web_api/web_api.service /etc/systemd/system/web_api.service
+
+# start the service
+sudo service web_api start
+```
+
+The web API is now accessible on port 5000 (e.g. `http://pi-server.local:5000`).
+
+To read the logs from PC:
+```sh
+ssh pi@pi-server "journalctl -f -u web_api"
+```
+
+## Port forwarding
+
+*TODO*
+
+Forward ports 80 (HTTP) and 443 (HTTPS) to your raspberry pi.
+
+## Setting up a web server with Nginx
+
+Why?
+
+- Host different websites on the Raspberry PI.
+- Can handle certificates, CORS, load balancing, etc.
+
+On the PC, edit `server.conf` and put your own domain name. Then run:
+```sh
+# copy the website configuration to the pi
+scp server.conf pi@pi-server:~
+```
+
+On the pi:
+```sh
+# install Nginx
+sudo apt install nginx
+
+# create a new website called 'web-api'
+sudo mv ~/server.conf /etc/nginx/sites-available/web-api
+
+# enable this website by creating a symlink
+sudo ln -s /etc/nginx/sites-available/web-api /etc/nginx/sites-enabled/
+
+# restart Nginx to apply changes
+sudo service nginx restart
+```
+
+The web API is now accessible via the specified domain name (e.g. `http://my-web-api.com`).
+
+## Enabling secure connections with HTTPS
+
+Why enabling HTTPS?
+
+- Password is sent in plaintext in request -> unsafe.
+- Client hosted on HTTPS can't send request to unsecure server.
+
+On the PI:
+```sh
+# install certbot
+sudo apt install certbot python3-certbot-nginx
+
+# run certbot and request a certificate for the web API domain
+sudo certbot
+```
+
+Then, change the API root to `https://my-web-api.com` in `web_client.html`.
