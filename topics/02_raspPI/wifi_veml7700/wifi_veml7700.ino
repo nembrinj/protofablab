@@ -14,8 +14,8 @@ Adafruit_VEML7700 veml = Adafruit_VEML7700();
 
 
 /* Put your SSID & Password */
-const char* ssid = "superhome";  // Enter SSID here
-const char* password = "k12mwukgp2fdi";  //Enter Password here
+const char* ssid = "xxxx";  // Enter SSID here
+const char* password = "xxxx";  //Enter Password here
 
 
 WebServer server(80);
