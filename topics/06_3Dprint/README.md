@@ -6,7 +6,7 @@ Among 3D printing for prototyping, several techniques exist and as of 2022, two 
 ## Definition 
 
 This particular type of printer creates 3D objects by hardening a liquid resin, layer by layer, using a UV laser.
-
+![stereoPrinter](tutorial/images/Schematic_representation_of_Stereolithography.png)
 (source: Wikipedia’s Stereolithography page, https://upload.wikimedia.org/wikipedia/commons/d/d6/Schematic_representation_of_Stereolithography.png, visited 15/10/2022)
 
 More specifically, the user pours the resin into the printer’s **tank** (part (b) in the picture). A UV laser (a) will flash the bottom (c) of the tank in order to cure, i.e. harden, the liquid resin into hardened plastic (d). The 3D object is built in an inverted way, upside-down, on a **print platform** (e) that will move the hardened plastic up and let new liquid resin in at the bottom of the tank.
@@ -16,7 +16,7 @@ At the end of the process using the Prusa 3D SL1S printer, the printed object wi
 ## Difference with string printer 
 
 Fused filament fabrication (FFF, also called Fused Deposition Modeling or FDM) uses filament. The filament goes through a heated header to be melted and the 3D object is built layer-by-layer from bottom to top - i.e. not inverted as with the SLA.
-
+![filamentPrinter](tutorial/images/Schematic_representation_of_Fused_Filament_Fabrication_01.png)
 (source: Wikipedia’s Fused Filament Fabrication page: https://upload.wikimedia.org/wikipedia/commons/c/c8/Schematic_representation_of_Fused_Filament_Fabrication_01.png, visited 15/10/2022)
 
 FFF is favored for larger and more robust objects than the SLA. But the printed layers are usually more visible, and SLA offers smoother prints. To give some numbers, the height of the SLA’s layers is between 0.025-0.1 mm, while the height with the FFF is between 0.05 - 0.35 mm.  //(remark: different from x-y precision: 1nanometer for UV ,  while 1microm)
@@ -24,11 +24,11 @@ FFF is favored for larger and more robust objects than the SLA. But the printed 
 The SLA presented above uses resin which is more difficult to handle and requires more attention such as wearing gloves and after-print actions.
 
 Supported material:
-FFF: Wide range of thermoplastics, including PLA, PETG, ASA, ABS, PC (Polycarbonate), CPE, PVA/BVOH, PVB, HIPS, PP (Polypropylene), Flex, nGen, Nylon, Carbon filled, Woodfill and other filled materials.
-SLA: Supported materials UV sensitive liquid resin (405nm), long-exposure materials supported
+- FFF: Wide range of thermoplastics, including PLA, PETG, ASA, ABS, PC (Polycarbonate), CPE, PVA/BVOH, PVB, HIPS, PP (Polypropylene), Flex, nGen, Nylon, Carbon filled, Woodfill and other filled materials.
+- SLA: Supported materials UV sensitive liquid resin (405nm), long-exposure materials supported
 
 For more information on the difference:
-How to Choose a 3D Printer? (Prusa3D’s blog)
+- [How to Choose a 3D Printer?](https://www.prusa3d.com/page/how-to-choose-a-3d-printer_229126/) (Prusa3D’s blog)
 
 When should an SLA printer be used ?
 You will want to favor the SLA printer when refined details are more important for your prototypes than robustness.
@@ -40,10 +40,10 @@ How to use
 // chapter 4.1, 4.2 of manual:
 The unpacking, first start and calibration of the printer have already been done - thanks to Yong-Joon Thoo. Calibration is a crucial part not only to print your object correctly but to avoid any damage to the printer.
 
-Important
-FEP film: at every use and before any print, it is important to check the FEP film. It is at the bottom of the tank and it must be transparent without any hole or scratch.
-Wear gloves to handle the resin.
-Ventilated space: to avoid being too close or inhaling the resin.
+> **Warning** 
+> - **FEP film**: at every use and before any print, it is important to check the FEP film. It is at the bottom of the tank and it must be transparent without any hole or scratch.
+> - **Wear gloves** to handle the resin.
+> - **Ventilated space**: to avoid being too close or inhaling the resin.
 
 Supported type of file / how to upload 3D model
 …
@@ -51,7 +51,7 @@ Supported type of file / how to upload 3D model
 // chapter 4.7: add resin
 
 
-
+//TODO add pic
 (source: manual from https://www.prusa3d.com/)
 
 
@@ -64,22 +64,22 @@ Using the Original Prusa CW1S makes it quicker and easier to finalize the print.
 
 
 ## Limitations
-3D printing is preferred to prototype quickly and when approx. one hundred parts are needed at a maximum. For mass production, one may consider injection moulding.
+3D printing is preferred to prototype quickly and when approx. one hundred parts are needed at a maximum. For mass production, one may consider [injection moulding](https://www.twi-global.com/technical-knowledge/faqs/3d-printing-vs-injection-moulding).
 
 # Object to print
 In this section, we present an alternative software OpenSCAD which uses script files, and a concrete object to print.
 ## OpenScad
 ### What is it
-OpenSCAD is a free software for 3D modeling. It focuses on the CAD characteristics of 3D modeling. OpenSCAD reads a script file to render the 3D model. The software offers two main modeling techniques: constructive solid geometry (CSG) and extrusion of 2D outline.
+[OpenSCAD](https://openscad.org/about.html) is a free software for 3D modeling. It focuses on the CAD characteristics of 3D modeling. OpenSCAD reads a script file to render the 3D model. The software offers two main modeling techniques: constructive solid geometry (CSG) and extrusion of 2D outline.
 
-SCAD refers to solide computer aided design, a file format to describe a 3D object, while STL refers to stereolithography, another file format to use with slicers for 3D printing. More information here.
+SCAD refers to solide computer aided design, a file format to describe a 3D object, while STL refers to stereolithography, another file format to use with slicers for 3D printing. More information [here](https://all3dp.com/2/convert-scad-files-to-stls/).
 
-What is it not: OpenSCAD is not an interactive modeler, and does not focus on the artistic side of 3D modeling like other softwares may do, e.g. Blender.
-how to download 
-Go to OpenSCAD’s Downloads page: https://openscad.org/downloads.html.
-Follow instructions for your respective operating system.
+What is it not: OpenSCAD is not an interactive modeler, and does not focus on the artistic side of 3D modeling like other softwares may do, e.g. [Blender](https://www.blender.org/).
+### How to download 
+1) Go to [OpenSCAD’s Downloads page](https://openscad.org/downloads.html).
+2) Follow instructions for your respective operating system.
 
-### how to use
+### How to use
 
 …
 
@@ -169,9 +169,11 @@ The [mirror](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#
 
 It will be called with x,y,z that will help to define the normal vector direction. A normal vector is the vector that points out of a plane in a perpendicular way.
 
- figure .. : hand mirroring, source : https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#/media/File:Mirror-x.png 
+![mirrorX](tutorial/images/Mirror-x.png)
+hand mirroring, source : https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#/media/File:Mirror-x.png 
 Here we have a mirror with the normal `[1,0,0]` as the normal vector is along the `x` axis.
 
+![mirrorXY](tutorial/images/Mirror-x-y.png)
 
 Here for instance, we can see that the normal is `[1,1,0]` as the vector is pointing in the middle of those 2 axis without angles.
 
@@ -254,6 +256,7 @@ Here, we see that the outer eye is a bit out of the head shape or the bear. We c
 As we wanted a crease for the inner eye, we then create an ellipse and played with its shape and angle to have it touch the other ellipse around its border and not in the center. 
 
 By doing the difference, we then have the shape of the eye with its pupil.
+![eye](tutorial/images/eye.PNG)
 
 ```sh
 module eye(){
@@ -273,6 +276,7 @@ module eye(){
 As we did not know precisely the look we wanted, we just used the preview to check if the result was satisfying.
 ### Nose 
 The nose will use exactly the example shown for the minkowski method. We will just call a translation and a rotation to match the rest of the piece.
+![nose](tutorial/images/nose.PNG)
 ```sh
 module nose(){
 	//nose
@@ -307,6 +311,7 @@ It works just as the head, and we will create that under the module named mouth.
 ### Ear
 Now we want to create its ears. But we will focus only on one side for the module. We chose the right one.
 The point is to create a cease in an ellipse to create this outer ear and inner ear aspect.
+![ear](tutorial/images/ear.PNG)
 ```sh
 module ear(){
 	difference(){
@@ -419,6 +424,8 @@ module foot(){
 If you remember the `difference(){}` function, it works like `A-B`, with A being the first object instantiated and `B` the second one.
 Well, you can actually do mutliple subtractions at once. It will work like : `A-B-C...`, so `A` will be the first object instantiate, `-B` the second one, `-C` the third, etc.
 This is why we are able to create the foot with its paw and limit under one `difference(){}` function.
+![paw](tutorial/images/paw.PNG)
+
 ### Butt 
 The bottom part of the teddy has its butt and little tail.
 It works just like the body trunk, with an extra sphere placed in the middle.
@@ -476,7 +483,7 @@ module scaling(size){
 	}
 }
 ```
-###Instantiation
+### Instantiation
 Finally, as the whole code is contained under the scaling module, we only need to instanciate this one with a sizing factor.
 When the scaling is parameter is 1, then the teddy will be 50mm.
 
