@@ -169,7 +169,8 @@ The [mirror](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#
 
 It will be called with x,y,z that will help to define the normal vector direction. A normal vector is the vector that points out of a plane in a perpendicular way.
 
-  hand mirroring, source : https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#/media/File:Mirror-x.png 
+![mirrorX](tutorial/images/Mirror-x.png)
+hand mirroring, source : https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#/media/File:Mirror-x.png 
 Here we have a mirror with the normal `[1,0,0]` as the normal vector is along the `x` axis.
 
 ![mirrorXY](tutorial/images/Mirror-x-y.png)
