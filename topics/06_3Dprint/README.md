@@ -1,70 +1,109 @@
-// suggestions (after talk with assistant / je ne sais pas où l’écrire haha):
- talk about conversion gcode (GoTo) from .STL?  Or be more technical (“closer” to physic basically) on the differences between UV laser (resin), laser (powder, e.g. https://www.3dnatives.com/impression-3d-liage-poudre-08062016/#! ),  and filament?
 # Introduction
-Among 3D printing for prototyping, several techniques exist and as of 2022, two are available in the FabLab at University of Fribourg: using filament or using liquid resin. In this tutorial, we focus on the latter type.
+This topic is about the creation of three-dimensional (3D) object from a computer-aided design (CAD) model, so called 3D printing or additive manufacturing.
+
+An [ISO standard](https://www.iso.org/standard/69669.html) lists 7 types of 3D printing processes (details on [ALL3DP](https://all3dp.com/1/types-of-3d-printers-3d-printing-technology/)):
+ - Material extrusion
+ - Vat polymerization
+ - Powder Bed Fusion
+ - Material Jetting
+ - Binder Jetting
+ - Direct Energy Deposition
+ - Sheet Lamination
+
+Each of the above 7 processes uses one or more 3D printing technology. Depending on your objectives (refined vs robust prototypes, production, etc.) and constraints (time, cost, material, etc.), one technology may be more appropriate.
+
+In the context of this Autumn 2022 course, we have access to two 3D printing technologies:
+- Fused Filament Fabrication (FFF) - with the material extrusion process
+- Stereolithography (SLA) - with the vat polymerization process
+
+And in the sections below, we focus on:
+ - SLA: the technology, difference with FFF, when to use SLA and its limitation, and how to use the [Prusa 3D SL1S printer](https://www.prusa3d.com/category/original-prusa-sl1s-speed/)
+ - Step-by-step example to create a CAD model using a script-based software
+
 # SLA Printer 
 ## Definition 
 
-This particular type of printer creates 3D objects by hardening a liquid resin, layer by layer, using a UV laser.
-![stereoPrinter](tutorial/images/Schematic_representation_of_Stereolithography.png)
-(source: Wikipedia’s Stereolithography page, https://upload.wikimedia.org/wikipedia/commons/d/d6/Schematic_representation_of_Stereolithography.png, visited 15/10/2022)
+A stereolithography printer creates 3D objects by hardening a liquid resin, layer by layer, using a UV laser.
 
-More specifically, the user pours the resin into the printer’s **tank** (part (b) in the picture). A UV laser (a) will flash the bottom (c) of the tank in order to cure, i.e. harden, the liquid resin into hardened plastic (d). The 3D object is built in an inverted way, upside-down, on a **print platform** (e) that will move the hardened plastic up and let new liquid resin in at the bottom of the tank.
+
+<img alt="stereoPrinter" src="tutorial/images/Schematic_representation_of_Stereolithography.png" width="250">
+
+Source: [Wikipedia's Stereolithography page](https://upload.wikimedia.org/wikipedia/commons/d/d6/Schematic_representation_of_Stereolithography.png), visited 15/10/2022.
+
+More specifically, the user pours the resin into the printer’s **tank** (part (b) in the picture above). A UV laser (a) will flash the bottom (c) of the tank in order to cure, i.e. harden, the liquid resin into hardened plastic (d). The 3D object is built in an inverted way, upside-down, on a **print platform** (e) that will move the hardened plastic up and let new liquid resin in at the bottom of the tank.
 
 At the end of the process using the Prusa 3D SL1S printer, the printed object will be relatively soft and sticky. Therefore, after-print actions are recommended: wash, cure and dry the model (cf section How to use).
 
 ## Difference with string printer 
 
-Fused filament fabrication (FFF, also called Fused Deposition Modeling or FDM) uses filament. The filament goes through a heated header to be melted and the 3D object is built layer-by-layer from bottom to top - i.e. not inverted as with the SLA.
-![filamentPrinter](tutorial/images/Schematic_representation_of_Fused_Filament_Fabrication_01.png)
-(source: Wikipedia’s Fused Filament Fabrication page: https://upload.wikimedia.org/wikipedia/commons/c/c8/Schematic_representation_of_Fused_Filament_Fabrication_01.png, visited 15/10/2022)
+Fused filament fabrication (also called Fused Deposition Modeling, FDM, despite their [differences](https://www.xometry.com/resources/3d-printing/fdm-vs-fff-3d-printing/)) uses a filament that goes through a heated header to be melted and the 3D object is built layer-by-layer from bottom to top - i.e. not inverted as with the SLA.
+
+<img alt="filamentPrinter" src="tutorial/images/Schematic_representation_of_Fused_Filament_Fabrication_01.png" width="350">
+
+Source: [Wikipedia’s Fused Filament Fabrication page](https://upload.wikimedia.org/wikipedia/commons/c/c8/Schematic_representation_of_Fused_Filament_Fabrication_01.png), visited 15/10/2022.
 
 FFF is favored for larger and more robust objects than the SLA. But the printed layers are usually more visible, and SLA offers smoother prints. To give some numbers, the height of the SLA’s layers is between 0.025-0.1 mm, while the height with the FFF is between 0.05 - 0.35 mm.  //(remark: different from x-y precision: 1nanometer for UV ,  while 1microm)
 
 The SLA presented above uses resin which is more difficult to handle and requires more attention such as wearing gloves and after-print actions.
 
-Supported material:
+Different supported material:
 - FFF: Wide range of thermoplastics, including PLA, PETG, ASA, ABS, PC (Polycarbonate), CPE, PVA/BVOH, PVB, HIPS, PP (Polypropylene), Flex, nGen, Nylon, Carbon filled, Woodfill and other filled materials.
 - SLA: Supported materials UV sensitive liquid resin (405nm), long-exposure materials supported
 
 For more information on the difference:
 - [How to Choose a 3D Printer?](https://www.prusa3d.com/page/how-to-choose-a-3d-printer_229126/) (Prusa3D’s blog)
 
-When should an SLA printer be used ?
+## When to use SLA and its limitations
 You will want to favor the SLA printer when refined details are more important for your prototypes than robustness.
 
 The extra care for handling the resin should not be a problem for you.
-How to use 
-//todo, turning on, configure, put file, type of file, adjustments, visualization, start machine
 
-// chapter 4.1, 4.2 of manual:
-The unpacking, first start and calibration of the printer have already been done - thanks to Yong-Joon Thoo. Calibration is a crucial part not only to print your object correctly but to avoid any damage to the printer.
+3D printing is preferred to prototype quickly and when approx. one hundred parts are needed at a maximum. For mass production, one may consider [injection moulding](https://www.twi-global.com/technical-knowledge/faqs/3d-printing-vs-injection-moulding).
+
+Depending on your objective, choose your resin for the Prusa 3D SL1S printer:
+ - Wavelength: choose a 405nm resin
+ - Types available
+     - Standard: smooth and detailed, but fragile and not suitable for mechanical parts
+	 - Clear: semi-transparent, but can be nearly full transparent...
+	 - Casting: detailed, little to no remnants
+	 - Hard and resistant: similar to ABS/PP materials, suitable for mechanical parts, low resistance to high temperatures
+	 - Heat-resistant: highly temperature-resistant, used for injection forms, but expensive
+	 - Bio-compatible: non-toxic, suitable for dental objects, abrasion-resistant, but expensive
+	 - Flexible: similar to rubber (70A hardness), but lower resolution
+
+## How to use the [Prusa 3D SL1S printer](https://www.prusa3d.com/product/original-prusa-sl1s-speed-3d-printer/)
 
 > **Warning** 
-> - **FEP film**: at every use and before any print, it is important to check the FEP film. It is at the bottom of the tank and it must be transparent without any hole or scratch.
-> - **Wear gloves** to handle the resin.
-> - **Ventilated space**: to avoid being too close or inhaling the resin.
+> - Refer to the [official manual](https://help.prusa3d.com/downloads/sl1/handbook) for detailed instructions and caution advices; never hesitate to ask questions! <!-- todo, turning on, configure, put file, type of file, adjustments, visualization, start machine-->
+> - **FEP film**: at every use and before any print, it is important to check the FEP film. It is at the bottom of the tank and it must be transparent without any hole or scratch. You use a *plastic* spatula to clean the film.
+> - **Resin**: Wear gloves to handle the resin, be in a ventilated space, keep it away from light.
 
-Supported type of file / how to upload 3D model
-…
+Instructions in 7 steps:
 
-// chapter 4.7: add resin
-
-
-//TODO add pic
-(source: manual from https://www.prusa3d.com/)
+1. Unpack and calibrate: the unpacking, first start and calibration of the printer have already been done - thanks to Yong-Joon Thoo. Calibration is a crucial part not only to print your object correctly but to avoid any damage to the printer. <!-- chapter 4.1, 4.2 of manual-->
 
 
-// chapter 4.9: first print,  4.10: removing the print
+2. Export CAD model: in your chosen modeling software, be creative or get inspired ([Printables](https://www.printables.com/)), and export your model in one of the [Supported file formats](https://help.prusa3d.com/article/supported-file-formats_1772): 3MF (preferred), STL (binary and ASCII supported), STEP (triangulated during import), OBJ (material/texture ignored during import)
 
-// chapter 5: after-print checks and actions
-// wash, cure, dry.
-
-Using the Original Prusa CW1S makes it quicker and easier to finalize the print.
+3. Slice your model: import your CAD model in a [slicer software](https://www.prusa3d.com/page/prusaslicer_424/), slice ([Prusa3d's blog](https://blog.prusa3d.com/how-to-slice-3d-objects-for-the-original-prusa-sl1_30323/), [YouTube Tutorial](https://www.youtube.com/watch?v=_kIqMPNQNSw&ab_channel=3DRevolution)), and export as G-code file to SD card
 
 
-## Limitations
-3D printing is preferred to prototype quickly and when approx. one hundred parts are needed at a maximum. For mass production, one may consider [injection moulding](https://www.twi-global.com/technical-knowledge/faqs/3d-printing-vs-injection-moulding).
+4. Add resin: **wear gloves!** <!-- // chapter 4.7: add resin -->
+   - Pour the correct amount
+   - Close the lid
+
+<img alt="filamentPrinter" src="tutorial/images/SLAprinter_tank_filling.jpg" width="250">
+
+Source: [Prusa3d.com](https://cdn.backend.prusa3d.com/wp-content/uploads/SL1S_web-18-800x533.jpg), visited 21/10/2022.
+
+5. Launch Print: select the model to print on your SD card, launch the print.
+
+6. Remove the print: **wear gloves!** <!-- // chapter 4.9: first print,  4.10: removing the print -->
+   - Once printing process is done, open the lid
+   - Use the metal spatula to remove objects from the print platform, and clean
+
+7. After-print actions <!-- // chapter 5: after-print checks and actions  -->: you can make use of the the Original Prusa CW1S makes it quicker and easier to finalize the print: wash, cure, and dry.
+
 
 # Object to print
 In this section, we present an alternative software OpenSCAD which uses script files, and a concrete object to print.
@@ -79,16 +118,10 @@ What is it not: OpenSCAD is not an interactive modeler, and does not focus on th
 1) Go to [OpenSCAD’s Downloads page](https://openscad.org/downloads.html).
 2) Follow instructions for your respective operating system.
 
-### How to use
-
-…
-
-Save 3D objects under types of file: …
-
 
 ## Object
 ### Functionalities needed
-Before starting to compute the object, here are all the methods that will be needed to achieve it.The list and explanations are ONLY for the teddy bear we will compute. There are a multitude of functionalities that we won’t cover, but feel free to explore them in the very well explained [manual of OpenScad](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/). They even offer some tutorials and a handy [cheat sheet](https://openscad.org/cheatsheet/)
+Before starting to compute the object, here are all the methods that will be needed to achieve it. The list and explanations are ONLY for the teddy bear we will compute. There are a multitude of functionalities that we won’t cover, but feel free to explore them in the very well explained [manual of OpenScad](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/). They even offer some tutorials and a handy [cheat sheet](https://openscad.org/cheatsheet/)
 ### Shapes
 The most basic method will be creating shapes such as [cubes](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Primitive_Solids#cube) and spheres. In OpenScad, we go by the principle that a rectangle will be a cube with different dimensions and an eclipse a sphere that we will stretch.
 
@@ -492,5 +525,3 @@ We will put
 scaling(0.25);
 ```
 For a small piece
-
-
