@@ -26,9 +26,10 @@ And in the sections below, we focus on:
 A stereolithography printer creates 3D objects by hardening a liquid resin, layer by layer, using a UV laser.
 
 
-<img alt="stereoPrinter" src="tutorial/images/Schematic_representation_of_Stereolithography.png" width="250">
-
-Source: [Wikipedia's Stereolithography page](https://upload.wikimedia.org/wikipedia/commons/d/d6/Schematic_representation_of_Stereolithography.png), visited 15/10/2022.
+<p align="center">
+	<img alt="stereoPrinter" src="tutorial/images/Schematic_representation_of_Stereolithography.png" width="250"><br>
+	<em>figure 1 : Representation of Stereolithography</em>
+	<br><em>Source: <a href=https://upload.wikimedia.org/wikipedia/commons/d/d6/Schematic_representation_of_Stereolithography.png>Wikipedia's Stereolithography page</a>, visited 15/10/2022.</em></p>
 
 More specifically, the user pours the resin into the printer’s **tank** (part (b) in the picture above). A UV laser (a) will flash the bottom (c) of the tank in order to cure, i.e. harden, the liquid resin into hardened plastic (d). The 3D object is built in an inverted way, upside-down, on a **print platform** (e) that will move the hardened plastic up and let new liquid resin in at the bottom of the tank.
 
@@ -38,9 +39,10 @@ At the end of the process using the Prusa 3D SL1S printer, the printed object wi
 
 Fused filament fabrication (also called Fused Deposition Modeling, FDM, despite their [differences](https://www.xometry.com/resources/3d-printing/fdm-vs-fff-3d-printing/)) uses a filament that goes through a heated header to be melted and the 3D object is built layer-by-layer from bottom to top - i.e. not inverted as with the SLA.
 
-<img alt="filamentPrinter" src="tutorial/images/Schematic_representation_of_Fused_Filament_Fabrication_01.png" width="350">
-
-Source: [Wikipedia’s Fused Filament Fabrication page](https://upload.wikimedia.org/wikipedia/commons/c/c8/Schematic_representation_of_Fused_Filament_Fabrication_01.png), visited 15/10/2022.
+<p align="center">
+	<img alt="filamentPrinter" src="tutorial/images/Schematic_representation_of_Fused_Filament_Fabrication_01.png" width="350"><br>
+	<em>figure 2 : Representation of Fused Filament</em>
+	<br><em>Source: <a href=https://upload.wikimedia.org/wikipedia/commons/c/c8/Schematic_representation_of_Fused_Filament_Fabrication_01.png>Wikipedia’s Fused Filament Fabrication page</a>, visited 15/10/2022.</em></p>
 
 FFF is favored for larger and more robust objects than the SLA. But the printed layers are usually more visible, and SLA offers smoother prints. To give some numbers, the height of the SLA’s layers is between 0.025-0.1 mm, while the height with the FFF is between 0.05 - 0.35 mm.  //(remark: different from x-y precision: 1nanometer for UV ,  while 1microm)
 
@@ -92,9 +94,10 @@ Instructions in 7 steps:
    - Pour the correct amount
    - Close the lid
 
-<img alt="filamentPrinter" src="tutorial/images/SLAprinter_tank_filling.jpg" width="250">
-
-Source: [Prusa3d.com](https://cdn.backend.prusa3d.com/wp-content/uploads/SL1S_web-18-800x533.jpg), visited 21/10/2022.
+<p align="center">
+	<img alt="filamentPrinter" src="tutorial/images/SLAprinter_tank_filling.jpg" width="250"><br>
+	<em>figure 3 : SLA printer tank filling</em>
+	<br><em>Source: <a href=https://cdn.backend.prusa3d.com/wp-content/uploads/SL1S_web-18-800x533.jpg>Prusa3d.com</a>, visited 21/10/2022.</em></p>
 
 5. Launch Print: select the model to print on your SD card, launch the print.
 
@@ -107,6 +110,27 @@ Source: [Prusa3d.com](https://cdn.backend.prusa3d.com/wp-content/uploads/SL1S_we
 
 # Object to print
 In this section, we present an alternative software OpenSCAD which uses script files, and a concrete object to print.
+Here, you can see the different views of the final object under the software :
+<div align="center">
+
+<img alt="sotfware_Front" src="tutorial/images/software_frontView.PNG" width="150"><br><em>figure 4 : OpenScad teddy front view</em> | <img alt="sotfware_top" src="tutorial/images/software_topView.PNG" width="150"><br><em>figure 6 : OpenScad teddy top view</em> | <img alt="sotfware_Side" src="tutorial/images/software_sideView.PNG" width="150"><br><em>figure 5 : OpenScad teddy side view</em> | <img alt="sotfware_top" src="tutorial/images/software_topView.PNG" width="150"><br><em>figure 6 : OpenScad teddy top view</em> | <img alt="sotfware_back" src="tutorial/images/software_backView.PNG" width="150"><br><em>figure 7 : OpenScad teddy back view</em> | <img alt="sotfware_lower" src="tutorial/images/software_lowerView.PNG" width="150"><br><em>figure 8 : OpenScad teddy lower view</em>
+:---------------------------:|:-------------------------:|:-------------:|:-----:|:--------:|:----:
+
+</div>
+
+Here is the printed object made with a filament printer :
+
+<div align="center">
+	
+<img alt="filament_Front" src="tutorial/images/filament_frontView.JPG" width="150"><br><em>figure 9 : Filament teddy front view</em> | <img alt="filament_Side" src="tutorial/images/filament_sideView.JPG" width="150"><br><em>figure 10 : Filament teddy side view</em> | <img alt="filament_top" src="tutorial/images/filament_topView.JPG" width="150"><br><em>figure 11 : Filament teddy top view</em>
+:---------------------------:|:-------------------------:|:-------------:
+
+</div>
+
+And here is the printed object made with a SLA printer :
+
+//TODO pics SLA teddy 12, 13, 14
+
 ## OpenScad
 ### What is it
 [OpenSCAD](https://openscad.org/about.html) is a free software for 3D modeling. It focuses on the CAD characteristics of 3D modeling. OpenSCAD reads a script file to render the 3D model. The software offers two main modeling techniques: constructive solid geometry (CSG) and extrusion of 2D outline.
@@ -157,7 +181,9 @@ As the code will only focus on the `;`
 ### Rotate
 Like the translation, the [rotation](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#rotate) needs to be called before the object instantiation. The method `rotate([x,y,z]);`
 It will rotate in degrees around the `x,y,z` axis. A positive rotation is clockwise and a negative one is anti-clockwise.
-//TODO pic of axis rotation
+
+<p align="center"><img alt="rotationAxis" src="tutorial/images/rotation_axis.png" width="450"><br><em>figure 15 : Scheme rotation axis</em></p>
+
 ```sh
 rotate([90,45,0])
 cube([40,20,10]);
@@ -202,11 +228,13 @@ The [mirror](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#
 
 It will be called with x,y,z that will help to define the normal vector direction. A normal vector is the vector that points out of a plane in a perpendicular way.
 
-![mirrorX](tutorial/images/Mirror-x.png)
+<p align="center"><img alt="mirrorX" src="tutorial/images/Mirror-x.png" width="450"><br><em>figure 16 : Mirror with normal pointing on x axis</em></p>
+
 hand mirroring, source : https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#/media/File:Mirror-x.png 
+
 Here we have a mirror with the normal `[1,0,0]` as the normal vector is along the `x` axis.
 
-![mirrorXY](tutorial/images/Mirror-x-y.png)
+<p align="center"><img alt="mirrorXY" src="tutorial/images/Mirror-x-y.png" width="450"><br><em>figure 17 : Mirror with normal pointing in the middle of x and y axis</em></p>
 
 Here for instance, we can see that the normal is `[1,1,0]` as the vector is pointing in the middle of those 2 axis without angles.
 
@@ -289,7 +317,8 @@ Here, we see that the outer eye is a bit out of the head shape or the bear. We c
 As we wanted a crease for the inner eye, we then create an ellipse and played with its shape and angle to have it touch the other ellipse around its border and not in the center. 
 
 By doing the difference, we then have the shape of the eye with its pupil.
-![eye](tutorial/images/eye.PNG)
+
+<p align="center"><img alt="eye" src="tutorial/images/eye.PNG"><br><em>figure 18 : OpenScad eye teddy</em></p>
 
 ```sh
 module eye(){
@@ -309,7 +338,9 @@ module eye(){
 As we did not know precisely the look we wanted, we just used the preview to check if the result was satisfying.
 ### Nose 
 The nose will use exactly the example shown for the minkowski method. We will just call a translation and a rotation to match the rest of the piece.
-![nose](tutorial/images/nose.PNG)
+
+<p align="center"><img alt="nose" src="tutorial/images/nose.PNG"><br><em>figure 19 : OpenScad nose teddy</em></p>
+
 ```sh
 module nose(){
 	//nose
@@ -344,7 +375,9 @@ It works just as the head, and we will create that under the module named mouth.
 ### Ear
 Now we want to create its ears. But we will focus only on one side for the module. We chose the right one.
 The point is to create a cease in an ellipse to create this outer ear and inner ear aspect.
-![ear](tutorial/images/ear.PNG)
+
+<p align="center"><img alt="ear" src="tutorial/images/ear.PNG"><br><em>figure 20 : OpenScad ear teddy</em></p>
+
 ```sh
 module ear(){
 	difference(){
@@ -457,7 +490,8 @@ module foot(){
 If you remember the `difference(){}` function, it works like `A-B`, with A being the first object instantiated and `B` the second one.
 Well, you can actually do mutliple subtractions at once. It will work like : `A-B-C...`, so `A` will be the first object instantiate, `-B` the second one, `-C` the third, etc.
 This is why we are able to create the foot with its paw and limit under one `difference(){}` function.
-![paw](tutorial/images/paw.PNG)
+
+<p align="center"><img alt="paw" src="tutorial/images/paw.PNG"><br><em>figure 21 : OpenScad paw teddy</em></p>
 
 ### Butt 
 The bottom part of the teddy has its butt and little tail.
