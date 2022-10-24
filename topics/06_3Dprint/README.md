@@ -13,11 +13,11 @@ An [ISO standard](https://www.iso.org/standard/69669.html) lists 7 types of 3D p
 Each of the above 7 processes uses one or more 3D printing technology. Depending on your objectives (refined vs robust prototypes, production, etc.) and constraints (time, cost, material, etc.), one technology may be more appropriate.
 
 In the context of this Autumn 2022 course, we have access to two 3D printing technologies:
-- Fused Filament Fabrication (FFF) - with the material extrusion process
-- Stereolithography (SLA) - with the vat polymerization process
+- Fused Filament Fabrication (FFF) - with the material extrusion process ([Printer: Prusa i3 MK3S](https://www.prusa3d.com/product/original-prusa-i3-mk3s-kit-3/))
+- Stereolithography (SLA) - with the vat polymerization process ([Printer: Prusa 3D SL1S printer](https://www.prusa3d.com/category/original-prusa-sl1s-speed/))
 
 And in the sections below, we focus on:
- - SLA: the technology, difference with FFF, when to use SLA and its limitation, and how to use the [Prusa 3D SL1S printer](https://www.prusa3d.com/category/original-prusa-sl1s-speed/)
+ - SLA: the technology, difference with FFF, when to use SLA and its limitation, and how to use the printer
  - Step-by-step example to create a CAD model using a script-based software
 
 # SLA Printer 
@@ -44,34 +44,22 @@ Fused filament fabrication (also called Fused Deposition Modeling, FDM, despite 
 	<em>figure 2 : Representation of Fused Filament</em>
 	<br><em>Source: <a href=https://upload.wikimedia.org/wikipedia/commons/c/c8/Schematic_representation_of_Fused_Filament_Fabrication_01.png>Wikipedia’s Fused Filament Fabrication page</a>, visited 15/10/2022.</em></p>
 
-FFF is favored for larger and more robust objects than the SLA. But the printed layers are usually more visible, and SLA offers smoother prints. To give some numbers, the height of the SLA’s layers is between 0.025-0.1 mm, while the height with the FFF is between 0.05 - 0.35 mm.  //(remark: different from x-y precision: 1nanometer for UV ,  while 1microm)
+FFF is favored for larger and more robust objects than the SLA. With FFF, the printed object has more visible layers, while the SLA offers printed object with smoother surface. To give some numbers, the height of the SLA’s layers is between 0.025-0.1 mm, while the height with the FFF is between 0.05 - 0.35 mm.
 
 The SLA presented above uses resin which is more difficult to handle and requires more attention such as wearing gloves and after-print actions.
 
-Different supported material:
-- FFF: Wide range of thermoplastics, including PLA, PETG, ASA, ABS, PC (Polycarbonate), CPE, PVA/BVOH, PVB, HIPS, PP (Polypropylene), Flex, nGen, Nylon, Carbon filled, Woodfill and other filled materials.
-- SLA: Supported materials UV sensitive liquid resin (405nm), long-exposure materials supported
+FFF supports a wide range of material: PLA (Polylactic acid, suitable for beginner), PC (Polycarbonate, suitable for advanced user), etc. To determine which filament suits your goal, constraints and budget: a Material guide is available [here](https://help.prusa3d.com/category/material-guide_220) and a comparison table is available [here](https://help.prusa3d.com/materials?_ga=2.89686683.1203427312.1666600669-1176099855.1664653443). SLA's supported material is: UV sensitive liquid resin compatible with the 405nm wavelength (important!) from any resin's brand.
 
-For more information on the difference:
-- [How to Choose a 3D Printer?](https://www.prusa3d.com/page/how-to-choose-a-3d-printer_229126/) (Prusa3D’s blog)
+For more information on the difference: [How to Choose a 3D Printer?](https://www.prusa3d.com/page/how-to-choose-a-3d-printer_229126/) (Prusa3D’s blog)
 
 ## When to use SLA and its limitations
-You will want to favor the SLA printer when refined details are more important for your prototypes than robustness.
+Favor the SLA printer when refined details are more important for your prototypes than robustness.
 
 The extra care for handling the resin should not be a problem for you.
 
 3D printing is preferred to prototype quickly and when approx. one hundred parts are needed at a maximum. For mass production, one may consider [injection moulding](https://www.twi-global.com/technical-knowledge/faqs/3d-printing-vs-injection-moulding).
 
-Depending on your objective, choose your resin for the Prusa 3D SL1S printer:
- - Wavelength: choose a 405nm resin
- - Types available
-     - Standard: smooth and detailed, but fragile and not suitable for mechanical parts
-	 - Clear: semi-transparent, but can be nearly full transparent...
-	 - Casting: detailed, little to no remnants
-	 - Hard and resistant: similar to ABS/PP materials, suitable for mechanical parts, low resistance to high temperatures
-	 - Heat-resistant: highly temperature-resistant, used for injection forms, but expensive
-	 - Bio-compatible: non-toxic, suitable for dental objects, abrasion-resistant, but expensive
-	 - Flexible: similar to rubber (70A hardness), but lower resolution
+Depending on your objective, choose your resin for the Prusa 3D SL1S printer accordingly. A *standard* resin offers smooth surface with great details, but is not robust and not recommended for mechanical parts. You would need *hard and resistant* resins for mechanical parts, even if it not suited for high temperatures. A list of the types of resin and their pros and cons is available [here](https://help.prusa3d.com/article/resins_1977).
 
 ## How to use the [Prusa 3D SL1S printer](https://www.prusa3d.com/product/original-prusa-sl1s-speed-3d-printer/)
 
