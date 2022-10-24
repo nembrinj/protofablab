@@ -68,18 +68,23 @@ Depending on your objective, choose your resin for the Prusa 3D SL1S printer acc
 > - **FEP film**: at every use and before any print, it is important to check the FEP film. It is at the bottom of the tank and it must be transparent without any hole or scratch. You use a *plastic* spatula to clean the film.
 > - **Resin**: Wear gloves to handle the resin, be in a ventilated space, keep it away from light.
 
-Instructions in 7 steps:
+> **Note**
+> Currently (Oct. 24, 2022), the Curing and Washing Machine (CW1S) cannot be used in the FabLab (missing material).
+> Please ask the professor for any update or consider the filament printer meanwhile.
+> If you print with the SL1S, you will not be able to wash the sticky excess resin from the surface properly.
+
+Instructions in 8 steps:
 
 1. Unpack and calibrate: the unpacking, first start and calibration of the printer have already been done - thanks to Yong-Joon Thoo. Calibration is a crucial part not only to print your object correctly but to avoid any damage to the printer. <!-- chapter 4.1, 4.2 of manual-->
 
 
 2. Export CAD model: in your chosen modeling software, be creative or get inspired ([Printables](https://www.printables.com/)), and export your model in one of the [Supported file formats](https://help.prusa3d.com/article/supported-file-formats_1772): 3MF (preferred), STL (binary and ASCII supported), STEP (triangulated during import), OBJ (material/texture ignored during import)
 
-3. Slice your model: import your CAD model in a [slicer software](https://www.prusa3d.com/page/prusaslicer_424/), slice ([Prusa3d's blog](https://blog.prusa3d.com/how-to-slice-3d-objects-for-the-original-prusa-sl1_30323/), [YouTube Tutorial](https://www.youtube.com/watch?v=_kIqMPNQNSw&ab_channel=3DRevolution)), and export as G-code file to SD card
+3. Slice your model: import your CAD model in a [slicer software](https://www.prusa3d.com/page/prusaslicer_424/), slice ([Prusa3d's blog](https://blog.prusa3d.com/how-to-slice-3d-objects-for-the-original-prusa-sl1_30323/), [YouTube Tutorial](https://www.youtube.com/watch?v=_kIqMPNQNSw&ab_channel=3DRevolution)), and export as G-code file to a USB memory stick.
 
 
 4. Add resin: **wear gloves!** <!-- // chapter 4.7: add resin -->
-   - Pour the correct amount
+   - Pour the correct amount: up to max line.
    - Close the lid
 
 <p align="center">
@@ -87,14 +92,22 @@ Instructions in 7 steps:
 	<em>figure 3 : SLA printer tank filling</em>
 	<br><em>Source: <a href=https://cdn.backend.prusa3d.com/wp-content/uploads/SL1S_web-18-800x533.jpg>Prusa3d.com</a>, visited 21/10/2022.</em></p>
 
-5. Launch Print: select the model to print on your SD card, launch the print.
+5. Launch Print: select the model to print on your USB memory stick, launch the print.
 
 6. Remove the print: **wear gloves!** <!-- // chapter 4.9: first print,  4.10: removing the print -->
    - Once printing process is done, open the lid
-   - Use the metal spatula to remove objects from the print platform, and clean
+   - Use the protective tray (U-shaped) to protect the printer when you remove the object.
+   - Clean (use paper towels) the top of the print platform, and unscrew the black knob to remove the platform out, and let extra resin falls down to the tank.
+   - Print platform: if you use the CW1S, keep the object on it (CW1S will wash both), else use the metal spatula to remove objects from the print platform
 
-7. After-print actions <!-- // chapter 5: after-print checks and actions  -->: you can make use of the the Original Prusa CW1S makes it quicker and easier to finalize the print: wash, cure, and dry.
+7. After-print actions <!-- // chapter 5: after-print checks and actions  -->: **keep your gloves!**
+   - either manually: (1) if available, wash with isopropyl alcohol (IPA, be cautious!), (2) dry with soft paper towel in direct sunlight (24-48h) or under strong UV light source.
+   - or with CW1S (detailed instruction in the [handbook](https://help.prusa3d.com/downloads/cw1s/handbook)): (1) pour IPA into the tank (keep lid open!), (2) wash: use a metal lid with the print platform and place that on top of the liquid container, (3) rinse your object with water briefly and use paper towel to dry it, (4) dry and cure: place object near the edge of the rotating platform, close the lid (now, always!), and start drying/curing.
 
+8. Finally: **gloves still on!**
+   - put the leftover resin into a separate bottle (to avoid having solidified little parts in the unused resin bottle)
+   - clean the resin off every parts thoroughly (use a nearby sink and water)
+   - Gloves off...
 
 # Object to print
 In this section, we present an alternative software OpenSCAD which uses script files, and a concrete object to print.
