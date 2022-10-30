@@ -272,7 +272,7 @@ As you know, if you don't give a lot of triangle for a cylinder, it can actually
 The triangle will actually have each of its corner merged with a sphere of 0.5 of radius, resulting to a triangle with rounded edges.
 Indeed, the shape of the corners aren't taking the form of the sphere totally (no bump), it just rounds it as much as the sphere is. (Take the sphere as a circle).
 
-> **NB**: As we have a 3D shape, it is not possible to use minkowski with a 2D circle. This is why we applied our 3D sphere.
+> **Note** As we have a 3D shape, it is not possible to use minkowski with a 2D circle. This is why we applied our 3D sphere.
 ### Module
 A [module](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/User-Defined_Functions_and_Modules#Modules) is similar to what we will be the closest as a method in regular coding. It will help grouping objects and we will be able to call multiple times this object. 
 To make short, like you are calling sphere();  to create a sphere, you will be able to create your own module and call it in the same way.
@@ -543,7 +543,7 @@ As you see, every part where we need its pair has its mirror function. As explai
 
 As everything is facing the `x` axis, we actually want our mirror to be along this one. It means that the plane is facing the `y` axis. Thus the normal vector would be `[0,1,0]`. This is why every object has the same mirror.
 
-> **NB**: the object is centered in the middle. So the mirror is also in the middle and didn’t need to be translated.
+> **Note** the object is centered in the middle. So the mirror is also in the middle and didn’t need to be translated.
 
 We can see that a union method is encapsulating all of this instantiation. This is made so that all the parts are behaving like one and unique object.
 Scaling
