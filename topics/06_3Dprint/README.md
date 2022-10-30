@@ -128,9 +128,14 @@ Here is the printed object made with a filament printer :
 
 </div>
 
-And here is the printed object made with a SLA printer :
+And here is the printed object made with a SLA printer (lessons learned: after-print actions are crucial including IPA washing, and do not forget the supports to avoid bad surprise - like the extra base under the Teddy):
 
-//TODO pics SLA teddy 12, 13, 14
+<div align="center">
+	
+<img alt="SLA_Front" src="tutorial/images/sla_frontView.jpg" width="150"><br><em>figure 12 : SLA teddy front view</em> | <img alt="SLA_Side" src="tutorial/images/sla_sideView.jpg" width="150"><br><em>figure 13 : SLA teddy side view</em> | <img alt="SLA_back" src="tutorial/images/sla_backView.jpg" width="150"><br><em>figure 14 : SLA teddy back view</em>
+:---------------------------:|:-------------------------:|:-------------:
+</div>
+
 
 ## OpenScad
 ### What is it
