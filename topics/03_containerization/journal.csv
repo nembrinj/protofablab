@@ -1,3 +1,5 @@
 date,person,contribution
 05.10.22, Julien, Created journal csv file
-02.11.22, Marius, Started the Presentation, basics so far
+02.11.22, Marius, Started the Presentation - basics so far
+02.11.22, Julius, Running PiHole docker on dietpi
+03.11.22, Julius, Start sharing internet sharing to dietpi and connecting as client to PiHole
