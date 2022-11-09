@@ -54,7 +54,7 @@ On the PI:
 cd ~ && mkdir web_api
 ```
 
-On the PC, edit `web_api.service` and define the `RPI_USER` and `RPI_PASS` environment variables. Then run:
+On the PC, edit `web_api.service` and define the `API_USER` and `API_PASS` environment variables. Then run:
 
 ```sh
 # copy the source code and the service to the pi
@@ -74,7 +74,7 @@ sudo mv ~/web_api/web_api.service /etc/systemd/system/web_api.service
 sudo service web_api start
 ```
 
-The web API is now accessible on port 5000 (e.g. `http://pi-server.local:5000`).
+The web API is now accessible on port 5000 in the local network (e.g. `http://pi-server.local:5000`).
 
 To read the logs from PC:
 
@@ -89,7 +89,7 @@ Why?
 - Host different websites on the Raspberry PI.
 - Can handle certificates, CORS, load balancing, etc.
 
-On the PC, edit `server.conf` and put your own domain name. Then run:
+On the PC, edit `server.conf` and put your own domain name(s). Then run:
 
 ```sh
 # copy the website configuration to the pi
@@ -112,7 +112,36 @@ sudo ln -s /etc/nginx/sites-available/web-api /etc/nginx/sites-enabled/
 sudo service nginx restart
 ```
 
-Nginx us now accessible on port `80`(http) on your local ip address (`http://pi-server`), but doesn't show the web API yet.
+The web API is now accessible through the regular port `80` (http) in the local network (e.g. `http://pi-server.local`), using the domain that you specified. If you try to access the Pi via its IP address (e.g. `http://192.168.47.83`), you'll get the default Nginx welcome page instead, because not website was configured to match this hostname.
+
+# Firewall
+
+This step is optional, but is highly recommended. Setting up a firewall will only let traffic come through a few ports, which increases security by reducing the attack surface. This can be done very easily with **UFW** (Uncomplicated FireWall).
+
+On the pi:
+
+```sh
+# install UFW
+sudo apt install ufw
+
+# deny all incoming and allow all outgoing traffic by default
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# allow incoming traffic through ports 22 (SSH), 80 (HTTP) and 443 (HTTPS)
+sudo ufw allow ssh
+sudo ufw allow http
+sudo ufw allow https
+
+# enable the firewall
+# WARNING: make sure incoming traffic to port 22 (SSH)
+# is allowed, or you'll loose access to your device
+sudo ufw enable
+```
+
+From now on, the web API is **not** accessible anymore through port 5000 in the local network. This forces the clients to use the regular ports 80/443 and pass through the web server.
+
+This is great, but we still can't access the web API through the Internet.
 
 ## Port forwarding
 
@@ -156,10 +185,10 @@ The API is now available on the domain `protofablab.ch`:
 
 Why enabling HTTPS?
 
-- Password is sent in plaintext in request -> unsafe.
-- Client hosted on HTTPS can't send request to unsecure server.
+- Without HTTPS, passwords are sent in plaintext with the request.
+- Client hosted on HTTPS server can't send request to unsecure server.
 
-On the PI:
+On the Pi:
 
 ```sh
 # install certbot
@@ -170,8 +199,7 @@ sudo certbot
 ```
 
 Add port forwarding for the external port `443` (https) to the local port `443`.
-Then, change the API root to `https://protofablab.ch` in `web_client.html`.
 
-The web API is now available securely on the domain `https://protofablab.ch`.
+The web API is now available securely at `https://protofablab.ch`.
 
 ![Secure](images/ssl.png)

@@ -6,6 +6,7 @@
     <title>My Web Client</title>
     <style>
         body {
+            font-family: sans-serif;
             text-align: center;
         }
 
@@ -44,6 +45,9 @@
         <label>
             Password <input id="pass" type="password"/>
         </label>
+        <label>
+            <input type="checkbox" id="secure" checked/> Secure connection
+        </label>
     </div>
 
     <div id="actions">
@@ -54,11 +58,13 @@
     <p id="loading" class="hidden">Loading...</p>
 </main>
 <script>
-    const apiRoot = "http://my-web-api.com"
+    const apiRoot = "protofablab.ch"
 
     // load credentials, if saved
     const credentials = localStorage.getItem("credentials")
     if (credentials) [user.value, pass.value] = atob(credentials).split(":")
+
+    secure.checked = localStorage.getItem("secure") !== "false"
 
     printButton.addEventListener("click", async _ => post("/print"))
     lockButton.addEventListener("click", async _ => post("/door", {action: "lock"}))
@@ -74,8 +80,12 @@
             const credentials = btoa(`${user.value}:${pass.value}`)
             localStorage.setItem("credentials", credentials)
 
+            // use HTTPS for secure connection
+            const scheme = secure.checked ? "https://" : "http://"
+            localStorage.setItem("secure", secure.checked)
+
             // send POST request to web api
-            const res = await fetch(`${apiRoot}${url}`, {
+            const res = await fetch(`${scheme}${apiRoot}${url}`, {
                 method: "POST",
                 body: JSON.stringify(body),
                 headers: {
@@ -85,7 +95,10 @@
             })
 
             // show response
-            alert(await res.text())
+            alert("Response: " + await res.text())
+
+        } catch (e) {
+            alert("Error: " + e.message)
 
         } finally {
             // stop loading
