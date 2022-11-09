@@ -82,44 +82,6 @@ To read the logs from PC:
 ssh pi@pi-server "journalctl -f -u web_api"
 ```
 
-## Port forwarding
-
-To access the web application from the internet outside your local network, you will need to enable port forwarding in your router settings.
-
-First, determine the ip address of your raspberry pi in your local network.
-
-    ifconfig
-
-![ifconfig](images/ifconfig.PNG)
-
-Then, log into your router. How exactly to do this depends on your internet service provider and your router.
-Often the router is accessible on the ip address http://192.168.0.1/.
-
-Enable port forwarding for the external port `80` (http) to the local port `5000`. This might look like this:
-
-![port forwarding](images/portforwarding.PNG)
-
-To check if this worked, first determine the public ip address of your raspberry pi. There are numerous ways to do this, but one of the easiest is just to call the website `icanhazip.com`.
-
-    curl icanhazip.com
-
-Call the ip address you receive in your web browser.
-Now your API should be visible from the wider internet, but it would be nice to have an actual domain name.
-
-## Buy a domain
-
-There are many websites to buy a domain. A list of these domain name registrars can be found [here](https://domainnamestat.com/statistics/registrar/others).
-
-For the purpose of this tutorial, we bought the domain `protofablab.ch`.
-
-On your domain registry, locate the DNS settings and add a DNS-record for your public ip address:
-
-![dns settings](images/dns.PNG)
-
-The API is now available on the domain `protofablab.ch`:
-
-![domain](images/domain.PNG)
-
 ## Setting up a web server with Nginx
 
 Why?
@@ -150,8 +112,45 @@ sudo ln -s /etc/nginx/sites-available/web-api /etc/nginx/sites-enabled/
 sudo service nginx restart
 ```
 
-The web API is now accessible on port `80`(http) on your local ip address (`http://pi-server`).
-To make the server available through nginx from the internet, you have to change your port forwarding to forward the external port `80` to the local port `80`. The API is now available via the specified domain name (e.g. `http://protofablab.ch/`).
+Nginx us now accessible on port `80`(http) on your local ip address (`http://pi-server`), but doesn't show the web API yet.
+
+## Port forwarding
+
+To access the web application from the internet outside your local network, you will need to enable port forwarding in your router settings.
+
+First, determine the ip address of your raspberry pi in your local network.
+
+    ifconfig
+
+![ifconfig](images/ifconfig.PNG)
+
+Then, log into your router. How exactly to do this depends on your internet service provider and your router.
+Often the router is accessible on the ip address http://192.168.0.1/.
+
+Enable port forwarding for the external port `80` (http) to the local port `80`. This might look like this:
+
+![port forwarding](images/portforwarding.PNG)
+
+To check if this worked, first determine the public ip address of your raspberry pi. There are numerous ways to do this, but one of the easiest is just to call the website `icanhazip.com`.
+
+    curl icanhazip.com
+
+Call the ip address you receive in your web browser.
+Now nginx should be visible from the wider internet, but it would be nice to have an actual domain name.
+
+## Buy a domain
+
+There are many websites to buy a domain. A list of these domain name registrars can be found [here](https://domainnamestat.com/statistics/registrar/others).
+
+For the purpose of this tutorial, we bought the domain `protofablab.ch`.
+
+On your domain registry, locate the DNS settings and add a DNS-record for your public ip address:
+
+![dns settings](images/dns.PNG)
+
+The API is now available on the domain `protofablab.ch`:
+
+![domain](images/domain.PNG)
 
 ## Enabling secure connections with HTTPS
 
