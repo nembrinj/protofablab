@@ -1,13 +1,5 @@
 # Raspberry Pi Tutorial
 
-TODO:
-
-- [x] burning image to sd card and get ssh access (Lukas)
-- [x] setup printer webserver (Loris)
-- [x] nginx (Loris)
-- [x] ssl certificate (Loris)
-- [x] port forwarding / firewall (Lukas)
-
 This tutorial will teach you, how to set up a web server on a `Raspberry Pi Zero W v1.1`.
 
 ## Write Image to SD-Card
@@ -98,14 +90,14 @@ First, determine the ip address of your raspberry pi in your local network.
 
     ifconfig
 
-![ifconfig](images/ifconfig.png)
+![ifconfig](images/ifconfig.PNG)
 
 Then, log into your router. How exactly to do this depends on your internet service provider and your router.
 Often the router is accessible on the ip address http://192.168.0.1/.
 
 Enable port forwarding for the external port `80` (http) to the local port `5000`. This might look like this:
 
-![port forwarding](images/portforwarding.png)
+![port forwarding](images/portforwarding.PNG)
 
 To check if this worked, first determine the public ip address of your raspberry pi. There are numerous ways to do this, but one of the easiest is just to call the website `icanhazip.com`.
 
