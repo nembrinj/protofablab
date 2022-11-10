@@ -3,3 +3,7 @@ date,person,contribution
 05.10.22, Julien, created raspi example files + README allowing to install/run exmaple setup
 14.10.22, Lukas, started working on tutorial
 16.10.22, Loris, create and setup web-api demo with nginx
+04.11.22, Lukas, port forwarding and dns
+06.11.22, Loris, prepared presentation slides
+09.11.22, Loris, presentation preparations and tutorial optimization
+09.11.22, Loris, presentation preparations and added firewall to tutorial
