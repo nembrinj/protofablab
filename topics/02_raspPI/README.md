@@ -44,8 +44,10 @@ Alternatively, if you are on Windows, you can use a tool like [PuTTY](https://ww
 
 Why a **web** API?
 
-- A web API is easy to develop and provides an easy to trigger actions remotely.
+- A web API is easy to develop and provides an easy way to trigger actions remotely.
 - Built over HTTP, which is easy to integrate in clients.
+
+We use the Python web application framework [Flask](https://flask.palletsprojects.com/) to set up the web API.
 
 On the PI:
 
@@ -146,6 +148,7 @@ This is great, but we still can't access the web API through the Internet.
 ## Port forwarding
 
 To access the web application from the internet outside your local network, you will need to enable port forwarding in your router settings.
+A great tutorial can be found [here](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/).
 
 First, determine the ip address of your raspberry pi in your local network.
 
@@ -154,7 +157,12 @@ First, determine the ip address of your raspberry pi in your local network.
 ![ifconfig](images/ifconfig.PNG)
 
 Then, log into your router. How exactly to do this depends on your internet service provider and your router.
-Often the router is accessible on the ip address http://192.168.0.1/.
+
+You can find the IP address of the router from your Pi with the following command: 
+
+    ip route | grep default
+
+Often, the default gateway is http://192.168.0.1/.
 
 Enable port forwarding for the external port `80` (http) to the local port `80`. This might look like this:
 
@@ -164,8 +172,10 @@ To check if this worked, first determine the public ip address of your raspberry
 
     curl icanhazip.com
 
-Call the ip address you receive in your web browser.
-Now nginx should be visible from the wider internet, but it would be nice to have an actual domain name.
+Call the ip address you receive with the port you just opened in your web browser.
+An nginx screen should be visible from the wider internet, but it won't redirect you to the actual web api application, because the IP address is not matching the configured domain-names in nginx.
+
+So the next step is to set up a memorable domain name, so that you don't have to remember your IP address.
 
 ## Buy a domain
 
@@ -173,7 +183,7 @@ There are many websites to buy a domain. A list of these domain name registrars 
 
 For the purpose of this tutorial, we bought the domain `protofablab.ch`.
 
-On your domain registry, locate the DNS settings and add a DNS-record for your public ip address:
+On your domain registry, locate the DNS settings and add a DNS-record for your public ip address. How to do this, depends on the registrat you have chosen. The registrar usually offers a good tutorial on how to do this.
 
 ![dns settings](images/dns.PNG)
 
