@@ -68,11 +68,6 @@ Depending on your objective, choose your resin for the Prusa 3D SL1S printer acc
 > - **FEP film**: at every use and before any print, it is important to check the FEP film. It is at the bottom of the tank and it must be transparent without any hole or scratch. You use a *plastic* spatula to clean the film.
 > - **Resin**: Wear gloves to handle the resin, be in a ventilated space, keep it away from light.
 
-> **Note**
-> Currently (Oct. 24, 2022), the Curing and Washing Machine (CW1S) cannot be used in the FabLab (missing material).
-> Please ask the professor for any update or consider the filament printer meanwhile.
-> If you print with the SL1S, you will not be able to wash the sticky excess resin from the surface properly.
-
 Instructions in 8 steps:
 
 1. Unpack and calibrate: the unpacking, first start and calibration of the printer have already been done - thanks to Yong-Joon Thoo. Calibration is a crucial part not only to print your object correctly but to avoid any damage to the printer. <!-- chapter 4.1, 4.2 of manual-->
