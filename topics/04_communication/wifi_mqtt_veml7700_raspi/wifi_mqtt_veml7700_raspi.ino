@@ -76,9 +76,9 @@ void setup(void){
   Serial.print(ssid);
 
   //Wait for WiFi to connect
-  while(WiFi.waitForConnectResult() != WL_CONNECTED){      
-      Serial.print(".");
-    }
+  /* while(WiFi.waitForConnectResult() != WL_CONNECTED){      
+     Serial.print(".");
+  } */
     
   //If connection successful show IP address in serial monitor
   Serial.println("");
