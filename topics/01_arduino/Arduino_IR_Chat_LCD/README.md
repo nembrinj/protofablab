@@ -10,6 +10,20 @@ Hence, we will go deeper into the code we wrote, here you can find [our presenta
 
 We started from the initial idea of being able to communicate between two computers via infrared beams, after a few challenges along the way we managed to achieve what we set out to do and we will explain in the following tutorial how we did it.
 
-### Libraries needed
+**Software Requirements**
 
-[IRremote](https://github.com/Arduino-IRremote/Arduino-IRremote) and [LiquidCrystal_I2C.h](https://github.com/johnrickman/LiquidCrystal_I2C) for if your screen uses the I2C communications protocol and [LiquidCrystal](https://github.com/arduino-libraries/LiquidCrystal) library if you don't have the I2C.
+1. [Arduino IDE](https://www.arduino.cc/en/software)
+2. [IRremote](https://github.com/Arduino-IRremote/Arduino-IRremote) library to be able to use functions to send and receive IR signals.
+3. [LiquidCrystal_I2C.h](https://github.com/johnrickman/LiquidCrystal_I2C) library if your screen uses the I2C communications protocol.
+4. [LiquidCrystal](https://github.com/arduino-libraries/LiquidCrystal) library if you don't have the I2C.
+
+# Tutorial for the IR sender + IR receiver + LCD
+
+### How to include the libraries?
+
+```
+#include <IRremote.h> // >v3.0.0 | tested on v3.9.0
+#include <LiquidCrystal_I2C.h>
+```
+
+`#define PIN_RECV 11 // Pin connected to the IR receiver #define PIN_SEND 10 // Pin connected to the IR emitter`
