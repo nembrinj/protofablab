@@ -21,9 +21,18 @@ We started from the initial idea of being able to communicate between two comput
 
 ### How to include the libraries?
 
+We simply include them in the header of our code file, as in the example below.
+
 ```
 #include <IRremote.h> // >v3.0.0 | tested on v3.9.0
 #include <LiquidCrystal_I2C.h>
 ```
 
-`#define PIN_RECV 11 // Pin connected to the IR receiver #define PIN_SEND 10 // Pin connected to the IR emitter`
+### Declaring constants
+
+The declaration of constants will have to be done according to the connections we have between our Arduino board and the screen sensors we have. You will need to change the values of 11 or 10 accordingly.
+
+```
+#define PIN_RECV 11 // Pin connected to the IR receiver
+#define PIN_SEND 10 // Pin connected to the IR emitter
+```
