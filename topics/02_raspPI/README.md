@@ -1,6 +1,17 @@
 # Raspberry Pi Tutorial
 
-This tutorial will teach you, how to set up a web server on a `Raspberry Pi Zero W v1.1`.
+This tutorial will teach you, how to set up a web api on a `Raspberry Pi Zero W v1.1`.
+
+- [Write Image to SD-Card](#image)
+- [Connecto to your raspberry pi](#connection)
+- [Setting up the web API](#webapi)
+- [Setting up a web server with Nginx](#nginx)
+- [Firewall](#firewall)
+- [Port forwarding](#portforwarding)
+- [Buy a domain](#dns)
+- [Enabling secure connections with HTTPS](#ssl)
+
+<a name="image"></a>
 
 ## Write Image to SD-Card
 
@@ -24,6 +35,8 @@ You are now ready to insert the SD-card into your raspberry pi and connect it to
 
 > **WARNING**: Make sure that the power supply is connected to `PWR IN` and not `USB`.
 
+<a name="connection"></a>
+
 ## Connect to your raspberry pi
 
 If you are connected to the same wireless network that you configured for your raspberry pi, you should be able to detect your device if it had enough time to boot.
@@ -39,6 +52,8 @@ You can now connect to your raspberry pi from the command line and log in with y
 ![](images/ssh_success.png)
 
 Alternatively, if you are on Windows, you can use a tool like [PuTTY](https://www.putty.org/) to open an ssh connection to the raspberry pi. There it is also possible to save multiple connections and login credentials.
+
+<a name="webapi"></a>
 
 ## Setting up the web API
 
@@ -84,6 +99,8 @@ To read the logs from PC:
 ssh pi@pi-server "journalctl -f -u web_api"
 ```
 
+<a name="nginx"></a>
+
 ## Setting up a web server with Nginx
 
 Why?
@@ -116,7 +133,9 @@ sudo service nginx restart
 
 The web API is now accessible through the regular port `80` (http) in the local network (e.g. `http://pi-server.local`), using the domain that you specified. If you try to access the Pi via its IP address (e.g. `http://192.168.47.83`), you'll get the default Nginx welcome page instead, because not website was configured to match this hostname.
 
-# Firewall
+<a name="firewall"></a>
+
+## Firewall
 
 This step is optional, but is highly recommended. Setting up a firewall will only let traffic come through a few ports, which increases security by reducing the attack surface. This can be done very easily with **UFW** (Uncomplicated FireWall).
 
@@ -145,6 +164,8 @@ From now on, the web API is **not** accessible anymore through port 5000 in the 
 
 This is great, but we still can't access the web API through the Internet.
 
+<a name="portforwarding"></a>
+
 ## Port forwarding
 
 To access the web application from the internet outside your local network, you will need to enable port forwarding in your router settings.
@@ -158,7 +179,7 @@ First, determine the ip address of your raspberry pi in your local network.
 
 Then, log into your router. How exactly to do this depends on your internet service provider and your router.
 
-You can find the IP address of the router from your Pi with the following command: 
+You can find the IP address of the router from your Pi with the following command:
 
     ip route | grep default
 
@@ -177,6 +198,8 @@ An nginx screen should be visible from the wider internet, but it won't redirect
 
 So the next step is to set up a memorable domain name, so that you don't have to remember your IP address.
 
+<a name="dns"></a>
+
 ## Buy a domain
 
 There are many websites to buy a domain. A list of these domain name registrars can be found [here](https://domainnamestat.com/statistics/registrar/others).
@@ -190,6 +213,8 @@ On your domain registry, locate the DNS settings and add a DNS-record for your p
 The API is now available on the domain `protofablab.ch`:
 
 ![domain](images/domain.PNG)
+
+<a name="ssl"></a>
 
 ## Enabling secure connections with HTTPS
 
