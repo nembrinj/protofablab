@@ -192,6 +192,8 @@ sudo ufw enable
 
 From now on, the web API is **not** accessible anymore through port 5000 in the local network. This forces the clients to use the regular ports 80/443 and pass through the web server.
 
+<img src="images/firewall.png" height="400"/>
+
 This is great, but we still can't access the web API through the Internet.
 
 <a name="portforwarding"></a>
