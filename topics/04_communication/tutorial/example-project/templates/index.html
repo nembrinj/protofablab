@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>lux meter</title>
+<style>
+html { 
+  font-family: Helvetica; 
+  display: inline-block; 
+  margin: 0px auto; 
+  text-align: center;}
+
+body {
+  margin-top: 50px;
+} 
+
+h1 {
+  font-size: 20pt; 
+  color: #444444;
+  margin: 50px auto 30px;
+} 
+
+h3 {
+  font-size: 14pt; 
+  color: #444444;
+  margin-bottom: 50px;
+}
+.val{
+    width: calc(33% - 15px);
+    margin-left: 15px;
+    display: block;
+    background-color: e1e1e1;
+}
+</style>
+</head>
+
+<body>
+
+<div>
+    <h3>ESP32-S3 VEML7700 lux sensor using different</h3><br>
+    <h1>Illuminance</h1>
+    <div style="display:flex; flex-wrap: wrap; ">
+        <div class="val">
+            <h1> <span id="luxValueWS">0</span> [lux]</h1>
+            <div>Using web socket</div>
+            <div id="time"></div>
+        </div>
+        <div class="val">
+            <h1> <span id="luxValueMqtt">0</span> [lux]</h1><br>
+            <div>Using mqtt with server</div>
+            <div id="timemqtt"></div>
+        </div>   
+        <div class="val">
+            <h1> <span id="luxValuedirectMqtt">0</span> [lux]</h1><br>
+            <div>Using mqtt directly from the arduino</div>
+        </div> 
+   </div>
+</div>
+</body>
+</html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+        
+    });
+    socket.on("message",function(message){
+        const timeStamp =  new Date().getTime();
+        message = JSON.parse(message)
+        document.getElementById("luxValueWS").innerHTML = message.message
+        document.getElementById("time").innerHTML = (timeStamp - message.timestamp) + " [MS]";
+    });
+   
+    // Create a client instance
+    client = new Paho.MQTT.Client("maqiatto.com", 8883,  "clientId");
+    // set callback handlers
+    client.onConnectionLost = onConnectionLost;
+    client.onMessageArrived = onMessageArrived;
+    // connect the client
+    client.connect({
+        onSuccess: onConnect,
+        // change both following values
+        userName : "<username on maqiatto.com>",
+        password : "<your maqiatto.com account's password>",
+    });
+
+
+    // called when the client connects
+    function onConnect() {
+    // Once a connection has been made, make a subscription and send a message.
+    console.log("onConnect");
+        client.subscribe("<username on maqiatto.com>/flask/lux");
+        client.subscribe("<username on maqiatto.com>/protofablab/lux");
+    }
+
+    // called when the client loses its connection
+    function onConnectionLost(responseObject) {
+        if (responseObject.errorCode !== 0) {
+            console.log("onConnectionLost:"+responseObject.errorMessage);
+        }
+    }
+
+    // called when a message arrives
+    function onMessageArrived(message) {
+        const timeStamp =  new Date().getTime();
+        if(message.destinationName == "<username on maqiatto.com>/flask/lux"){
+            message = JSON.parse(message.payloadString)
+            document.getElementById("luxValueMqtt").innerHTML = message.message;
+            document.getElementById("timemqtt").innerHTML = (timeStamp - message.timestamp) + " [MS]";
+        }else if ( message.destinationName == "<username on maqiatto.com>/protofablab/lux"){
+            document.getElementById("luxValuedirectMqtt").innerHTML = message.message;
+        }
+        
+    }
+
+    </script>
+
+
+
