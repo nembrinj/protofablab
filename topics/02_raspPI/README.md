@@ -1,15 +1,16 @@
 # Raspberry Pi Tutorial
 
-This tutorial will teach you, how to set up a web api on a `Raspberry Pi Zero W v1.1`.
+This tutorial will teach you, how to set up a web API on a `Raspberry Pi Zero W v1.1` and access it through the Internet.
 
 - [Write Image to SD-Card](#image)
-- [Connecto to your raspberry pi](#connection)
+- [Connect to your raspberry pi](#connection)
 - [Setting up the web API](#webapi)
 - [Setting up a web server with Nginx](#nginx)
 - [Firewall](#firewall)
 - [Port forwarding](#portforwarding)
 - [Buy a domain](#dns)
 - [Enabling secure connections with HTTPS](#ssl)
+- [Web client](#client)
 
 <a name="image"></a>
 
@@ -25,75 +26,81 @@ Select the SD-card in your card reader where the image will be installed.
 
 ![Advanced options](images/advanced_options.png)
 
-In the advanced options, you can enable ssh and configure wifi, so that the raspberry pi will automatically connect to your local network.
+In the advanced options, you can enable SSH and configure Wi-Fi, so that the Raspberry Pi will automatically connect to your local network.
 
-We also change the hostname to `pi-server` to differentiate it from other raspberry pi on the same network.
+We also change the hostname to `pi-server` to differentiate it from other Raspberry Pi on the same network.
 
 After making sure, that your configuration is correct, flash the image to your SD-card.
 
-You are now ready to insert the SD-card into your raspberry pi and connect it to the power.
+You are now ready to insert the SD-card into your Raspberry Pi and connect it to the power.
 
 > **WARNING**: Make sure that the power supply is connected to `PWR IN` and not `USB`.
 
 <a name="connection"></a>
 
-## Connect to your raspberry pi
+## Connect to your Raspberry Pi
 
-If you are connected to the same wireless network that you configured for your raspberry pi, you should be able to detect your device if it had enough time to boot.
+If you are connected to the same wireless network that you configured for your Raspberry Pi, you should be able to detect your device if it had enough time to boot.
 
     ping pi-server
 
-If you succeed in pinging the raspberry pi, you also see its ip address on the network. Note this address for later.
+If you succeed in pinging the Raspberry Pi, you also see its ip address on the network. Note this address for later.
 
-You can now connect to your raspberry pi from the command line and log in with your password.
+You can now connect to your Raspberry Pi from the command line and log in with your password.
 
     ssh pi@pi-server
 
 ![](images/ssh_success.png)
 
-Alternatively, if you are on Windows, you can use a tool like [PuTTY](https://www.putty.org/) to open an ssh connection to the raspberry pi. There it is also possible to save multiple connections and login credentials.
+Alternatively, if you are on Windows, you can use a tool like [PuTTY](https://www.putty.org/) to open an SSH connection to the Raspberry Pi. There it is also possible to save multiple connections and login credentials.
 
 <a name="webapi"></a>
 
 ## Setting up the web API
 
-Why a **web** API?
+We will now setup a web API to communicate with our Raspberry Pi. A web API is an interface between a server and clients, which is built using web technologies, such as the **HTTP** protocol. The benefits of developing a web API are as follows:
 
-- A web API is easy to develop and provides an easy way to trigger actions remotely.
-- Built over HTTP, which is easy to integrate in clients.
+- There exists many frameworks in different languages to develop a web API.
+- We can easily define multiple **endpoints** to match different actions.
+- Because it uses HTTP, it is easy to integrate in clients (e.g. in a web browser).
 
-We use the Python web application framework [Flask](https://flask.palletsprojects.com/) to set up the web API.
+![ifconfig](images/endpoints.png)
 
-On the PI:
+We don't want anybody to be able to access our Raspberry Pi from the Internet, so we have to setup some form of **authentication**. This can be done by providing information through the "Authorization" HTTP header with each request.
+
+We provide an example using the Python framework [Flask](https://flask.palletsprojects.com/) to set up the web API, which is available in `web_api/web_api.py`. Authentication is done using [Basic Authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#basic_authentication_scheme), and the default username and passwords are fetched from the environment variables `API_USER` and `API_PASS` (default values are `pi` and `protolab`).
+
+To setup the example, we first create a folder on the Pi to store our source code:
 
 ```sh
-# create a folder for the source code
+# on the Pi
 cd ~ && mkdir web_api
 ```
 
-On the PC, edit `web_api.service` and define the `API_USER` and `API_PASS` environment variables. Then run:
+To transfer the web API to the Pi, run from the PC:
 
 ```sh
-# copy the source code and the service to the pi
 scp web_api.py web_api.service pi@pi-server:~/web_api/
 ```
 
-On the PI:
+If you want to change the default username and password, edit the `web_api.service` file and define the `API_USER` and `API_PASS` environment variables accordingly. This file contains the service configuration that will make our web API run in the background.
+
+Then, run the following commands on the Pi:
 
 ```sh
 # install the Flask framework
 sudo apt install python3-flask
 
-# create a service that runs the web API
+# create the service that runs the web API
 sudo mv ~/web_api/web_api.service /etc/systemd/system/web_api.service
 
 # start the service
 sudo service web_api start
 ```
 
-The web API is now accessible on port 5000 in the local network (e.g. `http://pi-server.local:5000`).
+The web API is now accessible on port 5000 in the local network (e.g. http://pi-server.local:5000).
 
-To read the logs from PC:
+To debug the web API, we can use `journalctl` to read the logs. This can be done directly from the PC by running:
 
 ```sh
 ssh pi@pi-server "journalctl -f -u web_api"
@@ -103,19 +110,33 @@ ssh pi@pi-server "journalctl -f -u web_api"
 
 ## Setting up a web server with Nginx
 
-Why?
+Our web API is running and working, but there's a few things that are still missing, notably:
+- The [CORS headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) are not defined, which could cause clients to fail to connect.
+- The transferred data isn't secure, which means the password can be read by anyone who's able to sniff the traffic.
+- The web API is accessible on the non-standard port 5000. Changing that to the standard 80/443 ports would make us unable to deploy another web application on the Pi.
 
-- Host different websites on the Raspberry PI.
-- Can handle certificates, CORS, load balancing, etc.
+Although possible, this shouldn't be managed by the web API itself. Instead, we can install a **web server**, which acts as a layer above our web API and helps us configure web applications properly. It provides the following benefits:
 
-On the PC, edit `server.conf` and put your own domain name(s). Then run:
+- Host different web applications/API/websites on the Raspberry PI.
+- Link different hostnames to specific applications.
+- Redirect traffic according to various rules.
+- Define SSL certificates, CORS headers, etc.
+
+We choose to use **Nginx**, as it is very popular and considered one of the fastest web servers.
+
+![ifconfig](images/web_server.png)
+
+Each web application deployed through Nginx must be [configured in a separate file](http://nginx.org/en/docs/beginners_guide.html#conf_structure). We provide a very basic configuration in the `web_api/server.conf` file. Note that we configured this file with **our own** domain name, so you should **edit** it and provide yours.
+
+We have to configure Nginx to act as a **reverse proxy**, since our web API already runs as a web server. In our configuration file, we use the `proxy_pass` directive to tell Nginx to redirect all requests to the specified address (which matches our example web API).
+
+Transfer the configuration file from the PC to the Pi:
 
 ```sh
-# copy the website configuration to the pi
 scp server.conf pi@pi-server:~
 ```
 
-On the pi:
+Then, on the Pi:
 
 ```sh
 # install Nginx
@@ -131,7 +152,14 @@ sudo ln -s /etc/nginx/sites-available/web-api /etc/nginx/sites-enabled/
 sudo service nginx restart
 ```
 
-The web API is now accessible through the regular port `80` (http) in the local network (e.g. `http://pi-server.local`), using the domain that you specified. If you try to access the Pi via its IP address (e.g. `http://192.168.47.83`), you'll get the default Nginx welcome page instead, because not website was configured to match this hostname.
+Note that the `/etc/nginx/sites-available` folders will contain all the configurations files for all your future websites. To enable or disable these sites, you can simply create or remove symlinks in the `sites-enabled` folder, then restart Nginx each time.
+
+To check whether Nginx started successfully, run:
+```sh
+service nginx status
+```
+
+The web API is now accessible through the standard port `80` (http) in the local network (e.g. http://pi-server.local), using the domain that you specified. If you try to access the Pi via its IP address (e.g. http://192.168.47.83), you'll get the default Nginx welcome page instead (defined in `sites-available/default`), because no website was configured to match this hostname.
 
 <a name="firewall"></a>
 
@@ -171,7 +199,7 @@ This is great, but we still can't access the web API through the Internet.
 To access the web application from the internet outside your local network, you will need to enable port forwarding in your router settings.
 A great tutorial can be found [here](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/).
 
-First, determine the ip address of your raspberry pi in your local network.
+First, determine the IP address of your raspberry pi in your local network.
 
     ifconfig
 
@@ -189,12 +217,12 @@ Enable port forwarding for the external port `80` (http) to the local port `80`.
 
 ![port forwarding](images/portforwarding.PNG)
 
-To check if this worked, first determine the public ip address of your raspberry pi. There are numerous ways to do this, but one of the easiest is just to call the website `icanhazip.com`.
+To check if this worked, first determine the public IP address of your raspberry pi. There are numerous ways to do this, but one of the easiest is just to call the website `icanhazip.com`.
 
     curl icanhazip.com
 
-Call the ip address you receive with the port you just opened in your web browser.
-An nginx screen should be visible from the wider internet, but it won't redirect you to the actual web api application, because the IP address is not matching the configured domain-names in nginx.
+Call the IP address you receive with the port you just opened in your web browser.
+An Nginx screen should be visible from the wider internet, but it won't redirect you to the actual web api application, because the IP address is not matching the configured domain-names in Nginx.
 
 So the next step is to set up a memorable domain name, so that you don't have to remember your IP address.
 
@@ -206,7 +234,7 @@ There are many websites to buy a domain. A list of these domain name registrars 
 
 For the purpose of this tutorial, we bought the domain `protofablab.ch`.
 
-On your domain registry, locate the DNS settings and add a DNS-record for your public ip address. How to do this, depends on the registrat you have chosen. The registrar usually offers a good tutorial on how to do this.
+On your domain registry, locate the DNS settings and add a DNS-record for your public ip address. How to do this, depends on the registrar you have chosen. The registrar usually offers a good tutorial on how to do this.
 
 ![dns settings](images/dns.PNG)
 
@@ -218,23 +246,42 @@ The API is now available on the domain `protofablab.ch`:
 
 ## Enabling secure connections with HTTPS
 
-Why enabling HTTPS?
+HTTPS is basically HTTP with secure connections. All traffic send through HTTPS is encrypted and cannot be read or modified by a third-party, which highly increases the security.
+
+Why is this step so important?
 
 - Without HTTPS, passwords are sent in plaintext with the request.
-- Client hosted on HTTPS server can't send request to unsecure server.
+- Clients hosted themselves on an HTTPS server are not allowed to send requests to an unsecure server.
 
-On the Pi:
+For this, we need to:
+1. Generate an SSL certificate for our domain name(s).
+2. Reference this certificate in the Nginx configuration file.
+3. Redirect incoming traffic from the `http://` scheme to `https://`.
+4. Renew the certificate when it expires.
 
+Luckily, this can all be done automatically by running a single command using a single tool: **Certbot**.
 ```sh
 # install certbot
 sudo apt install certbot python3-certbot-nginx
 
-# run certbot and request a certificate for the web API domain
+# let certbot handle everything
 sudo certbot
 ```
 
-Add port forwarding for the external port `443` (https) to the local port `443`.
+If everything worked fine, the configuration file `sites-available/web-api` should have been modified to include new directives related to our certificate.
 
-The web API is now available securely at `https://protofablab.ch`.
+Finally, we need to configure our router to forward the external port `443` (HTTPS) to the local port `443`.
 
-![Secure](images/ssl.png)
+The web API is now available securely at https://protofablab.ch (or whatever your custom domain is).
+
+![Secure](images/certificate.png)
+
+<a name="client"></a>
+
+## Web client
+
+To test our web API, we developed a small client that runs in the browser. You can find it in `web_api/web_client.html` and run it locally in your browser, or access it from the cloud at https://protolab.vercel.app. 
+
+Note that the web API sometimes randomly returns a "failed" response to simulate a slightly more realistic environment (e.g. the printer has no more paper or ink).
+
+![Secure](images/client.png)
