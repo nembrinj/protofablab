@@ -8,7 +8,7 @@ This tutorial will teach you, how to set up a web API on a `Raspberry Pi Zero W 
 - [Setting up a web server with Nginx](#nginx)
 - [Firewall](#firewall)
 - [Port forwarding](#portforwarding)
-- [Buy a domain](#dns)
+- [DNS setup](#dns)
 - [Enabling secure connections with HTTPS](#ssl)
 - [Web client](#client)
 
@@ -24,7 +24,7 @@ Select the SD-card in your card reader where the image will be installed.
 
 > **WARNING**: Make sure to back up your SD-card, if you already have a Raspberry Pi installation or other data that you want to keep. This process is explained [here](https://raspberryexpert.com/how-to-backup-raspberry-pi/).
 
-![Advanced options](images/advanced_options.png)
+<img src="images/advanced_options.png" height="700"/>
 
 In the advanced options, you can enable SSH and configure Wi-Fi, so that the Raspberry Pi will automatically connect to your local network.
 
@@ -50,7 +50,7 @@ You can now connect to your Raspberry Pi from the command line and log in with y
 
     ssh pi@pi-server
 
-![](images/ssh_success.png)
+<img src="images/ssh_success.png" width="80%"/>
 
 Alternatively, if you are on Windows, you can use a tool like [PuTTY](https://www.putty.org/) to open an SSH connection to the Raspberry Pi. There it is also possible to save multiple connections and login credentials.
 
@@ -58,15 +58,15 @@ Alternatively, if you are on Windows, you can use a tool like [PuTTY](https://ww
 
 ## Setting up the web API
 
-We will now setup a web API to communicate with our Raspberry Pi. A web API is an interface between a server and clients, which is built using web technologies, such as the **HTTP** protocol. The benefits of developing a web API are as follows:
+We will now set up a web API to communicate with our Raspberry Pi. A web API is an interface between a server and clients, which is built using web technologies, such as the **HTTP** protocol. The benefits of developing a web API are as follows:
 
 - There exists many frameworks in different languages to develop a web API.
 - We can easily define multiple **endpoints** to match different actions.
 - Because it uses HTTP, it is easy to integrate in clients (e.g. in a web browser).
 
-![ifconfig](images/endpoints.png)
+<img src="images/endpoints.png" height="400"/>
 
-We don't want anybody to be able to access our Raspberry Pi from the Internet, so we have to setup some form of **authentication**. This can be done by providing information through the "Authorization" HTTP header with each request.
+We don't want everybody to be able to access our Raspberry Pi from the Internet, so we have to set up some form of **authentication**. This can be done by providing information through the "Authorization" HTTP header with each request.
 
 We provide an example using the Python framework [Flask](https://flask.palletsprojects.com/) to set up the web API, which is available in `web_api/web_api.py`. Authentication is done using [Basic Authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#basic_authentication_scheme), and the default username and passwords are fetched from the environment variables `API_USER` and `API_PASS` (default values are `pi` and `protolab`).
 
@@ -111,6 +111,7 @@ ssh pi@pi-server "journalctl -f -u web_api"
 ## Setting up a web server with Nginx
 
 Our web API is running and working, but there's a few things that are still missing, notably:
+
 - The [CORS headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) are not defined, which could cause clients to fail to connect.
 - The transferred data isn't secure, which means the password can be read by anyone who's able to sniff the traffic.
 - The web API is accessible on the non-standard port 5000. Changing that to the standard 80/443 ports would make us unable to deploy another web application on the Pi.
@@ -124,7 +125,7 @@ Although possible, this shouldn't be managed by the web API itself. Instead, we 
 
 We choose to use **Nginx**, as it is very popular and considered one of the fastest web servers.
 
-![ifconfig](images/web_server.png)
+<img src="images/web_server.png" height="400"/>
 
 Each web application deployed through Nginx must be [configured in a separate file](http://nginx.org/en/docs/beginners_guide.html#conf_structure). We provide a very basic configuration in the `web_api/server.conf` file. Note that we configured this file with **our own** domain name, so you should **edit** it and provide yours.
 
@@ -155,6 +156,7 @@ sudo service nginx restart
 Note that the `/etc/nginx/sites-available` folders will contain all the configurations files for all your future websites. To enable or disable these sites, you can simply create or remove symlinks in the `sites-enabled` folder, then restart Nginx each time.
 
 To check whether Nginx started successfully, run:
+
 ```sh
 service nginx status
 ```
@@ -213,11 +215,11 @@ You can find the IP address of the router from your Pi with the following comman
 
 Often, the default gateway is http://192.168.0.1/.
 
-Enable port forwarding for the external port `80` (http) to the local port `80`. This might look like this:
+Enable port forwarding for the external port `80` (http) to the local port `80` on your Raspberry Pi. This might look like this, if the IP address of your Pi is `192.168.0.108`:
 
 ![port forwarding](images/portforwarding.PNG)
 
-To check if this worked, first determine the public IP address of your raspberry pi. There are numerous ways to do this, but one of the easiest is just to call the website `icanhazip.com`.
+To check if this worked, first determine the public IP address of your raspberry pi. There are numerous ways to do this, but one of the easiest is just to call the website `icanhazip.com` from your Pi:
 
     curl icanhazip.com
 
@@ -228,13 +230,17 @@ So the next step is to set up a memorable domain name, so that you don't have to
 
 <a name="dns"></a>
 
-## Buy a domain
+## DNS setup
 
-There are many websites to buy a domain. A list of these domain name registrars can be found [here](https://domainnamestat.com/statistics/registrar/others).
+The [Domain Name System](https://en.wikipedia.org/wiki/Domain_Name_System) (or DNS) is a system that translates readable names to IPv4 or IPv6 addresses.
 
-For the purpose of this tutorial, we bought the domain `protofablab.ch`.
+To make use of this system, you must first own a domain name. There are many websites to buy a domain. A list of these domain name registrars can be found [here](https://domainnamestat.com/statistics/registrar/others). Alternatively there are also some free options like [No-IP](https://www.noip.com/).
 
-On your domain registry, locate the DNS settings and add a DNS-record for your public ip address. How to do this, depends on the registrar you have chosen. The registrar usually offers a good tutorial on how to do this.
+Which DNS provider to choose also depends on your IP address. If you have a `static` public IP address, the IP address assigned to you by your ISP will never change and it will be much easier to set up DNS. If you have a `dynamic` IP address, your IP address might change over time. Some providers offer `Dynamic DNS Updates`, which will change your DNS entries, if an address change is detected. Dynamic and static IP addresses are also explained [here](https://www.avast.com/c-static-vs-dynamic-ip-addresses).
+
+For the purpose of this tutorial, we will use the domain `protofablab.ch` and assume, that we have e static IP address.
+
+On your domain registry, locate the DNS settings and add a DNS-record for your static public ip address. How to do this, depends on the registrar you have chosen. The registrar usually offers a good tutorial on how to do this.
 
 ![dns settings](images/dns.PNG)
 
@@ -253,13 +259,15 @@ Why is this step so important?
 - Without HTTPS, passwords are sent in plaintext with the request.
 - Clients hosted themselves on an HTTPS server are not allowed to send requests to an unsecure server.
 
-For this, we need to:
+To enable SSL, we need to:
+
 1. Generate an SSL certificate for our domain name(s).
 2. Reference this certificate in the Nginx configuration file.
 3. Redirect incoming traffic from the `http://` scheme to `https://`.
 4. Renew the certificate when it expires.
 
 Luckily, this can all be done automatically by running a single command using a single tool: **Certbot**.
+
 ```sh
 # install certbot
 sudo apt install certbot python3-certbot-nginx
@@ -274,14 +282,14 @@ Finally, we need to configure our router to forward the external port `443` (HTT
 
 The web API is now available securely at https://protofablab.ch (or whatever your custom domain is).
 
-![Secure](images/certificate.png)
+<img src="images/certificate.png" height="400"/>
 
 <a name="client"></a>
 
 ## Web client
 
-To test our web API, we developed a small client that runs in the browser. You can find it in `web_api/web_client.html` and run it locally in your browser, or access it from the cloud at https://protolab.vercel.app. 
+To test our web API, we developed a small client that runs in the browser. You can find it in `web_api/web_client.html` and run it locally in your browser, or access it from the cloud at https://protolab.vercel.app.
 
 Note that the web API sometimes randomly returns a "failed" response to simulate a slightly more realistic environment (e.g. the printer has no more paper or ink).
 
-![Secure](images/client.png)
+<img src="images/client.png" height="400"/>
