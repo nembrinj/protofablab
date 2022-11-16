@@ -6,3 +6,5 @@ date,person,contribution
 09.11.22, Julius, Successful validation of Pi-hole working
 09.11.22, Julius, Gave up on creating an AP on dietpi after a whole day of trying
 09.11.22, Julius, Reinstall fresh image + Pi-hole docker to create flashable image for raspberry pi
+12.11.22, Julius, Start working on a practical docker example 'Pi-hole'
+16.11.22, Julius, Finish tutorial for Pi-hole
