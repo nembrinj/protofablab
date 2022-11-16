@@ -1,7 +1,7 @@
-# Arduino ESP32 S3 feather + IR emmiter and receiver
+# Arduino ARDUINO UNO R3 + IR emmiter and receiver + LCD screen
 
 ## Introduction
-In this short tutorial we want to explain how to use the IR emmiter and IR receiver sensors that are compatible with the ESP32 S3 feather board.
+In this short tutorial we want to explain how to use the IR emmiter and IR receiver sensors that are compatible with the Arduino Uno board.
 
 Hence, we will go deeper into the code we wrote, here you can find [our presentation](https://docs.google.com/presentation/d/16dn7L52ekWoVPDxIX628QUl-f3-3H6wDVpz8NBfJ2Ys/edit#slide=id.p) which contains explanations with reference to the physical components used. 
 
@@ -19,7 +19,7 @@ There will be some differences in the code presented because the screen that doe
 
 
 
-# Tutorial for the IR sender + IR receiver + LCD
+# Tutorial for the IR sender + IR receiver + LCD I2C
 ### How to include the libraries?
 We simply include them in the header of our code file, as in the example below.
 
@@ -195,3 +195,36 @@ In **the second if()** we check if we have exceeded the maximum number of rows s
 - `IrSender.sendNEC(MY_ADDRESS, input, 0)` As we want to use the NEC protocol we use the **sendNEC()** function. In the **first** parameter (MY_ADDRESS) we insert the predefined address of our Arduino, in the **second** parameter we just place the **input** which is the char typed from the keyboard and lastly we input the number of repetitions for the message which is 0 in our case.
 - `delay(60)` Even though at the end but with **particular importance**, we place a delay of 60 milliseconds. In our experiments, the code did not work with a 50ms delay, we even encourage using a higher number such as 70ms. These numbers are **not random**, the NEC protocol needs **67.5 ms** in total to be received correctly.
 
+
+## Differences between the code with I2C and the code without I2C
+
+Regarding the setup of the circuit, there are differences in the connections that must be followed in each case. The LCD screen without the I2C interface has 16 pins to connect to, while with the I2C adapter has 4 pins. We recommend review the wiring diagram in our presentation before continue. 
+
+The difference in the number of pins used is because the LCD establishes parallel communication, while the adapter converts it to serial communication.
+
+Regarding the code, there are some differences. In the case without the I2C adapter, the library used is LiquidCrystal.h, instead of LiquidCrystal_I2C.h:
+
+```
+#include <LiquidCrystal.h>
+```
+
+Also, to instance the LiquidCrystal class takes 6 parameters. This is what they are used for:
+
+```
+const int rs = 7, en = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7)
+```
+ 
+1. rs: The Register Select (RS) pin enables a user to select the instruction mode or the character mode of a LCD. Depending on which mode is selected, the data on the 8 data pins (D0-D7) is treated either as instruction or character data.
+2. en: Must be held high to perform Read/Write Operation
+3. d4, d5, d6, d7: Pins used to send Command or data to the LCD.
+
+Another difference is how the lcd is initialized:
+```
+  // set up the LCD's number of columns and rows:
+    lcd.begin(16, 2);
+```
+
+Parameters, 16 and 2, corresponds to the number of characters and the number of rows that we can display on our screen.
+
+Finally, in the case without the I2C adapter, there is not a method to turn on or turn off the bakclight because that is done manually during the wiring. 
