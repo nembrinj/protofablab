@@ -15,7 +15,7 @@ This tutorial will teach you, how to set up a web api on a `Raspberry Pi Zero W 
 
 ## Write Image to SD-Card
 
-Open the Raspberry Pi Images.
+Install and open the [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
 
 As an Operating System, select `Raspberry Pi OS Lite (32-Bit)`.
 
