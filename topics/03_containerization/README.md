@@ -201,7 +201,7 @@ $ sudo clair-scanner --ip 172.17.0.1 -r clair_report.json pihole/pihole
 
 The results should appear shortly after, as seen below:
 
-![Clair_Pihole](./tutorial-example-pi-hole/Images/piholescan.png)
+![Clair_Pihole](./tutorial-example-pi-hole/images/piholescan.png)
 
 At the time of writing the PiHole image contained 78 vulnerabilities.
 To see the full list, refer to the following [json](./tutorial-example-pi-hole/clair_report.json) file.
@@ -237,7 +237,7 @@ $ sudo clair-scanner --ip 172.17.0.1 -r clair_report.json autowlan
 ```
 The results should once again appear shortly after:
 
-![Clair_Pihole](./tutorial-example-pi-hole/Images/autowlanscan.png)
+![Clair_Pihole](./tutorial-example-pi-hole/images/autowlanscan.png)
 
 At the time of writing the autowlan image contained no vulnerabilities.
 
