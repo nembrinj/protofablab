@@ -15,7 +15,7 @@ app.config['MQTT_USERNAME'] = '<username>'  # insert your username on maqiatto.c
 app.config['MQTT_PASSWORD'] = '<password>'  # your account's password on maqiatto.com
 app.config['MQTT_KEEPALIVE'] = 15  # Set KeepAlive time in seconds
 app.config['MQTT_TLS_ENABLED'] = False  # If your server supports TLS, set it True
-topic = '<username>/protofablab/lux'
+topic = '<username>/protofablab/lux' # same username as above
 luxValue = 0;
 mqtt_client = Mqtt(app)
 
@@ -47,7 +47,7 @@ def handle_message(val):
     )
     toSend = json.dumps(toSend)
     socketio.send(toSend,broadcast=True)
-    mqtt_client.publish('mathias.tonini@gmail.com/flask/lux', toSend)
+    mqtt_client.publish('<your username on maqiatto.com>/flask/lux', toSend)
 
 
 
