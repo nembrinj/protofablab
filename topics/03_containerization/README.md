@@ -2,7 +2,7 @@
 
 As a nice example of using an [OCI](https://opencontainers.org/) container we
 demonstrate [Pi-hole](https://pi-hole.net/) for docker.
-[Pi-hole](https://pi-hole.net/) is a DNS system for network-wide ad blocking in private networks.
+Pi-hole is a DNS system for network-wide ad blocking in private networks.
 It acts as a DNS sinkhole, handing out non-routable addresses for a predefined list of domain names.
 Adding new blacklists, or even whitelists is done very simply over Pi-hole's web server.
 
@@ -117,25 +117,25 @@ E.g., you can still easily add other web servers running on the the Raspberry Pi
 directories or config files.
 
 # Security
-It is important to consider security when making any computer science application. Especially when the
-technology is new and constantly changing. Furthermore, the research conducted on containers paints a 
+When using such new and developing technology it is especially important to consider the security aspects.
+Furthermore, the research conducted on containers paints a 
 bleak picture. A [paper](https://dl.acm.org/doi/10.1145/3029806.3029832) 
-from 2017 states that on average each container had 180 vulnerabilities. 
-Since then new technology has arisen to improve the security of containers.
+from 2017 states that on average each container has 180 vulnerabilities. 
+Since then new technology have arisen to improve the security of containers.
 
 ![Clair_Logo](https://cloud.githubusercontent.com/assets/343539/21630811/c5081e5c-d202-11e6-92eb-919d5999c77a.png)
 
 As described by themselves, [Clair](https://github.com/quay/clair) is an open 
 source project for the static analysis of vulnerabilities in application containers. 
-It performs this analysis by inspecting containers layer by layer for known security flaws, 
-which appear in an extensive database.
+It performs this analysis by inspecting containers layer by layer for known security flaws. 
+These flaws are all stored in an extensive database provided by Clair.
 Using Clair does not make your containers safer per se, but knowing the
 vulnerabilities helps immensely when trying to fix them. 
 
-With this in mind we set out to analyze the [autowlan](https://github.com/Harveg/autowlan)
-container provided during the lecture and also the PiHole container discussed above. 
+With this in mind we set out to analyze the PiHole container discussed above and also the
+[autowlan](https://github.com/Harveg/autowlan) container provided during the lecture. 
 We did so, as to find out if the security of containers had improved in recent years and as
-to see how easy it was to use Clair.
+to test how easy it was to use Clair.
 
 ### Hypothesis
 
@@ -145,7 +145,8 @@ expect both numbers to be smaller than 180.
 
 Our logic is that autowlan was intended as a tutorial and has very little
 development behind it. On the other hand PiHole has been downloaded more than
-500 million times and is one of the most known containers.
+500 million times and is one of the most known containers. Also 5 years have
+passed since 2017, so we expect there to be far less vulnerabilities in general.
 
 ### Running Clair
 
@@ -155,9 +156,8 @@ we did not intend on making any sort of pipeline. Furthermore, starting Clair
 from scratch takes about half an hour, since the database needs to be filled with all 
 known vulnerabilities.
 
-To solve these issues we instead needed a prefilled DB and a standalone scanner that uses Clair. 
-Thankfully [Armin Coralic](https://github.com/arminc) had developed solutions for both of these 
-issues.
+To solve these issues we instead needed a prefilled DB and a standalone scanner that used Clair. 
+Thankfully [Armin Coralic](https://github.com/arminc) had developed solutions for both of our problems.
 
 Firstly, we tried running the scanner on the PiZero. After all, containers are lightweight, 
 quick to boot and can be run on any sort of hardware.
@@ -191,7 +191,7 @@ $ CONTAINER="$(sudo docker ps -a | grep -i "clair-local-scan" | awk ' { print $1
 $ if sudo docker inspect --format="{{.State.Running}}" $CONTAINER; then sudo docker start $CONTAINER; else echo "Container is already running, proceed with next command"; fi
 ```
 
-You output at this point should look similar to the following image:
+Your output at this point should look similar to the following image:
 ![if_statement](./tutorial-example-pi-hole/images/if_statement.png)
 
 Lastly to scan PiHole we run:
@@ -205,10 +205,11 @@ The results should appear shortly after, as seen below:
 
 At the time of writing the PiHole image contained 78 vulnerabilities.
 To see the full list, refer to the following [json](./tutorial-example-pi-hole/clair_report.json) file.
-The vulnerabilities range from negligible to high severity.
+The vulnerabilities range from negligible to high severity. 
+These results will be discussed later.
 
-Now that everything is set up we should be able to scan any image. 
-We show this by scanning the autowlan image from the lecture.
+Now that everything was set up we were able to scan any image. 
+We showed this by scanning the autowlan image from the lecture.
 For this we needed to build the image on our machine first. 
 This must be done, since it is not available on the Docker-Hub.
 Firstly, you must clone the git repository locally:
@@ -218,8 +219,9 @@ $ git clone https://github.com/Harveg/autowlan.git
 $ cd autowlan/
 ```
 
-Next we had to change the image architecture from arm32 to amd64, since you can only scan images that can be built on your machine.
-If your machine is running on a 32 ARM architecture, then skip the next line.
+Next we had to change the image architecture from arm32 to amd64, since you can only build images 
+that match the very basic architecture of your machine.
+If your machine is running on a 32-Bit ARM architecture, then skip the next line.
 
 We simply had to change the first line of the Dockerfile to: 
 ```shell
