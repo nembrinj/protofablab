@@ -20,7 +20,7 @@ It should also be noted that using the WebSocket protocol as a backbone for comm
 
 ## Practical introduction
 
-WebSocket is a well-supported protocol. Several implementations exist for javascript (ref) and Python (ref), among others. We will mainly showcase the use of WebSockets in these two contexts during this tutorial with the help of an example derived from one of the course's exercises
+WebSocket is a well-supported protocol. Several implementations exist for javascript (ref) and Python (ref), among others. We will mainly showcase the use of WebSockets in these two contexts during this tutorial with the help of an example derived from one of the course's exercises.
 
 ### Mini-project structure
 
@@ -38,8 +38,8 @@ The project is setup so as to compare the different methods of sending sensor da
   - sends it back to the MQTT broker on another channel (this allows us to see what kind of delay such an operation would impose
   - sends it directly to the web app via a Web Socket
 
-  (insert image here lol)
-  
+![Schema of all MQTT and WS connections in the mini project](https://github.com/nembrinj/protofablab/blob/main/topics/04_communication/tutorial/images/Project-connections.png)
+
 ### Running the project
 
 Before we started showcasing the IoT uses of WebSockets, we must first configure the project. To do this, setup your mqtt browser and your wifi hotspot, then copy the required informations in each of the files. Finally, copy the files in the `example-project` folder on your devices :
