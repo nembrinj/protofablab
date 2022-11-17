@@ -192,7 +192,7 @@ $ if sudo docker inspect --format="{{.State.Running}}" $CONTAINER; then sudo doc
 ```
 
 You output at this point should look similar to the following image:
-![if_statement](./tutorial-example-pi-hole/Images/if_statement.png)
+![if_statement](./tutorial-example-pi-hole/images/if_statement.png)
 
 Lastly to scan PiHole we run:
 ```shell
