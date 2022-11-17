@@ -3,6 +3,12 @@ date,person,contribution
 02.11.22, Marius, Started the Presentation - basics so far
 02.11.22, Julius, Running Pi-hole docker on dietpi
 03.11.22, Julius, Start sharing internet sharing to dietpi and connecting as client to Pi-hole
+09.11.22, Marius, Powerpoint design and Slides 1-12
 09.11.22, Julius, Successful validation of Pi-hole working
 09.11.22, Julius, Gave up on creating an AP on dietpi after a whole day of trying
 09.11.22, Julius, Reinstall fresh image + Pi-hole docker to create flashable image for raspberry pi
+12.11.22, Julius, Start working on a practical docker example 'Pi-hole'
+15.11.22, Marius, Got Clair to work
+15.11.22, Marius, Security part of containerization tutorial
+16.11.22, Julius, Finish tutorial for Pi-hole
+16.11.22, Marius, Tutorial finalized
