@@ -137,7 +137,7 @@ With this in mind we set out to analyze the PiHole container discussed above and
 We did so, as to find out if the security of containers had improved in recent years and as
 to test how easy it was to use Clair.
 
-### Hypothesis
+## Hypothesis
 
 We suspect that the autowlan container will have multiple vulnerabilities, 
 while the PiHole container will have few to no vulnerabilities. We also 
@@ -148,7 +148,7 @@ development behind it. On the other hand PiHole has been downloaded more than
 500 million times and is one of the most known containers. Also 5 years have
 passed since 2017, so we expect there to be far less vulnerabilities in general.
 
-### Running Clair
+## Running Clair
 
 Clair's intended use case is inside a CI/CD pipeline, this stands for 
 continuous integration/continuous development pipeline. For our project however, 
@@ -243,7 +243,7 @@ The results should once again appear shortly after:
 
 At the time of writing the autowlan image contained no vulnerabilities.
 
-### Results
+## Results
 
 Our hypothesis was the exact opposite of what took place. We explain this with the fact that 
 autowlan relies on very few containers. Only Alpine and a few minor packages to be exact. 
