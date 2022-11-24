@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -36,12 +37,14 @@ export class HomeComponent implements OnInit {
     }
     const pushSubscription = await registration.pushManager.subscribe(subscribeOptions)
     if(pushSubscription) {
+      console.log(JSON.stringify(pushSubscription))
+      console.log(pushSubscription)
       this.sendSubscriptionToBackEnd(pushSubscription)
     }
   }
 
   private async sendSubscriptionToBackEnd(subscription : PushSubscription) {
-    const resp = await fetch('/api/subscription', { //TODO
+    const resp = await fetch(environment.apiRoot + '/pushsubscription', { //TODO
       method:'POST',
       headers: {
         'Content-Type': 'application/json'
