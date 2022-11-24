@@ -53,6 +53,9 @@ h3 {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
 <script type="text/javascript" charset="utf-8">
+    document.ready = () => {
+        Notification.requestPermission().then(function(permission) { console.log('permiss', permission)});
+    };
     var socket = io();
     socket.on('connect', function() {
         console.log("Conneced");
@@ -62,11 +65,14 @@ h3 {
         const timeStamp =  new Date().getTime();
         console.log("message");
         message = JSON.parse(message)
-        document.getElementById("luxValueWS").innerHTML = message.message
+        document.getElementById("luxValueWS").innerHTML = message.luxValue
         document.getElementById("time").innerHTML = (timeStamp - message.timestamp) + " [MS]";
+        if(parseInt(message.luxValue) < 200){
+            const n = new Notification('Bad Lux');
+        }
     });
    
-    // Create a client instance
+    
     
 
     </script>

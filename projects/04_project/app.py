@@ -1,6 +1,7 @@
 from flask import Flask, render_template, Response
 from flask_socketio import SocketIO
 from flask_mqtt import Mqtt
+#from flask_influxdb import InfluxDB
 import time
 import json
 
@@ -9,14 +10,10 @@ import json
 from datetime import datetime
 
 app = Flask(__name__)
+app.config.from_pyfile("config.cfg")
 socketio = SocketIO(app)
-app.config['SECRET_KEY'] = 'secret!'
-app.config['MQTT_BROKER_URL'] = 'maqiatto.com'
-app.config['MQTT_BROKER_PORT'] = 1883
-app.config['MQTT_USERNAME'] = 'mathias.tonini@gmail.com'  # Set this item when you need to verify username and password
-app.config['MQTT_PASSWORD'] = '123456789'  # Set this item when you need to verify username and password
-app.config['MQTT_KEEPALIVE'] = 15  # Set KeepAlive time in seconds
-app.config['MQTT_TLS_ENABLED'] = False  # If your server supports TLS, set it True
+#influx_db = InfluxDB(app=app)
+
 topic = 'mathias.tonini@gmail.com/protofablab/lux'
 luxValue = 0;
 mqtt_client = Mqtt(app)
@@ -43,7 +40,7 @@ def handle_mqtt_message(client, userdata, message):
 def handle_message(val):
     toSend = dict(
         timestamp = (time.time_ns()) // 1000000,
-        message = val
+        luxValue = val
     )
     toSend = json.dumps(toSend)
     socketio.send(toSend)
