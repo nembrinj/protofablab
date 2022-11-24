@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>lux meter</title>
+<style>
+html { 
+  font-family: Helvetica; 
+  display: inline-block; 
+  margin: 0px auto; 
+  text-align: center;}
+
+body {
+  margin-top: 50px;
+} 
+
+h1 {
+  font-size: 20pt; 
+  color: #444444;
+  margin: 50px auto 30px;
+} 
+
+h3 {
+  font-size: 14pt; 
+  color: #444444;
+  margin-bottom: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<div>
+  <h3>ESP32-S3 VEML7700 lux sensor using webSocket</h4><br>
+  <h1>Illuminance</h1>
+  <h1> <span id="luxValue">0</span> [lux]</h1><br>
+  <br/>
+</div>
+</body>
+</html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+        console.log("connected")
+    });
+    socket.on("message",function(message){
+     document.getElementById("luxValue").innerHTML = message
+    });
+</script>
+
+

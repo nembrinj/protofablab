@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>lux meter</title>
+<style>
+html { 
+  font-family: Helvetica; 
+  display: inline-block; 
+  margin: 0px auto; 
+  text-align: center;}
+
+body {
+  margin-top: 50px;
+} 
+
+h1 {
+  font-size: 20pt; 
+  color: #444444;
+  margin: 50px auto 30px;
+} 
+
+h3 {
+  font-size: 14pt; 
+  color: #444444;
+  margin-bottom: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<div>
+  <h3>ESP32-S3 VEML7700 lux sensor with refresh</h4><br>
+  <h1>Illuminance</h1>
+  <h1> <span id="luxValue">0</span> [lux]</h1><br>
+  <br/>
+</div>
+</body>
+</html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+<script>
+// Create a client instance
+client = new Paho.MQTT.Client("maqiatto.com", 8883,  "clientId");
+
+// set callback handlers
+client.onConnectionLost = onConnectionLost;
+client.onMessageArrived = onMessageArrived;
+// connect the client
+client.connect({
+  onSuccess: onConnect,
+  userName : "mathias.tonini@gmail.com",
+  password : "123456789",
+});
+
+
+// called when the client connects
+function onConnect() {
+  // Once a connection has been made, make a subscription and send a message.
+  console.log("onConnect");
+  client.subscribe("mathias.tonini@gmail.com/protofablab/lux");
+}
+
+// called when the client loses its connection
+function onConnectionLost(responseObject) {
+  if (responseObject.errorCode !== 0) {
+    console.log("onConnectionLost:"+responseObject.errorMessage);
+  }
+}
+
+// called when a message arrives
+function onMessageArrived(message) {
+  console.log(message);
+  document.getElementById("luxValue").innerHTML = message.payloadString;
+}
+
+</script>
+
