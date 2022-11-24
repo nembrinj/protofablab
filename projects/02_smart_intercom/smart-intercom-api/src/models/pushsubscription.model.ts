@@ -5,6 +5,7 @@ export class Pushsubscription extends Entity {
 
   @property({
     id: true,
+    generated: true,
     type: 'number', 
     required: false,
   })
@@ -17,10 +18,11 @@ export class Pushsubscription extends Entity {
   endpoint: string;
 
   @property({
-    type: 'any',
-    required: true,
+    type: 'number',
+    required: false,
+    nullable: true
   })
-  expirationTime: any;
+  expirationTime: number;
 
   @property({
     type: 'object',

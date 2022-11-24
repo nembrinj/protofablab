@@ -26,7 +26,7 @@ export class PushSubscriptionController {
     public pushsubscriptionRepository : PushsubscriptionRepository,
   ) {}
 
-  @post('/pushsubscriptions')
+  @post('/pushsubscription')
   @response(200, {
     description: 'Pushsubscription model instance',
     content: {'application/json': {schema: getModelSchemaRef(Pushsubscription)}},
@@ -47,7 +47,7 @@ export class PushSubscriptionController {
     return this.pushsubscriptionRepository.create(pushsubscription);
   }
 
-  @get('/pushsubscriptions/count')
+  @get('/pushsubscription/count')
   @response(200, {
     description: 'Pushsubscription model count',
     content: {'application/json': {schema: CountSchema}},
@@ -58,7 +58,7 @@ export class PushSubscriptionController {
     return this.pushsubscriptionRepository.count(where);
   }
 
-  @get('/pushsubscriptions')
+  @get('/pushsubscription')
   @response(200, {
     description: 'Array of Pushsubscription model instances',
     content: {
@@ -76,7 +76,7 @@ export class PushSubscriptionController {
     return this.pushsubscriptionRepository.find(filter);
   }
 
-  @patch('/pushsubscriptions')
+  @patch('/pushsubscription')
   @response(200, {
     description: 'Pushsubscription PATCH success count',
     content: {'application/json': {schema: CountSchema}},
@@ -95,7 +95,7 @@ export class PushSubscriptionController {
     return this.pushsubscriptionRepository.updateAll(pushsubscription, where);
   }
 
-  @get('/pushsubscriptions/{id}')
+  @get('/pushsubscription/{id}')
   @response(200, {
     description: 'Pushsubscription model instance',
     content: {
@@ -111,7 +111,7 @@ export class PushSubscriptionController {
     return this.pushsubscriptionRepository.findById(id, filter);
   }
 
-  @patch('/pushsubscriptions/{id}')
+  @patch('/pushsubscription/{id}')
   @response(204, {
     description: 'Pushsubscription PATCH success',
   })
@@ -129,7 +129,7 @@ export class PushSubscriptionController {
     await this.pushsubscriptionRepository.updateById(id, pushsubscription);
   }
 
-  @put('/pushsubscriptions/{id}')
+  @put('/pushsubscription/{id}')
   @response(204, {
     description: 'Pushsubscription PUT success',
   })
@@ -140,7 +140,7 @@ export class PushSubscriptionController {
     await this.pushsubscriptionRepository.replaceById(id, pushsubscription);
   }
 
-  @del('/pushsubscriptions/{id}')
+  @del('/pushsubscription/{id}')
   @response(204, {
     description: 'Pushsubscription DELETE success',
   })
