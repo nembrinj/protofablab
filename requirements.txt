@@ -1,0 +1,4 @@
+websockets~=10.4
+toml~=0.10.2
+# headless as this would be running on the RPi 4
+opencv-python-headless~=4.6.0.66
