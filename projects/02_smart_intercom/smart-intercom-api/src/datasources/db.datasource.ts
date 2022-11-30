@@ -4,11 +4,11 @@ import {juggler} from '@loopback/repository';
 const config = {
   name: 'db',
   connector: 'postgresql',
-  url: 'postgresql://postgres:Vb3XQ7ke1TvWDZvM8Lmj@localhost:5432/smartintercom',
-  host: 'localhost',
+  url: '',
+  host: 'database',
   port: 5432,
-  user: 'postgres',
-  password: 'Vb3XQ7ke1TvWDZvM8Lmj',
+  user: 'docker',
+  password: 'C4iELjeL8Nc7Kzr17tCw',
   database: 'smartintercom'
 };
 

@@ -3,9 +3,13 @@ import {ApplicationConfig, SmartIntercomApiApplication} from './application';
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
+  console.log('main: start')
   const app = new SmartIntercomApiApplication(options);
+  console.log('main: app created')
   await app.boot();
+  console.log('main: app booted')
   await app.migrateSchema();
+  console.log('main: schema migrated')
   await app.start();
 
   const url = app.restServer.url;
@@ -16,6 +20,7 @@ export async function main(options: ApplicationConfig = {}) {
 }
 
 if (require.main === module) {
+  console.log('Starting application')
   // Run the application
   const config = {
     rest: {

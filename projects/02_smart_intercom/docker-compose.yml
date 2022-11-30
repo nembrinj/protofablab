@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  database:
+    image: postgres:13.1
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=CYbnKI0Ll3K0uC2tgv84
+      - APP_DB_USER=docker
+      - APP_DB_PASS=C4iELjeL8Nc7Kzr17tCw
+      - APP_DB_NAME=smartintercom
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432
+
+  api:
+    build: ./smart-intercom-api/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+    environment:
+      - PORT=3000
+      - HOST=0.0.0.0
+#    depends_on:
+#      - mqttbroker
+    links:
+      - database
+    ports:
+      - 3000:3000
+
+  ui:
+    build: ./smart-intercom-ui/
+    restart: on-failure
+    depends_on:
+      - api
+    ports:
+      - 8080:8080
+
+
+  
+#  mqttbroker:
+#    hostname: mosquitto
+#    image: eclipse-mosquitto:latest
+#    restart: always
+#    volumes:
+#      - ./mqtt_broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+#      - ./mqtt_broker/mosquitto.passwd:/mosquitto/config/mosquitto.passwd
+#      - ./mqtt_broker/log/mosquitto.log:/mosquitto/log/mosquitto.log
+#      - ./mqtt_broker/data:/mosquitto/data
+#    ports:
+#      - 1883:1883
+#    privileged: true
