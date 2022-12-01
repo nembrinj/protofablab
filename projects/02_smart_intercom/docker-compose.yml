@@ -32,8 +32,8 @@ services:
       - PORT=3000
       - HOST=0.0.0.0
       - LOCAL_DATABASE=false
-#    depends_on:
-#      - mqttbroker
+    depends_on:
+      - mqtt
     links:
       - database
     ports:
@@ -60,15 +60,11 @@ services:
       - api
       - ui
   
-#  mqttbroker:
-#    hostname: mosquitto
-#    image: eclipse-mosquitto:latest
-#    restart: always
-#    volumes:
-#      - ./mqtt_broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
-#      - ./mqtt_broker/mosquitto.passwd:/mosquitto/config/mosquitto.passwd
-#      - ./mqtt_broker/log/mosquitto.log:/mosquitto/log/mosquitto.log
-#      - ./mqtt_broker/data:/mosquitto/data
-#    ports:
-#      - 1883:1883
-#    privileged: true
+  mqtt:
+    image: eclipse-mosquitto:latest
+    restart: always
+    volumes:
+      - ./mqtt/config/:/mosquitto/config/:ro
+      - ./mqtt/data/:/mosquitto/data/
+    ports:
+      - 1883:1883

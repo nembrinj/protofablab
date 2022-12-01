@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+projects/02_smart_intercom/mqtt/data/mosquitto.db

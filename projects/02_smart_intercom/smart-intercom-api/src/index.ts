@@ -1,20 +1,26 @@
 import {ApplicationConfig, SmartIntercomApiApplication} from './application';
+import { MqttService } from './services';
+
+const http = require('http');
 
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
-  console.log('main: start')
   const app = new SmartIntercomApiApplication(options);
-  console.log('main: app created')
   await app.boot();
-  console.log('main: app booted')
   await app.migrateSchema();
-  console.log('main: schema migrated')
   await app.start();
+
+  app.service(MqttService)
 
   const url = app.restServer.url;
   console.log(`Server is running at ${url}`);
   console.log(`Try ${url}/ping`);
+
+  // ping application to initialize MqttService
+  http.get(`${url}/ping`, () => {
+    console.log('pinged application')
+  })
 
   return app;
 }

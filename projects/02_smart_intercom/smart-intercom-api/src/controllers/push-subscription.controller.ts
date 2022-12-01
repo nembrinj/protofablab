@@ -1,3 +1,4 @@
+import { service } from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -19,12 +20,20 @@ import {
 } from '@loopback/rest';
 import {Pushsubscription} from '../models';
 import {PushsubscriptionRepository} from '../repositories';
+import { MqttService } from '../services';
 
 export class PushSubscriptionController {
   constructor(
     @repository(PushsubscriptionRepository)
     public pushsubscriptionRepository : PushsubscriptionRepository,
-  ) {}
+    @service(MqttService) 
+    public mqttService : MqttService
+  ) {
+    
+    this.mqttService.subscribe('doorbell').subscribe(msg => {
+      console.log('doorbell received', msg)
+    })
+  }
 
   @post('/pushsubscription')
   @response(200, {
