@@ -40,13 +40,19 @@ services:
 
   ui:
     build: ./smart-intercom-ui/
-    restart: on-failure
+    restart: always
     depends_on:
       - api
     ports:
-      - 8080:8080
+      - 4200:4200
 
-
+  nginx:
+    image: nginx
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
   
 #  mqttbroker:
 #    hostname: mosquitto
