@@ -20,9 +20,12 @@ export class Pushsubscription extends Entity {
   @property({
     type: 'number',
     required: false,
-    nullable: true
+    nullable: true,
+    jsonSchema: {
+      nullable: true
+    }
   })
-  expirationTime: number;
+  expirationTime?: number;
 
   @property({
     type: 'object',
