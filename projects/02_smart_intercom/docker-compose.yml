@@ -31,7 +31,7 @@ services:
     environment:
       - PORT=3000
       - HOST=0.0.0.0
-      - LOCAL_DATABASE=false
+      - DB_CONNECTION=postgresql://docker:C4iELjeL8Nc7Kzr17tCw@database:5432/smartintercom
     depends_on:
       - mqtt
     links:
