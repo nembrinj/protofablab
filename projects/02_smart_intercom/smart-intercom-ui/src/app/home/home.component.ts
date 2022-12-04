@@ -27,19 +27,49 @@ export class HomeComponent implements OnInit {
 
     const registration = await this.registerServiceWorker()
     if(!registration) {
+      console.error('service worker registration is null')
       return
     }
+
+    var serviceWorker = registration.installing || registration.waiting || registration.active
+
+    if (!serviceWorker) {
+      console.error('service worker is null')
+      return
+    }
+
+    console.log('waiting for service worker to be active')
+    await this.waitForServiceWorker(serviceWorker)
+    console.log('service worker activated')
+
     const subscribeOptions = {
       userVisibleOnly: true,
       applicationServerKey: this.urlBase64ToUint8Array(
-        'BJJ2P64jPFBQ8jIc_l4SsHMMwMIzEY_6wMvGMSTnO3_rklTg2XtZM8OC3Sw8MlZ8--NsKXvkOTEQmqbW_rl08zc',
+        environment.vapidPublic,
       ), // public vapid key. the private key will be used to send push notifications
     }
-    const pushSubscription = await registration.pushManager.subscribe(subscribeOptions)
-    if(pushSubscription) {
-      console.log(JSON.stringify(pushSubscription))
-      this.sendSubscriptionToBackEnd(pushSubscription)
+    try {
+      const pushSubscription = await registration.pushManager.subscribe(subscribeOptions)
+      if(pushSubscription) {
+        console.log('push subscription registered')
+        await this.sendSubscriptionToBackEnd(pushSubscription)
+      } else {
+        console.error("push subscription failed")
+      }
+    } catch(err) {
+      console.error("push subscription failed", err)
     }
+  }
+
+  private waitForServiceWorker(serviceWorker : ServiceWorker) : Promise<void> {
+    return new Promise<void>(resolve => {
+      const interval = setInterval(() => {
+        if(serviceWorker.state === 'activated') {
+          clearInterval(interval)
+          resolve()
+        }
+      }, 100)
+    })
   }
 
   private async sendSubscriptionToBackEnd(subscription : PushSubscription) {
@@ -52,7 +82,9 @@ export class HomeComponent implements OnInit {
     })
 
     if(!resp.ok) {
-      debugger
+      console.error('unable to save push subscription', resp)
+    } else {
+      console.log('push subscription saved', resp.status)
     }
   }
 

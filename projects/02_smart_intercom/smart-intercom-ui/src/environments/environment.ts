@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  apiRoot: 'http://localhost/api'
+  apiRoot: 'http://localhost/api',
+  vapidPublic: 'BJJ2P64jPFBQ8jIc_l4SsHMMwMIzEY_6wMvGMSTnO3_rklTg2XtZM8OC3Sw8MlZ8--NsKXvkOTEQmqbW_rl08zc'
 };
 
 /*

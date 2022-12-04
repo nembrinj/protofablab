@@ -32,6 +32,9 @@ services:
       - PORT=3000
       - HOST=0.0.0.0
       - DB_CONNECTION=postgresql://docker:C4iELjeL8Nc7Kzr17tCw@database:5432/smartintercom
+      - VAPID_PUBLIC=BJJ2P64jPFBQ8jIc_l4SsHMMwMIzEY_6wMvGMSTnO3_rklTg2XtZM8OC3Sw8MlZ8--NsKXvkOTEQmqbW_rl08zc
+      - VAPID_PRIVATE=KQc-F0ZHIvupzVk_lAy6IRv8umTuYofBfMO8WlNCyBA
+      - VAPID_SUBJECT=https://protofablab.ch
     depends_on:
       - mqtt
     links:

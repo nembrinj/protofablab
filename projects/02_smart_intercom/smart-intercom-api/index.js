@@ -1,5 +1,4 @@
 const router = require('koa-router')();
-
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const cors = require('@koa/cors');
@@ -14,9 +13,17 @@ const client = new Client({
 })
 initDB()
 
+// webpush
+const webpush = require('web-push');
+webpush.setVapidDetails(
+  process.env.VAPID_SUBJECT,
+  process.env.VAPID_PUBLIC,
+  process.env.VAPID_PRIVATE,
+)
 
 router.get('/ping', ping)
   .post('/pushsubscription', savePushSubscription)
+  .post('/notify', sendNotification)
 
 async function ping(ctx) {
   ctx.body = {
@@ -34,6 +41,7 @@ async function savePushSubscription(ctx) {
         subscription
       }
       ctx.status = 200
+      console.log('Push subscription already saved', key)
       return
     }
   }
@@ -46,6 +54,34 @@ async function savePushSubscription(ctx) {
   }
   ctx.status = 201
   
+  await saveToDB()
+  console.log('Push subscription saved', id)
+}
+
+async function sendNotification(ctx) {
+  const body = ctx.request.body
+  if (!body.message) {
+    ctx.throw(400, {'error': '"message" is a required field'})
+  }
+
+  if (Object.entries(pushSubscriptions).length == 0) {
+    ctx.throw(404, {'error': 'no subscriptions found'})
+  }
+
+  dataToSend = body.message
+
+  for (const [id, subscription] of Object.entries(pushSubscriptions)) {
+    try {
+      const success = await webpush.sendNotification(subscription, dataToSend)
+      console.log('sent notification with status:', success.statusCode)
+    } catch(err) {
+      console.log('Subscription has expired or is no longer valid: ', err)
+      delete pushSubscriptions[id]
+    }
+  }
+
+  ctx.status = 204
+
   await saveToDB()
 }
 
@@ -60,11 +96,11 @@ async function initDB() {
 
   const subscriptions = await client.query('SELECT * from PUSH_SUBSCRIPTION')
   for(const row of subscriptions.rows) {
-    let id = row[0]
-    let subscription = JSON.parse(row[1])
+    let id = row.id
+    let subscription = row.subscription
 
     maxSubscriptionId = Math.max(maxSubscriptionId, id)
-    pushSubscriptions.push(subscription)
+    pushSubscriptions[id] = subscription
   }
 }
 
