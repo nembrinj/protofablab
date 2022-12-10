@@ -1,3 +1,5 @@
+# TODO: FOR REMOVAL
+
 import asyncio
 import json
 import logging
@@ -38,7 +40,7 @@ class Client:
 
     async def handler(self, ws):
         text = random.random()
-        img = image_util.to_json_value(cv2.imread('../resources/00_messing_python.png'))
+        img = image_util.to_json_value(cv2.imread('../resources/xkcd.png'))
 
         msg = {
             'text': text,

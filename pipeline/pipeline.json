@@ -1,0 +1,140 @@
+{
+  "grayscale": {
+    "description": "Turns an image into grayscale."
+  },
+  "rgb": {
+    "description": "Turns an image into RGB."
+  },
+  "blur": {
+    "methods": [
+      "gaussian",
+      "median"
+    ],
+    "gaussian": {
+      "kernel": {
+        "min": 3,
+        "step": 2,
+        "recommended": 5
+      },
+      "sigma": {
+        "min": 0.1,
+        "max": 10,
+        "recommended": 1
+      },
+      "description": "Performs a gaussian blur. Useful to remove Gaussian noise."
+    },
+    "median": {
+      "kernel": {
+        "min": 3,
+        "step": 2,
+        "recommended": 5
+      },
+      "description": "Performs a median blur. Useful to remove salt-and-pepper noise."
+    },
+    "description": "Performs a blur to remove noise."
+  },
+  "threshold": {
+    "methods": [
+      "manual",
+      "otsu",
+      "mean",
+      "gaussian"
+    ],
+    "manual": {
+      "threshold" : {
+        "min": 0,
+        "max": 255,
+        "recommended": 127,
+        "description": "Performs a hard threshold with a user-defined global value."
+      }
+    },
+    "otsu": {
+      "description": "Otsu's method tries to find an optimal threshold. This pairs well with a prior Gaussian blur."
+    },
+    "mean": {
+      "c": {
+        "min": -255,
+        "max": 255,
+        "recommended": 0
+      },
+      "block_size": {
+        "min": 3,
+        "step": 2,
+        "recommended": 11
+      },
+      "description": "The threshold value is the mean of the neighbourhood area minus the constant 'c'."
+    },
+    "gaussian": {
+      "c": {
+        "min": -255,
+        "max": 255,
+        "recommended": 0
+      },
+      "block_size": {
+        "min": 3,
+        "step": 2,
+        "recommended": 11
+      },
+      "description": "The threshold value is a gaussian-weighted sum of the neighbourhood area minus the constant 'c'."
+    },
+    "recommended": "mean",
+    "description": "Performs a threshold on each pixel. Turns each pixel into either 'black' or 'white'."
+  },
+  "edge_detect": {
+    "min": {
+      "min": 0,
+      "max": 255,
+      "recommended": 100
+    },
+    "max": {
+      "min": 0,
+      "max": 255,
+      "recommended": 200
+    },
+    "description": "Performs the Canny edge detection. This will need some playing around."
+  },
+  "dilate": {
+    "kernel": {
+      "min": 2,
+      "step": 1,
+      "recommended": 5
+    },
+    "iterations": {
+      "min": 1,
+      "recommended": 1,
+      "description": "The number of times dilation is applied."
+    },
+    "description": "Performs dilation on an image by using a specific kernel."
+  },
+  "erode": {
+    "kernel": {
+      "min": 2,
+      "step": 1,
+      "recommended": 5
+    },
+    "iterations": {
+      "min": 1,
+      "recommended": 1,
+      "description": "The number of times erosion is applied."
+    },
+    "description": "Performs erosion on an image by using a specific kernel."
+  },
+  "find_contours": {
+    "methods": [
+      "none",
+      "simple",
+      "tc89_l1",
+      "tc89_kcos"
+    ],
+    "recommended": "simple",
+    "description": "Finds contours in a binary image."
+  },
+  "smooth_contours": {
+    "accuracy": {
+      "min": 1,
+      "recommended": 5,
+      "description": "The maximum distance between the original contour and its approximation."
+    },
+    "description": "Approximates a contour shape to another shape with less number of vertices depending on the accuracy."
+  }
+}
