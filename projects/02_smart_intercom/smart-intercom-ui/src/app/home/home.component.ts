@@ -8,34 +8,67 @@ import { environment } from 'src/environments/environment';
 })
 export class HomeComponent implements OnInit {
 
+  isPushSubscriptionSucess = false
+  doorbellEvtTime : Date | undefined
+  doorbellEvtData : any
+
   constructor() { }
 
-  ngOnInit(): void {
-    this.registerPushSubscription()
-    this.requestNotificationPermission()
+  async ngOnInit(): Promise<void> {
+    this.isPushSubscriptionSucess = await this.registerPushSubscription() || true // TODO
+    await this.getLoadDoorbellEvent()
   }
 
-  private async registerPushSubscription() {
+  private async getLoadDoorbellEvent() {
+    const resp = await fetch(environment.apiRoot + '/doorbell', {
+      method:'GET'
+    })
+
+    if(!resp.ok) {
+      console.error('unable to load doorbell event', resp)
+    } else {
+      const doorbellEvt = await resp.json()
+      this.doorbellEvtTime = new Date(doorbellEvt.time)
+      this.doorbellEvtData = doorbellEvt.data
+    }
+  }
+
+  public async openDoor() {
+    const resp = await fetch(environment.apiRoot + '/door', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'open'
+      })
+    })
+    if(!resp.ok) {
+      console.error('unable to open door', resp)
+    }
+  }
+
+  private async registerPushSubscription() : Promise<boolean> {
     if (!('serviceWorker' in navigator)) {
       console.error('Service Worker isn\'t supported on this browser, disable or hide UI.')
-      return
+      return false
     }
     if (!('PushManager' in window)) {
       console.error('Push isn\'t supported on this browser, disable or hide UI.')
-      return
+      return false
     }
 
     const registration = await this.registerServiceWorker()
     if(!registration) {
       console.error('service worker registration is null')
-      return
+      return false
     }
 
     var serviceWorker = registration.installing || registration.waiting || registration.active
 
     if (!serviceWorker) {
       console.error('service worker is null')
-      return
+      return false
     }
 
     console.log('waiting for service worker to be active')
@@ -53,12 +86,14 @@ export class HomeComponent implements OnInit {
       if(pushSubscription) {
         console.log('push subscription registered')
         await this.sendSubscriptionToBackEnd(pushSubscription)
+        return true
       } else {
         console.error("push subscription failed")
       }
     } catch(err) {
       console.error("push subscription failed", err)
     }
+    return false
   }
 
   private waitForServiceWorker(serviceWorker : ServiceWorker) : Promise<void> {
@@ -105,7 +140,7 @@ export class HomeComponent implements OnInit {
 
   private async registerServiceWorker() {
     return navigator.serviceWorker
-      .register('/assets/service-worker.js')
+      .register(`/assets/service-worker.js?url=${location.href}`)
       .then(function (registration) {
         console.log('Service worker successfully registered.');
         return registration;
@@ -116,7 +151,7 @@ export class HomeComponent implements OnInit {
       });
   }
 
-  private async requestNotificationPermission() {
+  public async requestNotificationPermission() {
     if(!Notification) {
       console.error('Browser does not support notificatons')
       return
@@ -126,10 +161,10 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  public getNotificationStatus() : string {
+  public arePermissionsGranted() : boolean {
     if(!Notification) {
-      return 'not possible'
+      return false
     }
-    return Notification.permission
+    return Notification.permission === 'granted'
   }
 }

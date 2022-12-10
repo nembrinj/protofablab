@@ -12,5 +12,12 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
       subscription json NOT NULL,
       CONSTRAINT pushsubscription_pkey PRIMARY KEY (id)
     );
+
+    CREATE TABLE IF NOT EXISTS public.doorbell (
+      id serial4 NOT NULL,
+      evt_time timestamp NULL,
+      evt_data json NULL,
+      CONSTRAINT doorbell_pkey PRIMARY KEY (id)
+    );
   COMMIT;
 EOSQL

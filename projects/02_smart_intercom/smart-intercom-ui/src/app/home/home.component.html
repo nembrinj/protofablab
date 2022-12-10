@@ -1,1 +1,16 @@
-<div class="notificationStatus">Notifications are {{ getNotificationStatus() }}</div>
+<div class="warn" *ngIf="!isPushSubscriptionSucess">
+  Unable to subscribe to push notifications. Try another browser like chrome.
+</div>
+<div class="warn" *ngIf="!arePermissionsGranted()">
+  Please enable notifictions.
+  <button (click)="requestNotificationPermission()">OK</button>
+</div>
+
+<div *ngIf="arePermissionsGranted() && isPushSubscriptionSucess">
+  <div *ngIf="doorbellEvtTime">
+    Last recorded doorbell event: {{doorbellEvtTime}}
+  </div>
+  <div>
+    <button (click)="openDoor()">Open door</button>
+  </div>
+</div>

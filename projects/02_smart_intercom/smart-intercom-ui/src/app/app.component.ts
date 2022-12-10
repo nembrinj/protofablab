@@ -7,4 +7,11 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'smart-intercom-ui';
+
+  public getNotificationStatus() : string {
+    if(!Notification) {
+      return 'not possible'
+    }
+    return Notification.permission
+  }
 }

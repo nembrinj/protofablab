@@ -7,3 +7,11 @@ self.addEventListener('push', async function(event) {
     }
   ))
 })
+
+self.addEventListener('notificationclick', (event) => {
+  let url = new URL(location).searchParams.get('url')
+  event.notification.close()
+  event.waitUntil(
+    clients.openWindow(url)
+);
+});
