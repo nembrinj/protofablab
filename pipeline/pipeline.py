@@ -185,7 +185,7 @@ def smooth_contours(img=None, **kwargs) -> dict:
     accuracy: float = kwargs.setdefault('accuracy', pipeline_json['smooth_contours']['accuracy']['recommended'])
 
     for i in range(0, len(contours)):
-        contours[i] = cv2.approxPolyDP(contours[i], accuracy, True)
+        contours[i] = cv2.approxPolyDP(contours[i], accuracy, False)
 
     return {'contours': contours, 'length': contour_len(contours)}
 
