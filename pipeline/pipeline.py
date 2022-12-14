@@ -190,6 +190,34 @@ def smooth_contours(img=None, **kwargs) -> dict:
     return {'contours': contours, 'length': contour_len(contours)}
 
 
+def clean_contours(img=None, **kwargs) -> dict:
+    """
+    Cleans / drops / flattens contours according to given parameters.
+    :param img: ignored
+    :param kwargs: parameters for contour dropping.
+                   Read the documentation in the `pipeline.json` and `README.md` of this module.
+    :return: cleaned contours and its length in a dict
+    """
+    contours = list(kwargs['contours'])
+    threshold: float = kwargs.setdefault('threshold', pipeline_json['clean_contours']['threshold']['recommended'])
+
+    clean_contours = []
+    for path in contours:
+        length = 0
+        for idx, point in enumerate(path):
+            p: np.ndarray = point[0]
+            if idx == 0:
+                last = p
+                continue
+
+            length += np.linalg.norm(p - last)
+
+        if length > threshold:
+            clean_contours.append(path)
+
+    return {'contours': clean_contours, 'length': contour_len(clean_contours)}
+
+
 def dimensions(contours: list[list]) -> (float, float):
     """
     Returns the dimensions (width, height) of given contours.

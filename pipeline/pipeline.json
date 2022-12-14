@@ -136,5 +136,13 @@
       "description": "The maximum distance between the original contour and its approximation."
     },
     "description": "Approximates a contour shape to another shape with less number of vertices depending on the accuracy."
+  },
+  "clean_contours": {
+    "threshold": {
+      "min": 0.01,
+      "recommended": 5,
+      "description": "The threshold length of a contour before it is being removed from the list."
+    },
+    "description": "Cleans / drops / flattens contours that are shorter than a threshold."
   }
 }
