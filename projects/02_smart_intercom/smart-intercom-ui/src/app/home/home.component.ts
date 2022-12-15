@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -12,7 +13,7 @@ export class HomeComponent implements OnInit {
   doorbellEvtTime : Date | undefined
   doorbellEvtData : any
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   async ngOnInit(): Promise<void> {
     this.isPushSubscriptionSucess = await this.registerPushSubscription() || true // TODO
@@ -166,5 +167,9 @@ export class HomeComponent implements OnInit {
       return false
     }
     return Notification.permission === 'granted'
+  }
+
+  public configure() {
+    this.router.navigate(['config']);
   }
 }
