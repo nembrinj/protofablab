@@ -26,6 +26,7 @@ let sensorConfig = {
   sample_rate: 1000,
   drop_rate: 1000
 }
+const app = new Koa();
 
 // database
 const { Client } = require('pg')
