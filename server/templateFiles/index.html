@@ -3,14 +3,14 @@
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <!--  Load CSS in Flask with html-->
-    <link rel="stylesheet" href='/staticFiles/main.css' />
+    <link rel="stylesheet" href='/staticFiles/main.css'/>
     <!--  Load JavaScript in Flask with html-->
-    <script>
-        var loadFile = function(event) {
-              var image = document.getElementById('output');
-              image.src=URL.createObjectURL(event.target.files[0]);
-          };
-    </script>
+    <!--    <script>-->
+    <!--        var loadFile = function(event) {-->
+    <!--              var image = document.getElementById('output');-->
+    <!--              image.src=URL.createObjectURL(event.target.files[0]);-->
+    <!--          };-->
+    <!--    </script>-->
 </head>
 <body>
 
@@ -23,51 +23,61 @@
     </div>
 
     <div class="buttons">
-        <p1>Blurs to apply:</p1><br>
-        <input type="checkbox" id="median" name="blur" value="median" checked>
+        <p>Blurs to apply:</p>
+        <!--        <input type="range" id="TEST MF" name="blur" min="3" max="17" value="1" step="2">-->
+        <input type="checkbox" id="median" name="blur" value="median">
         <label for="median">Median Blur</label><br>
-        <input type="checkbox" id="gauss" name="blur" value="gauss" checked>
+        <input type="checkbox" id="gauss" name="blur" value="gaussian">
         <label for="gauss">Gaussian Blur</label>
     </div>
 
     <div class="buttons">
-        <p1>Threshold Type:</p1><br>
-        <input type="radio" id="gaussian" name="threshold" value="gaussian">
-        <label for="gaussian">gaussian</label><br>
+        <p>Threshold Type:</p>
         <input type="radio" id="otsu" name="threshold" value="otsu">
         <label for="otsu">otsu</label><br>
-        <input type="radio" id="manual" name="threshold" value="manual">
-        <label for="manual">manual</label><br>
+        <input type="radio" id="gaussian" name="threshold" value="gaussian">
+        <label for="gaussian">gaussian</label><br>
+        <!--        <input type="radio" id="manual" name="threshold" value="manual">-->
+        <!--        <label for="manual">manual</label><br>-->
         <input type="radio" id="mean" name="threshold" value="mean">
-        <label for="mean">mean</label>
+        <label for="mean">mean</label><br>
+
+        <input type="checkbox" id="invert" name="invert" value="False">
+        <label>Invert</label>
     </div>
 
+    <div class="buttons">
+        <p>Remove Details:</p>
+        <input type="range" id="dilate" name="dilate" min="0" max="5" value="0">
+        <label for="dilate">Dilate</label><br>
+        <input type="range" id="erode" name="erode" min="0" max="5" value="0">
+        <label for="erode">Erode</label>
+    </div>
 
     <div class="buttons">
-        <p1>Contouring Type:</p1><br>
+        <p>Contouring Type:</p>
+        <input type="radio" id="none" name="contour" value=0>
+        <label for="none">none</label><br>
         <input type="radio" id="simple" name="contour" value=1>
         <label for="simple">simple</label><br>
         <input type="radio" id="tc89_l1" name="contour" value=2>
         <label for="tc89_l1">tc89_l1</label><br>
         <input type="radio" id="tc89_kcos" name="contour" value=3>
         <label for="tc89_kcos">tc89_kcos</label><br>
-        <input type="range" id="smooth" name="smooth" min="0" max="10" value="5">
-        <label for="smooth">Smoothness</label><br>
+        <p>Clean short path lengths:</p>
+        <input type="range" id="clean" name="clean" min="0" max="100" value="20">
+        <label for="smooth">path length</label><br>
+        <p>Smoothness:</p>
+        <input type="range" id="smooth" name="smooth" min="0" max="100" value="10">
+        <label for="smooth">accuracy</label>
     </div>
 
     <div class="buttons">
-        <p1>Remove Details:</p1><br>
-        <input type="range" id="dilate" name="dier" min="0" max="5" value="1">
-        <label for="dilate">Dilate</label><br>
-        <input type="range" id="erode" name="dier" min="0" max="5" value="1">
-        <label for="erode">Erode</label>
-    </div>
-    <div class="buttons">
-        <input type=submit value=Start>
+        <input type="submit" value="Start">
     </div>
 
     <div class="buttons">
-        <input type=submit value=Undo name="undo">
+        <input type="submit" value="Undo" name="undo">
     </div>
 
     <div class="frame">
@@ -75,6 +85,14 @@
     </div>
     <div class="frame">
         <img id="svg" src="../staticFiles/images/main.svg" onerror="this.onerror=null; this.remove();"/>
+    </div>
+    <script>
+        document.get
+
+    </script>
+
+    <div class="buttons">
+        <input type="submit" value="Send to Silhouette" name="send-to-silhouette" hidden="">
     </div>
 </form>
 

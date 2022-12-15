@@ -240,13 +240,15 @@ def dimensions(contours: list[list]) -> (float, float):
     return max_x - min_x, max_y - min_y
 
 
-def contours2svg(contours: list[list]) -> str:
+def contours2svg(contours: list[list], width: int = None, height: int = None) -> str:
     """
     Converts contours to SVG specifications.
     :param contours: the contours
     :return: SVG specification as a str
     """
-    width, height = dimensions(contours)
+    if not width or not height:
+        width, height = dimensions(contours)
+
     s = f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">\n'
     for path in contours:
         if len(path) >= 2:
@@ -274,8 +276,6 @@ def call_pipeline(args: dict) -> dict:
 
     img = args['img']
     pipeline = args['pipeline']
-
-    assert len(pipeline) == 1
 
     for method, kwargs in pipeline:
         fun = locals()[method]

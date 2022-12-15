@@ -3,3 +3,5 @@ toml~=0.10.2
 opencv-python-headless~=4.6.0.66
 flask~=2.2.2
 numpy~=1.23.5
+svgpathtools~=1.5.1
+matplotlib~=3.6.2
