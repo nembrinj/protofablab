@@ -84,10 +84,6 @@ void setup()
   mqtt.subscribe(MQTT_TOPIC "/bell_amp");
   mqtt.subscribe(MQTT_TOPIC "/bell_duration");
   mqtt.subscribe(MQTT_TOPIC "/sample_rate");
-
-  mqtt.publish(MQTT_TOPIC "/bell_amp", toStr(minBellAmp));
-  mqtt.publish(MQTT_TOPIC "/bell_duration", toStr(minBellDuration));
-  mqtt.publish(MQTT_TOPIC "/sample_rate", toStr(sampleRate));
 }
 
 unsigned counter = 0;
@@ -170,6 +166,6 @@ void mqttCallback(const char *topic, byte *payload, unsigned length)
   else if (!strcmp(topic, MQTT_TOPIC "/bell_duration"))
     minBellDuration = atof(value);
 
-  /*else if (!strcmp(topic, MQTT_TOPIC "/sample_rate"))
-    sampleRate = atoi(value);*/
+  else if (!strcmp(topic, MQTT_TOPIC "/sample_rate"))
+    sampleRate = min(atoi(value), 1);
 }
