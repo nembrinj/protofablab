@@ -58,6 +58,9 @@ export class ConfigComponent implements OnInit {
     }
     const resp = await fetch(environment.apiRoot + '/sensorconfig', {
       method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(this.sensorConfig)
     })
     if(!resp.ok) {
