@@ -5,7 +5,8 @@ const bodyParser = require('koa-bodyparser');
 const cors = require('@koa/cors');
 const bcrypt = require("bcrypt")
 
-const TOPIC_DOORBELL = 'doorbell'
+const TOPIC_BELL_RINGING = 'smart_intercom/bell_ringing'
+const TOPIC_DOOR_ACTION = 'smart_intercom/door_action'
 
 const PUSH_SUBSCRIPTION_INSERT_STATEMENT = 'INSERT INTO PUSH_SUBSCRIPTION(id, subscription) VALUES($1, $2)'
 const DOORBELL_INSERT_STATEMENT = 'INSERT INTO DOORBELL(evt_time, evt_data) VALUES (NOW(), $1)'
@@ -200,7 +201,7 @@ async function doorAction(ctx) {
   }
 
   console.log('sending action to door:', body.action)
-  mqttClient.publish('door', body.action)
+  mqttClient.publish(TOPIC_DOOR_ACTION, body.action)
   ctx.status = 200
 }
 
@@ -239,7 +240,7 @@ async function saveToDB() {
 // mqtt handling
 mqttClient.on('connect', () => {
   console.log('mqtt connected')
-  mqttClient.subscribe('doorbell', function (err) {
+  mqttClient.subscribe(TOPIC_BELL_RINGING, function (err) {
     if (!err) {
       console.log('mqtt subscribed to doorbell topic')
     }
@@ -248,7 +249,7 @@ mqttClient.on('connect', () => {
 mqttClient.on('error', err => console.error('mqtt error', err))
 mqttClient.on('message', async (topic, message) => {
   console.log('mqtt message received (topic, msg):', topic, message.toString())
-  if(topic === TOPIC_DOORBELL && !!message) {
+  if(topic === TOPIC_BELL_RINGING && !!message) {
     const data = {
       source: 'mqtt'
     }
