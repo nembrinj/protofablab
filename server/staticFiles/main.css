@@ -1,0 +1,50 @@
+.title-box {
+  padding: 10px;
+  font-size: 30px;
+  font-weight: 500;
+  text-align: center;
+  text-shadow: 1px 1px hsl(0deg 0% 0% / 0.48);
+  background-color: whitesmoke;
+  box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+}
+
+* {
+  margin: 2px;
+  padding: 2px;
+}
+
+body {
+  font-family: 'montserrat', sans-serif;
+  background-image: url( './images/pattern.svg' );
+}
+
+.buttons{
+  width: fit-content
+  padding: 25px;
+  margin-top: 25px;
+  font-size: 20px;
+
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 16px 0px 16px 0px;
+  box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
+
+img {
+  max-width: 20%;
+  height: auto;
+
+  padding: 20px;
+  margin-top: 25px;
+  font-size: 20px;
+
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
