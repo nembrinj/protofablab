@@ -19,5 +19,17 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
       evt_data json NULL,
       CONSTRAINT doorbell_pkey PRIMARY KEY (id)
     );
+
+    CREATE TABLE IF NOT EXISTS public.user (
+      id serial4 NOT NULL,
+      username varchar(255) NOT NULL,
+      PASSWORD varchar(255) NOT NULL,
+      salt varchar(255) NOT NULL,
+      CONSTRAINT user_pkey PRIMARY KEY (id)
+    );
+
+    CREATE UNIQUE INDEX user_username ON
+      public.user(username);
+      
   COMMIT;
 EOSQL

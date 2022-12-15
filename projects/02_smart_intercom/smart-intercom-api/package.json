@@ -15,9 +15,11 @@
   },
   "dependencies": {
     "@koa/cors": "^4.0.0",
+    "bcrypt": "^5.1.0",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^12.0.0",
+    "koa-session": "^6.2.0",
     "mqtt": "^4.3.7",
     "pg": "^8.8.0",
     "web-push": "^3.5.0"
