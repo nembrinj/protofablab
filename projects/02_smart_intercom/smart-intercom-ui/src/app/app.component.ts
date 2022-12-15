@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -8,10 +9,18 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'smart-intercom-ui';
 
+  constructor(private router : Router) {
+
+  }
+
   public getNotificationStatus() : string {
     if(!Notification) {
       return 'not possible'
     }
     return Notification.permission
+  }
+
+  public goHome() {
+    this.router.navigate(['home']);
   }
 }
