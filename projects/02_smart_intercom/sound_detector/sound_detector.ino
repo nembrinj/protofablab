@@ -47,6 +47,7 @@ void setup()
   pinMode(11, INPUT);
   pinMode(A0, INPUT);
   pinMode(A1, INPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -84,6 +85,7 @@ void setup()
   mqtt.subscribe(MQTT_TOPIC "/bell_amp");
   mqtt.subscribe(MQTT_TOPIC "/bell_duration");
   mqtt.subscribe(MQTT_TOPIC "/sample_rate");
+  mqtt.subscribe(MQTT_TOPIC "/door_action");
 }
 
 unsigned counter = 0;
@@ -168,4 +170,10 @@ void mqttCallback(const char *topic, byte *payload, unsigned length)
 
   else if (!strcmp(topic, MQTT_TOPIC "/sample_rate"))
     sampleRate = min(atoi(value), 1);
+
+  else if (!strcmp(topic, MQTT_TOPIC "/door_action") && !strcmp(value, "open"))
+    digitalWrite(LED_BUILTIN, HIGH);
+    Serial.println("opening door");
+    delay(5000);
+    digitalWrite(LED_BUILTIN, LOW);
 }
