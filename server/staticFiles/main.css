@@ -1,16 +1,16 @@
 .title-box {
-  padding: 10px;
   font-size: 30px;
   font-weight: 500;
   text-align: center;
   text-shadow: 1px 1px hsl(0deg 0% 0% / 0.48);
   background-color: whitesmoke;
   box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+  margin-bottom: 3px;
 }
 
 * {
-  margin: 2px;
-  padding: 2px;
+  margin: 1px;
+  padding: 1px;
 }
 
 body {
@@ -18,10 +18,15 @@ body {
   background-image: url( './images/pattern.svg' );
 }
 
+.frame{
+  margin: 0px;
+  padding: 0px;
+}
+
 .buttons{
-  width: fit-content
-  padding: 25px;
-  margin-top: 25px;
+  margin: 1px;
+  width: fit-content;
+  padding: 5px;
   font-size: 20px;
 
   background-color: rgba(255, 255, 255, 0.8);
@@ -34,11 +39,10 @@ body {
 }
 
 img {
-  max-width: 20%;
+  max-width: 23%;
   height: auto;
 
-  padding: 20px;
-  margin-top: 25px;
+  padding: 10px;
   font-size: 20px;
 
   background-color: rgba(255, 255, 255, 0.8);

@@ -1,16 +1,7 @@
-<!--  how to use css in python_ flask-->
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
-    <!--  Load CSS in Flask with html-->
     <link rel="stylesheet" href='/staticFiles/main.css'/>
-    <!--  Load JavaScript in Flask with html-->
-    <!--    <script>-->
-    <!--        var loadFile = function(event) {-->
-    <!--              var image = document.getElementById('output');-->
-    <!--              image.src=URL.createObjectURL(event.target.files[0]);-->
-    <!--          };-->
-    <!--    </script>-->
 </head>
 <body>
 
@@ -19,12 +10,13 @@
 </div>
 <form method=post enctype=multipart/form-data>
     <div class="buttons">
-        <input type=file name=file value="Choose an Image">
+        <p>Upload Image:</p>
+        <input type=file name=file value="Choose an Image" class = "upload-button">
     </div>
 
     <div class="buttons">
         <p>Blurs to apply:</p>
-        <!--        <input type="range" id="TEST MF" name="blur" min="3" max="17" value="1" step="2">-->
+        <!--<input type="range" id="TEST MF" name="blur" min="3" max="17" value="1" step="2">-->
         <input type="checkbox" id="median" name="blur" value="median">
         <label for="median">Median Blur</label><br>
         <input type="checkbox" id="gauss" name="blur" value="gaussian">
@@ -64,10 +56,8 @@
         <label for="tc89_l1">tc89_l1</label><br>
         <input type="radio" id="tc89_kcos" name="contour" value=3>
         <label for="tc89_kcos">tc89_kcos</label><br>
-        <p>Clean short path lengths:</p>
         <input type="range" id="clean" name="clean" min="0" max="100" value="20">
         <label for="smooth">path length</label><br>
-        <p>Smoothness:</p>
         <input type="range" id="smooth" name="smooth" min="0" max="100" value="10">
         <label for="smooth">accuracy</label>
     </div>
@@ -81,15 +71,25 @@
     </div>
 
     <div class="frame">
-        <img id="png" src="../staticFiles/images/main.png" onerror="this.onerror=null; this.remove();"/>
+        <img id="png0" src="../staticFiles/images/pngs/0.png"
+             onerror="this.onerror=null; this.remove();"/>
+        <img id="png1" src="../staticFiles/images/pngs/1.png"
+             onerror="this.onerror=null; this.remove();"/>
+        <img id="png2" src="../staticFiles/images/pngs/2.png"
+             onerror="this.onerror=null; this.remove();"/>
+        <img id="png3" src="../staticFiles/images/pngs/3.png"
+             onerror="this.onerror=null; this.remove();"/>
     </div>
     <div class="frame">
-        <img id="svg" src="../staticFiles/images/main.svg" onerror="this.onerror=null; this.remove();"/>
+        <img id="svg0" src="../staticFiles/images/svgs/0.svg"
+             onerror="this.onerror=null; this.remove();"/>
+        <img id="svg1" src="../staticFiles/images/svgs/1.svg"
+             onerror="this.onerror=null; this.remove();"/>
+        <img id="svg2" src="../staticFiles/images/svgs/2.svg"
+             onerror="this.onerror=null; this.remove();"/>
+        <img id="svg3" src="../staticFiles/images/svgs/3.svg"
+             onerror="this.onerror=null; this.remove();"/>
     </div>
-    <script>
-        document.get
-
-    </script>
 
     <div class="buttons">
         <input type="submit" value="Send to Silhouette" name="send-to-silhouette" hidden="">
