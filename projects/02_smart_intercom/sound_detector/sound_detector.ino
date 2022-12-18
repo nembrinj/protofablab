@@ -15,8 +15,8 @@ unsigned sampleRate = 1000; // in Hz
 double offset = 0;   // the DC offset
 unsigned window = 1; // amount of samples to average
 
-double maxAmp = 0;             // the highest amplitude recorded
-const double DROP_RATE = 1000; // how much maxAmp decreases every second
+double maxAmp = 0;      // the highest amplitude recorded
+double dropRate = 1000; // how much maxAmp decreases every second
 
 double minBellAmp = 50;       // above this = ringing
 double minBellDuration = 500; // longer than this = ringing
@@ -102,7 +102,7 @@ void loop()
   if (amp > maxAmp)
     maxAmp = amp;
   else
-    maxAmp -= DROP_RATE / sampleRate;
+    maxAmp -= dropRate / sampleRate;
 
   // estimate DC offset by averaging amplitude during the last second
   offset = (offset * (window - 1) + amp) / window;
@@ -168,8 +168,11 @@ void mqttCallback(const char *topic, byte *payload, unsigned length)
   else if (!strcmp(topic, MQTT_TOPIC "/bell_duration"))
     minBellDuration = atof(value);
 
+  else if (!strcmp(topic, MQTT_TOPIC "/drop_rate"))
+    sampleRate = atof(value);
+
   else if (!strcmp(topic, MQTT_TOPIC "/sample_rate"))
-    sampleRate = min(atoi(value), 1);
+    sampleRate = max(atoi(value), 1);
 
   else if (!strcmp(topic, MQTT_TOPIC "/door_action") && !strcmp(value, "open"))
     digitalWrite(LED_BUILTIN, HIGH);
