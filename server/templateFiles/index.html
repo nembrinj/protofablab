@@ -8,10 +8,11 @@
 <div class="title-box">
     <h1>Image to Silhouette Drawing</h1>
 </div>
-<form method=post enctype=multipart/form-data>
+<form id="form" method=post enctype=multipart/form-data>
     <div class="buttons">
         <p>Upload Image:</p>
-        <input type=file name=file value="Choose an Image" class = "upload-button">
+        <input type=file name=file value="Choose an Image" class = "upload-button"
+               onchange="document.getElementById('form').submit();">
     </div>
 
     <div class="buttons">
@@ -40,14 +41,15 @@
 
     <div class="buttons">
         <p>Remove Details:</p>
-        <input type="range" id="dilate" name="dilate" min="0" max="5" value="0">
-        <label for="dilate">Dilate</label><br>
+        <input type="range" id="dilate" name="dilate" min="0" max="5" value="0"
+        onchange="document.getElementById('dilate-amt').">
+        <label id="dilate-amt" for="dilate">Dilate</label><br>
         <input type="range" id="erode" name="erode" min="0" max="5" value="0">
         <label for="erode">Erode</label>
     </div>
 
     <div class="buttons">
-        <p>Contouring Type:</p>
+        <p>Create SVG:</p>
         <input type="radio" id="none" name="contour" value=0>
         <label for="none">none</label><br>
         <input type="radio" id="simple" name="contour" value=1>
