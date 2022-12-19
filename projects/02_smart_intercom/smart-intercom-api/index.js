@@ -121,18 +121,18 @@ async function sendNotificationToAllSubcriptions(message) {
 async function getDoorbell(ctx) {
   try {
     const res = await pgClient.query('SELECT EVT_TIME, EVT_DATA FROM DOORBELL WHERE EVT_TIME = (SELECT MAX(EVT_TIME) FROM DOORBELL)')
-    if(res.rows.length === 0) {
-      ctx.throw(404, {'error': 'no doorbell events found'})
-    }
-    ctx.body = {
-      time: res.rows[0].evt_time,
-      data: res.rows[0].evt_data
-    }
-    ctx.status = 200
   } catch(err) {
     console.error(err)
     ctx.throw(500, {'error': 'database error'})
   }
+  if(res.rows.length === 0) {
+    ctx.throw(404, {'error': 'no doorbell events found'})
+  }
+  ctx.body = {
+    time: res.rows[0].evt_time,
+    data: res.rows[0].evt_data
+  }
+  ctx.status = 200
 }
 
 async function doorAction(ctx) {
