@@ -42,6 +42,13 @@ git pull origin main
 
 cd projects/02_smart_intercom/
 
-docker-compose build && docker-compose up
+# comment out ngingx.conf server config for port 443
+nano ngingx.conf
+
+docker-compose build
+
+docker-compose up nginx
+
+docker compose run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ -d protofablab.ch
 
 ```
