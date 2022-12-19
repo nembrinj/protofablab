@@ -311,7 +311,7 @@ mqttClient.on('connect', () => {
 mqttClient.on('error', err => console.error('mqtt error', err))
 mqttClient.on('message', async (topic, message) => {
   console.log('mqtt message received (topic, msg):', topic, message.toString())
-  if(topic === TOPIC_BELL_RINGING && 'true' === message) {
+  if(topic === TOPIC_BELL_RINGING && 'true' === message.toString()) {
     const data = {
       source: 'mqtt'
     }
