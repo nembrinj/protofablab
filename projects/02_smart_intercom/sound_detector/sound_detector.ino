@@ -84,6 +84,7 @@ void setup()
 
   mqtt.subscribe(MQTT_TOPIC "/bell_amp");
   mqtt.subscribe(MQTT_TOPIC "/bell_duration");
+  mqtt.subscribe(MQTT_TOPIC "/drop_rate");
   mqtt.subscribe(MQTT_TOPIC "/sample_rate");
   mqtt.subscribe(MQTT_TOPIC "/door_action");
 }
@@ -169,7 +170,7 @@ void mqttCallback(const char *topic, byte *payload, unsigned length)
     minBellDuration = atof(value);
 
   else if (!strcmp(topic, MQTT_TOPIC "/drop_rate"))
-    sampleRate = atof(value);
+    dropRate = atof(value);
 
   else if (!strcmp(topic, MQTT_TOPIC "/sample_rate"))
     sampleRate = max(atoi(value), 1);
