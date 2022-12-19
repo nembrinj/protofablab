@@ -58,7 +58,7 @@ services:
       - api
     
   certbot:
-    image: certbot/certbot:latest
+    image: certbot/certbot:arm32v6-latest
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/letsencrypt/:rw
