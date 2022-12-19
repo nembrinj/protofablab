@@ -191,8 +191,9 @@ async function sendNotificationToAllSubcriptions(message) {
 }
 
 async function getDoorbell(ctx) {
+  let res
   try {
-    const res = await pgClient.query('SELECT EVT_TIME, EVT_DATA FROM DOORBELL WHERE EVT_TIME = (SELECT MAX(EVT_TIME) FROM DOORBELL)')
+    res = await pgClient.query('SELECT EVT_TIME, EVT_DATA FROM DOORBELL WHERE EVT_TIME = (SELECT MAX(EVT_TIME) FROM DOORBELL)')
   } catch(err) {
     console.error(err)
     ctx.throw(500, {'error': 'database error'})
