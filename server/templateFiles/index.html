@@ -15,7 +15,7 @@
                onchange="document.getElementById('form').submit();">
     </div>
 
-    <div class="buttons">
+    <div class="boxes">
         <p>Blurs to apply:</p>
         <!--<input type="range" id="TEST MF" name="blur" min="3" max="17" value="1" step="2">-->
         <input type="checkbox" id="median" name="blur" value="median">
@@ -24,7 +24,7 @@
         <label for="gauss">Gaussian Blur</label>
     </div>
 
-    <div class="buttons">
+    <div class="boxes">
         <p>Threshold Type:</p>
         <input type="radio" id="otsu" name="threshold" value="otsu">
         <label for="otsu">otsu</label><br>
@@ -39,16 +39,21 @@
         <label>Invert</label>
     </div>
 
-    <div class="buttons">
+    <div class="boxes">
         <p>Remove Details:</p>
-        <input type="range" id="dilate" name="dilate" min="0" max="5" value="0"
-        onchange="document.getElementById('dilate-amt').">
-        <label id="dilate-amt" for="dilate">Dilate</label><br>
-        <input type="range" id="erode" name="erode" min="0" max="5" value="0">
-        <label for="erode">Erode</label>
+        <input type="range" id="dilate" name="dilate" class="slider" min="0" max="5" value="0"
+               oninput="document.getElementById('dilate-amt').innerHTML = this.value;"><br>
+        <label for="dilate">
+            Dilate <span id="dilate-amt">0</span> times
+        </label><br>
+        <input type="range" id="erode" name="erode" class="slider" min="0" max="5" value="0"
+               oninput="document.getElementById('erode-amt').innerHTML = this.value;"><br>
+        <label for="erode">
+            Dilate <span id="erode-amt">0</span> times
+        </label>
     </div>
 
-    <div class="buttons">
+    <div class="boxes">
         <p>Create SVG:</p>
         <input type="radio" id="none" name="contour" value=0>
         <label for="none">none</label><br>
@@ -58,10 +63,16 @@
         <label for="tc89_l1">tc89_l1</label><br>
         <input type="radio" id="tc89_kcos" name="contour" value=3>
         <label for="tc89_kcos">tc89_kcos</label><br>
-        <input type="range" id="clean" name="clean" min="0" max="100" value="20">
-        <label for="smooth">path length</label><br>
-        <input type="range" id="smooth" name="smooth" min="0" max="100" value="10">
-        <label for="smooth">accuracy</label>
+        <input type="range" id="clean" name="clean" class="slider" min="0" max="100" value="0"
+               oninput="document.getElementById('clean-amt').innerHTML = this.value;"><br>
+        <label for="clean">
+            Ignore <span id="clean-amt">0</span>px Paths
+        </label><br>
+        <input type="range" id="smooth" name="smooth" class="slider" min="0" max="100" value="0"
+               oninput="document.getElementById('smooth-amt').innerHTML = this.value;"><br>
+        <label for="smooth">
+            Accuracy: <span id="smooth-amt">0</span>
+        </label>
     </div>
 
     <div class="buttons">
@@ -97,6 +108,5 @@
         <input type="submit" value="Send to Silhouette" name="send-to-silhouette" hidden="">
     </div>
 </form>
-
 </body>
 </html>

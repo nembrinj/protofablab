@@ -23,6 +23,20 @@ body {
   padding: 0px;
 }
 
+.boxes{
+  margin: 1 auto;
+  width: fit-content;
+  padding: 5px;
+  font-size: 20px;
+
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 16px 0px 16px 0px;
+  box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+
+  display:inline-block;
+  position: relative;
+  overflow: hidden;
+}
 .buttons{
   margin: 1px;
   width: fit-content;
@@ -51,4 +65,38 @@ img {
   display: inline-block;
   position: relative;
   overflow: hidden;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 95%;
+  height: 5px;
+  border-radius: 5px;
+  background: #f2f2f2;
+  outline: none;
+  opacity: 0.8;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ecc94b;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2a4365;
+  cursor: pointer;
+}
+
+.slider:hover {
+  opacity: 1; /* Fully shown on mouse-over */
 }
