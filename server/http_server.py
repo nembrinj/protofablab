@@ -109,7 +109,7 @@ def upload_file():
         dilate_iterations = int(request.form.get('dilate')) if request.form.get('dilate') else None
         erode_iterations = int(request.form.get('erode')) if request.form.get('erode') else None
         contour_type = int(request.form.get('contour')) if request.form.get('contour') else None
-        cleanliness = float(request.form.get('clean')) / 10 if request.form.get('clean') else None
+        cleanliness = float(request.form.get('clean')) if request.form.get('clean') else None
         smoothness = float(request.form.get('smooth')) / 10 if request.form.get('smooth') else None
 
         # check if the post request has the file part
@@ -137,32 +137,37 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
     svg = f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg"></svg>'
     blur = gray
 
-    if blurs:
+    if blurs is not None:
         if 'median' in blurs:
             blur = cv2.medianBlur(blur, 3)
         if 'gaussian' in blurs:
             blur = cv2.GaussianBlur(blur, (5, 5), 0)
 
-    if threshold_type:
+    if threshold_type is not None:
         blur = pipeline.threshold(blur, **{'method': threshold_type})['img']
 
-    if invert:
+    if invert is not None:
         blur = ~blur
 
-    if dilate_iterations != 0:
+    if dilate_iterations is not None and dilate_iterations != 0:
         blur = cv2.dilate(blur, np.ones((5, 5), np.uint8), iterations=dilate_iterations)
-    if erode_iterations != 0:
+    if erode_iterations is not None and erode_iterations != 0:
         blur = cv2.erode(blur, np.ones((5, 5), np.uint8), iterations=erode_iterations)
 
-    if contour_type:
+    if contour_type is not None:
         contours, _ = cv2.findContours(blur, cv2.RETR_LIST, contour_type)
 
-        if smoothness > 0:
+        if cleanliness is not None and cleanliness > 0:
             arr = []
             for cont in contours:
-                # TODO: add as argument
                 if cv2.arcLength(cont, False) > cleanliness:
-                    arr.append(cv2.approxPolyDP(cont, smoothness, False))
+                    arr.append(cont)
+            contours = arr
+
+        if smoothness is not None and smoothness > 0:
+            arr = []
+            for cont in contours:
+                arr.append(cv2.approxPolyDP(cont, smoothness, False))
             contours = arr
 
         svg = pipeline.contours2svg(contours, width, height)
