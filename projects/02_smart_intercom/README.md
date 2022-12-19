@@ -47,8 +47,10 @@ nano ngingx.conf
 
 docker-compose build
 
-docker-compose up nginx
+docker-compose up -d
 
-docker compose run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ -d protofablab.ch
+docker-compose run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ -d protofablab.ch
+
+git restore nginx.conf
 
 ```
