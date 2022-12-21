@@ -42,6 +42,20 @@
     </div>
 
     <div class="boxes">
+        <p>Remove Details:</p>
+        <input type="range" id="dilate" name="dilate" class="slider" min="0" max="5" value="0"
+               oninput="document.getElementById('dilate-amt').innerHTML = this.value;"><br>
+        <label for="dilate">
+            Dilate <span id="dilate-amt">0</span> times
+        </label><br>
+        <input type="range" id="erode" name="erode" class="slider" min="0" max="5" value="0"
+               oninput="document.getElementById('erode-amt').innerHTML = this.value;"><br>
+        <label for="erode">
+            Erode <span id="erode-amt">0</span> times
+        </label>
+    </div>
+
+    <div class="boxes">
         <p>Threshold Type:</p>
         <input type="radio" id="otsu" name="threshold" value="otsu">
         <label for="otsu">otsu</label><br>
@@ -57,23 +71,7 @@
     </div>
 
     <div class="boxes">
-        <p>Remove Details:</p>
-        <input type="range" id="dilate" name="dilate" class="slider" min="0" max="5" value="0"
-               oninput="document.getElementById('dilate-amt').innerHTML = this.value;"><br>
-        <label for="dilate">
-            Dilate <span id="dilate-amt">0</span> times
-        </label><br>
-        <input type="range" id="erode" name="erode" class="slider" min="0" max="5" value="0"
-               oninput="document.getElementById('erode-amt').innerHTML = this.value;"><br>
-        <label for="erode">
-            Erode <span id="erode-amt">0</span> times
-        </label>
-    </div>
-
-    <div class="boxes">
         <p>Create SVG:</p>
-        <input type="radio" id="none" name="contour" value=0>
-        <label for="none">none</label><br>
         <input type="radio" id="simple" name="contour" value=1 checked>
         <label for="simple">simple</label><br>
         <input type="radio" id="tc89_l1" name="contour" value=2>

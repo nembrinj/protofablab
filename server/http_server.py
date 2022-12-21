@@ -117,30 +117,34 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
          cleanliness: float, smoothness: float):
     idx = get_latest_img()
     img = cv2.imread('./staticFiles/images/pngs/' + str(idx) + '.png')
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    height, width = gray.shape
+    height, width = img.shape[:2]
     svg = f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg"></svg>'
-    blur = gray
-    print(blurs)
+
     if blurs is not ['1', '1']:
         if int(blurs[0]) > 1:
-            blur = cv2.medianBlur(blur, int(blurs[0]))
+            img = cv2.medianBlur(img, int(blurs[0]))
         if int(blurs[1]) > 1:
-            blur = cv2.GaussianBlur(blur, (int(blurs[1]), int(blurs[1])), 0)
-
-    if threshold_type is not None:
-        blur = pipeline.threshold(blur, **{'method': threshold_type})['img']
+            img = cv2.GaussianBlur(img, (int(blurs[1]), int(blurs[1])), 0)
 
     if invert is not None:
-        blur = ~blur
+        img = ~img
 
     if dilate_iterations is not None and dilate_iterations != 0:
-        blur = cv2.dilate(blur, np.ones((5, 5), np.uint8), iterations=dilate_iterations)
+        img = cv2.dilate(img, np.ones((5, 5), np.uint8), iterations=dilate_iterations)
     if erode_iterations is not None and erode_iterations != 0:
-        blur = cv2.erode(blur, np.ones((5, 5), np.uint8), iterations=erode_iterations)
+        img = cv2.erode(img, np.ones((5, 5), np.uint8), iterations=erode_iterations)
+
+    if threshold_type is not None:
+        if len(img.shape) > 2:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = pipeline.threshold(img, **{'method': threshold_type})['img']
 
     if contour_type is not None:
-        contours, _ = cv2.findContours(blur, cv2.RETR_LIST, contour_type)
+        if len(img.shape) > 2:
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = img
+        contours, _ = cv2.findContours(gray, cv2.RETR_LIST, contour_type)
 
         if cleanliness is not None and cleanliness > 0:
             arr = []
@@ -156,7 +160,7 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
             contours = arr
         svg = pipeline.contours2svg(contours, width, height)
 
-    add_img(blur, svg, idx)
+    add_img(img, svg, idx)
 
 
 def get_latest_img():
