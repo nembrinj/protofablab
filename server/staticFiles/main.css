@@ -13,6 +13,29 @@
   padding: 1px;
 }
 
+.pmbutton{
+  padding: 0;
+  margin: 0;
+  width: 20px;
+  height: 20px;
+  border: 1px;
+  background: white;
+}
+
+.pmbutton:hover{
+    background: lightgray;
+}
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+}
+
 body {
   font-family: 'montserrat', sans-serif;
   background-image: url( './images/pattern.svg' );

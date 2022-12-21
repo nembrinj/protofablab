@@ -4,6 +4,20 @@
     <link rel="stylesheet" href='/staticFiles/main.css'/>
 </head>
 <body>
+<script>
+   function incrementMed() {
+      document.getElementById('medInput').stepUp();
+   }
+   function decrementMed() {
+      document.getElementById('medInput').stepDown();
+   }
+      function incrementGau() {
+      document.getElementById('gauInput').stepUp();
+   }
+   function decrementGau() {
+      document.getElementById('gauInput').stepDown();
+   }
+</script>
 
 <div class="title-box">
     <h1>Image to Silhouette Drawing</h1>
@@ -16,22 +30,25 @@
     </div>
 
     <div class="boxes">
-        <p>Blurs to apply:</p>
-        <!--<input type="range" id="TEST MF" name="blur" min="3" max="17" value="1" step="2">-->
-        <input type="checkbox" id="median" name="blur" value="median">
-        <label for="median">Median Blur</label><br>
-        <input type="checkbox" id="gauss" name="blur" value="gaussian">
-        <label for="gauss">Gaussian Blur</label>
+        <span>Gaussian Blur Size:</span><br>
+        <input id=gauInput type=number min=1 max=21 size="1" step="2" name="blur" value=1>
+        <button onclick="incrementGau()" type="button" class="pmbutton">+</button>
+        <button onclick="decrementGau()" type="button" class="pmbutton">-</button>
+        <br>
+        <span>Median Blur Size:</span><br>
+        <input id=medInput type=number min=1 max=21 size="1" step="2" name="blur" value=1>
+        <button onclick="incrementMed()" type="button" class="pmbutton">+</button>
+        <button onclick="decrementMed()" type="button" class="pmbutton">-</button>
     </div>
 
     <div class="boxes">
         <p>Threshold Type:</p>
         <input type="radio" id="otsu" name="threshold" value="otsu">
         <label for="otsu">otsu</label><br>
+        <input type="radio" id="triangle" name="threshold" value="triangle">
+        <label for="triangle">triangle</label><br>
         <input type="radio" id="gaussian" name="threshold" value="gaussian">
         <label for="gaussian">gaussian</label><br>
-        <!--        <input type="radio" id="manual" name="threshold" value="manual">-->
-        <!--        <label for="manual">manual</label><br>-->
         <input type="radio" id="mean" name="threshold" value="mean">
         <label for="mean">mean</label><br>
 
@@ -64,7 +81,8 @@
         <input type="radio" id="tc89_kcos" name="contour" value=3>
         <label for="tc89_kcos">tc89_kcos</label><br>
         <input type="range" id="clean" name="clean" class="slider" min="0" max="100" value="0"
-               oninput="document.getElementById('clean-amt').innerHTML = this.value;"><br>
+               oninput="document.getElementById('clean-amt').innerHTML = this.value;"
+               style="width: 190px;"><br>
         <label for="clean">
             Ignore <span id="clean-amt">0</span>px Paths
         </label><br>
@@ -105,7 +123,7 @@
     </div>
 
     <div class="buttons">
-        <input type="submit" value="Send to Silhouette" name="send-to-silhouette" hidden="">
+        <input type="submit" value="Send to Silhouette" name="send-to-silhouette">
     </div>
 </form>
 </body>

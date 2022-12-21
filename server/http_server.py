@@ -136,12 +136,12 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
     height, width = gray.shape
     svg = f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg"></svg>'
     blur = gray
-
-    if blurs is not None:
-        if 'median' in blurs:
-            blur = cv2.medianBlur(blur, 3)
-        if 'gaussian' in blurs:
-            blur = cv2.GaussianBlur(blur, (5, 5), 0)
+    print(blurs)
+    if blurs is not ['1', '1']:
+        if int(blurs[0]) > 1:
+            blur = cv2.medianBlur(blur, int(blurs[0]))
+        if int(blurs[1]) > 1:
+            blur = cv2.GaussianBlur(blur, (int(blurs[1]), int(blurs[1])), 0)
 
     if threshold_type is not None:
         blur = pipeline.threshold(blur, **{'method': threshold_type})['img']
@@ -169,7 +169,6 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
             for cont in contours:
                 arr.append(cv2.approxPolyDP(cont, smoothness, False))
             contours = arr
-
         svg = pipeline.contours2svg(contours, width, height)
 
     add_img(blur, svg, idx)

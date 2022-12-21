@@ -94,6 +94,8 @@ def threshold(img, **kwargs) -> dict:
             return {'img': cv2.threshold(img, t, 255, cv2.THRESH_BINARY)[1]}
         case 'otsu':
             return {'img': cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]}
+        case 'triangle':
+            return {'img': cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_TRIANGLE)[1]}
         case 'mean':
             block_size: int = kwargs.setdefault('block_size',
                                                 pipeline_json['threshold']['mean']['block_size']['recommended'])
