@@ -45,7 +45,7 @@ void Mqtt::connect()
   while (!client.connected())
   {
     Serial.println("Connecting to MQTT...");
-    if (client.connect("ESP32Client", "", ""))
+    if (client.connect("ESP32Client", username, password))
     {
       Serial.print("Connected to ");
       Serial.println(address);
