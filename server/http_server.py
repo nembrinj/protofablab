@@ -48,45 +48,29 @@ def send_to_silhouette():
 
         return contours
 
-    def scale(contours: list[list[tuple[float, float]]], max_width: float, max_height: float) -> list[list[(int, int)]]:
-        min_x = float('inf')
-        max_x = float('-inf')
-        min_y = float('inf')
-        max_y = float('-inf')
-        for p in contours:
-            for x, y in p:
-                min_x = min(min_x, x)
-                max_x = max(max_x, x)
-
-                min_y = min(min_y, y)
-                max_y = max(max_y, y)
-
-        w = max_x - min_x
-        h = max_y - min_y
-
-        factor_width = max_width / w
-        factor_height = max_height / h
-
-        if factor_width > factor_height:
-            factor_height = factor_width
-        else:
-            factor_width = factor_height
+    def scale(contours: list[list[tuple[float, float]]], w, h, zoom) -> list[list[(int, int)]]:
+        factor_width = zoom / w
+        factor_height = zoom / h
 
         scaled = []
         for p in contours:
             path = []
             for x, y in p:
-                x = (x - min_x) * factor_width
-                y = (y - min_y) * factor_height
+                x *= factor_width
+                y *= factor_height
 
                 path.append((x, y))
 
             scaled.append(path)
         return scaled
 
-    with open('staticFiles/images/main.svg') as filename:
+    idx = get_latest_img()
+    height, width = cv2.imread('staticFiles/images/pngs/' + str(idx) + '.png').shape[:2]
+    with open('staticFiles/images/svgs/' + str(idx) + '.svg') as filename:
         contours = get_paths(filename)
-        contours = scale(contours, max_width=100, max_height=100)
+        contours = scale(contours, width, height, 100)
+
+        print(contours)
 
         # dev.setup(media=132, pen=True, pressure=10, speed=3)
         # dev.plot(pathlist=contours, offset=(5, 5))
@@ -98,6 +82,7 @@ def upload_file():
         if request.form.getlist('undo'):
             undo()
             return redirect(request.url)
+
 
         if request.form.get('send-to-silhouette'):
             send_to_silhouette()
