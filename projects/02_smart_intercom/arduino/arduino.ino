@@ -1,12 +1,12 @@
 #include "wifi.h"
 #include "mqtt.h"
 
-const char *WIFI_SSID = "ssid";
-const char *WIFI_PASSWORD = "password";
+const char *WIFI_SSID = "AndroidAP125C";
+const char *WIFI_PASSWORD = "eepb8097";
 
-const char *MQTT_SERVER = "address";
-const char *MQTT_USER = "user";
-const char *MQTT_PASSWORD = "pass";
+const char *MQTT_SERVER = "protofablab.ch";
+const char *MQTT_USER = "api";
+const char *MQTT_PASSWORD = "apipw";
 
 unsigned sampleRate = 4; // in Hz
 
@@ -39,10 +39,13 @@ void setup()
   mqtt.subscribe("drop_rate", [](const char *val) { dropRate = atof(val); });
   mqtt.subscribe("door_action", [](const char *val) {
     if (!strcmp(val, "open")) {
-      digitalWrite(LED_BUILTIN, HIGH);
       Serial.println("opening door");
-      delay(5000);
-      digitalWrite(LED_BUILTIN, LOW);
+      for(int i = 0; i < 10; i++) {
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(200);
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(200);
+      }
   }});
 }
 
