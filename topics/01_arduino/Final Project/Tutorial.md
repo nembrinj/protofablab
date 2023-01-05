@@ -46,6 +46,13 @@ Aceasta este o demonstrație că sistemul nostru de notificare a utilizatorului 
 
 
 
+ 
+https://user-images.githubusercontent.com/15964709/210858171-c8710c31-4560-43ef-b8ef-35b9d91e1f13.mp4
+
+
+
+
+
 
 
 
