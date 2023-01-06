@@ -65,7 +65,7 @@ E.g., kernel sizes in `{3, 6, 9, ..., 15}` can be expressed like following:
 }
 ```
 
-# Calling the ipeline
+# Calling the pipeline
 Inside `pipeline.py` we provide all methods of the pipeline.
 These methods take an image and a dictionary as arguments.
 
