@@ -42,7 +42,7 @@ void setup() {
   WiFiManagerParameter my_phone_number("my_number", "Enter your phone number!", "default" , 15);
   wfm.addParameter(&my_phone_number);
 
-  if(!wfm.autoConnect("HM Water Sensor", "password")){
+  if(!wfm.autoConnect("HN Water Sensor", "password")){
     Serial.println("failed to connect and hit timeout");
     ESP.restart();
     delay(1000);
