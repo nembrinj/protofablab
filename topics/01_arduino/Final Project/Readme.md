@@ -14,7 +14,6 @@
 WhatsApp notifier created for ESP32 Feather using Arduino. This is the final project of the course Fabrication and Prototyping in the LearningLab at the University of Bern in the fall semester of 2022.
 
 
-
 ## Introduction
 After a lot of brainstorming sessions in which we proposed, we came up with several projects and a few more discussions on the choice of project, this is the result. It took multiple coffee ☕, chocolate 🍫 and Friday (sometimes even Thursday) 🕑 breaks offered to the project to bring it to fruition.
 
@@ -30,22 +29,24 @@ This problem is completely eliminated if we use the water sensor together with H
 * * *
 
 ## Technologies
-
-
+ The project is created with:
+1. Arduino IDE 2.0.3
+2. Twilio
+3. ThingEsp.h   1.3.0
+4. Preferences.h preinstalled
+5. WiFiManager. h 2.0.9-beta
+6. VL53L0X.h 1.3.1
 
 
 ## General schema
 
 The scheme of the project is modular. Each module consists of a sensor that is connected to an ESP32 Feather. Depending on the sensor and its use, the ESP32 Feather will be programmed to send and receive data via Wi-Fi to the Twilio server to later be transmitted as WhatsApp messages to the user.
 
-//Figure slide 3
+![Figure1](https://ucf7d26b82c39a6ffcaa8ad5715b.previews.dropboxusercontent.com/p/thumb/ABytSse8BDttl5yVXDi32gKEenvZkEvcy3oVCyBlNsiRsuYQ0FNRsrZf-ezfF1xsPkSb-E8hspzBYPO3nFGHz5tejDUO2TjsSkll7-H88CLp_8-4Z8LIb1Vd4vdP4OiFfNm0Wel47ynTn6bzZyYBxgyyiMo_qJrA5A9a-sp6X0JdQMM2BfCzsHrjbAI2BM_QWbMKURZaWpK-kLdpA93TXjK2SFKnc1mTgxn6ho6mtcNmWFe97NpSeUx58QVsvtfRqqkAc1yA5RMF0CabwAz0OUhNfcF-huKpNBei3k3QNNX_2OcSVDqZkDhPThvG_BnhdDyOwPOYqqgUE7T8FMBQp7BikXqwkU6p9oShh620aA1chTXlQHfCEUp18tqeBvgJlF8hU5fJ-ojoaRJjKbtlPN4e4D-BguKyXNZpiMeo7OEoSg/p.png)
 
 In this tutorial, we focus on the application of detecting the water level in a bathtub as it fills up. Other possible uses may be to detect the temperature of a pot until it boils.
 
-
-//Figure slide 2
-
-![Figure2](https://www.dropbox.com/s/qdvqh2kiobunt8s/Device_schema.PNG?dl=0)
+![Figure2](https://ucb7f89455edaa7604d7ce1cb1b5.previews.dropboxusercontent.com/p/thumb/ABwVLqOHD_VAjsOtcGIKHfINqapkPnnTYPJqQL76e_Dk_HA3EN3arUqAC2R6e0pGegIQ6gkbdbSztyRsJwxVV2SI_VgLYjOH25OfTuffiFon_X6Xze3X5nRCsXM3xvDcpg8Ysc2T3NvKYXCcF-cgVJ8OiEZGG7MXLOCnvS6Ez2K_WBWaiuWe6W-H2OoPBKKkgX9vnRRYRcAPcPErnJvA-eAiLBgwbc2NNdJiOXCRCjT7IGxFQHgK3e-elEwIbbdQe_lfXmubZMmhRp35W9y6lBq7JnB3bhlqCFMjMnIreGStLVwPkcVNqDCM4nkcYhkG6kzeXt1RJgJJARyOVxuuQFz6Js7B6cvNWPNlUht20dudsPUfFY5oxSntByHdaC4TZG5Pv_hPqltavkssWW6rsugw4zBe5AeqdImUqwTtB_2esA/p.png)
 
 To determine the water levels in the bathtub application we have used the VL53L0X TOF sensor. This is an infrared emitter and receiver that measures the flight time that elapses between a pulse leaving the sensor and returning reflected. The sensor uses this time to calculate the distance at which the reflective surface is.
 
@@ -53,12 +54,12 @@ To determine the water levels in the bathtub application we have used the VL53L0
 
 The connection between the TOF VL53L0X sensor and the ESP32 Feather is straightforward:
 
-GND in sensor to GND in ESP32 Feather
-Vin in sensor to GND in ESP32 Feather
-SCL in sensor to SCL in ESP32 Feather
-SDA in sensor to SDA in ESP32 Feather
+- GND in sensor to GND in ESP32 Feather
+- Vin in sensor to GND in ESP32 Feather
+- SCL in sensor to SCL in ESP32 Feather
+- SDA in sensor to SDA in ESP32 Feather
 
-//Figure Electrical Schema
+![Figure3](https://uc47e333b6839944b9c5cd5d556c.previews.dropboxusercontent.com/p/thumb/ABx6PyepFs9GtezquKLWkJSyWGYefK30I51Oge8Fvto-pXmX85kGWtdTqxUZfVBLKvCpp-Ws0fdlVmoslAW3c7eMfUOhMjCmCsm4WElbVasZdcjjhMxZr89zMuKOhVrhRCeobe98LBOKvGSrxlflXIMyu_b1K0HBSPmWrACJWqSuj5z881hnlo8MmxyYjASR3CvDlRryu7URxK79sq4eql9EFhouwy08Wep8t9_uHCUz1pI68qIHDyfPMGl8kWesDbn1ivBM15hIETnoCvwZ2d_tC3r_kAnBJyVyPWnlwihv7Cs-DN0m_xHPhs3wzvzCn3WxewuCviGNYeW3Nq_xdRfcx0q-IgCmdxCLarNtCR2HeVJtQBgGW1XaarlrNYu48vNrm7KnaXslxf_4HeAUhrBjtxC7UL5L89IAZ0rNwVQ0wQ/p.png)
 (Source: https://learn.adafruit.com/adafruit-vl53l0x-micro-lidar-distance-sensor-breakout/python-circuitpython)
 
 ## Procedure
@@ -76,7 +77,7 @@ The process that que are going to implement consists of 5 steps:
 ## Preview of the code and functionality
 
 
-- How to Set up the Wifi credentials using a smartphone?
+- ### How to Set up the Wifi credentials using a smartphone?
   
 This can be done using the [WiFiManager](https://github.com/tzapu/WiFiManager) library. For example:
 ```
@@ -90,7 +91,7 @@ This can be done using the [WiFiManager](https://github.com/tzapu/WiFiManager) l
 ```
 We first instantiate an object called **wfm**
 
-The **my_phone_number()** constructor will create an object that has the following parameters: "my_number", placeholder text, default value and a max length. 
+The **my_phone_number()** constructor will create an object that has the following parameters: "my_number", placeholder text, default value and a max length.  
 
 ```
   if(!wfm.autoConnect("HN Water Sensor", "password")){
@@ -99,15 +100,37 @@ The **my_phone_number()** constructor will create an object that has the followi
   }
   myNumber = my_phone_number.getValue();
 ```
-Where **myNumber** will store the value of the **my_phone_number** input as a string.
+The **autoConnect()** method sets up a WiFi hotspot. The first parameter is the SSID name and the second one the inserted password.
+
+ **myNumber** will store the value of the **my_phone_number** input as a string.
 If the password is wrong the WiFi login interface will be restarted by resseting the ESP. 
   
-- How to send and recevie messages from the ESP32 Feather to WhatsApp?
+- ### How to send and recevie messages from the ESP32 Feather to WhatsApp?
+
+We first need to use the [ThingESP Arduino Library](https://github.com/SiddheshNan/ThingESP-Arduino-Library) in our Arduino IDE and create an account on the [following platform](https://thingesp.siddhesh.me/) and from there create a [new project](https://thingesp.siddhesh.me/#/console/projects). Afterwards we insert the following parameters inside the **thing()** constructor. Please use your own credentials to run your project as these are not valid.
+ 
 
 
-- How to save water level values into the ESP32 Feather flash memory?
+```
+ThingESP32 thing("Alexandru98", "Bathtub", "123456789");
+```
+1. Username
+2. Project name
+3. Project's Device Credentials
 
 
+- ### How to save water level values into the ESP32 Feather flash memory?
+
+We used a library called Preferences.h and it can save different data types onto the flash memory.
+```
+preferences.begin("App", false);
+level1Set = preferences.getBool("level1_bool");
+preferences.putBool("level1_bool", true);
+```
+
+With **preferences.begin()** we can initialize the **preferences** object with a certain set of values correlated with the **App** string. We can get and save various values related to the String **level1_bool**.
+
+A better implementation variant would give us the possibility to have an unlimited number of levels that can be saved, this would be a possible future development.
 
 * * *
 ## **Demo** video
