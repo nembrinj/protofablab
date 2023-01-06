@@ -37,6 +37,7 @@ This problem is completely eliminated if we use the water sensor together with H
 5. WiFiManager. h 2.0.9-beta
 6. VL53L0X.h 1.3.1
 
+* * *
 
 ## General schema
 
@@ -50,6 +51,8 @@ In this tutorial, we focus on the application of detecting the water level in a 
 
 To determine the water levels in the bathtub application we have used the VL53L0X TOF sensor. This is an infrared emitter and receiver that measures the flight time that elapses between a pulse leaving the sensor and returning reflected. The sensor uses this time to calculate the distance at which the reflective surface is.
 
+* * *
+
 ## Electrical schema
 
 The connection between the TOF VL53L0X sensor and the ESP32 Feather is straightforward:
@@ -62,6 +65,9 @@ The connection between the TOF VL53L0X sensor and the ESP32 Feather is straightf
 ![Figure3](https://uc47e333b6839944b9c5cd5d556c.previews.dropboxusercontent.com/p/thumb/ABx6PyepFs9GtezquKLWkJSyWGYefK30I51Oge8Fvto-pXmX85kGWtdTqxUZfVBLKvCpp-Ws0fdlVmoslAW3c7eMfUOhMjCmCsm4WElbVasZdcjjhMxZr89zMuKOhVrhRCeobe98LBOKvGSrxlflXIMyu_b1K0HBSPmWrACJWqSuj5z881hnlo8MmxyYjASR3CvDlRryu7URxK79sq4eql9EFhouwy08Wep8t9_uHCUz1pI68qIHDyfPMGl8kWesDbn1ivBM15hIETnoCvwZ2d_tC3r_kAnBJyVyPWnlwihv7Cs-DN0m_xHPhs3wzvzCn3WxewuCviGNYeW3Nq_xdRfcx0q-IgCmdxCLarNtCR2HeVJtQBgGW1XaarlrNYu48vNrm7KnaXslxf_4HeAUhrBjtxC7UL5L89IAZ0rNwVQ0wQ/p.png)
 (Source: https://learn.adafruit.com/adafruit-vl53l0x-micro-lidar-distance-sensor-breakout/python-circuitpython)
 
+
+* * *
+
 ## Procedure
 
 The process that que are going to implement consists of 5 steps:
@@ -72,8 +78,8 @@ The process that que are going to implement consists of 5 steps:
 4. Reset the device
 5. Ready to use
 
-
 * * *
+
 ## Preview of the code and functionality
 
 
@@ -161,7 +167,7 @@ https://user-images.githubusercontent.com/15964709/210858171-c8710c31-4560-43ef-
 
 
 
-Missing from the previous tutorial
+<!-- Missing from the previous tutorial
 
 ❌ Sandro: General schema + Process
 
@@ -171,8 +177,8 @@ Missing from the previous tutorial
 * a schema of the concept of your project is missing in the tutorial. As is missing an electrical schema….Linking your presentation is not a solution. Take a look at your tutorial: would you be willing to read it without schema/electrical schema?
   ❌Sandro
 
-* You should generalize your idea: why is this project interesting for programming arduino boards in general? Your intro should be much more interesting to invite the reader to engage in following the tutorial.  ✅ALEXANDRU 
+* You should generalize your idea: why is this project interesting for programming arduino boards in general? Your intro should be much more interesting to invite the reader to engage in following the tutorial.  ✅ Sandro + Alexandru  
 
-* The tutorial follows exactly the code. This is probably not the best option in terms of explaining your project (and even explaining the code).  ❌ALEXANDRU 
+* The tutorial follows exactly the code. This is probably not the best option in terms of explaining your project (and even explaining the code).   ✅Alexandru 
 
-* There is no presentation of a successful run (video?image?)       ✅ALEXANDRU 
+* There is no presentation of a successful run (video?image?)       ✅Alexandru  -->
