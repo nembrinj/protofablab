@@ -1,125 +1,117 @@
 .title-box {
-  font-size: 30px;
-  font-weight: 500;
-  text-align: center;
-  text-shadow: 1px 1px hsl(0deg 0% 0% / 0.48);
-  background-color: whitesmoke;
-  box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
-  margin-bottom: 3px;
+	font-size: 25px;
+	font-weight: 500;
+	text-align: center;
+	text-shadow: 1px 1px hsl(0deg 0% 0% / 0.48);
+	background-color: whitesmoke;
+	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+	margin-bottom: 3px;
 }
-
 * {
-  margin: 1px;
-  padding: 1px;
+	margin: 1px;
+	padding: 1px;
 }
-
 .pmbutton{
-  padding: 0;
-  margin: 0;
-  width: 20px;
-  height: 20px;
-  border: 1px;
-  background: white;
+	padding: 0;
+	margin: 0;
+	width: 20px;
+	height: 20px;
+	border: 1px;
+	background: white;
 }
-
 .pmbutton:hover{
-    background: lightgray;
+	background: lightgray;
 }
-
-input[type=number]::-webkit-outer-spin-button,
-input[type=number]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
 }
-
 input[type=number] {
-    -moz-appearance:textfield;
+	-moz-appearance:textfield;
 }
-
 body {
-  font-family: 'montserrat', sans-serif;
-  background-image: url( './images/pattern.svg' );
+	font-family: 'montserrat', sans-serif;
+	background-image: url( './images/pattern.svg' );
 }
-
-.frame{
-  margin: 0px;
-  padding: 0px;
-}
-
 .boxes{
-  margin: 1 auto;
-  width: fit-content;
-  padding: 5px;
-  font-size: 20px;
-
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 16px 0px 16px 0px;
-  box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
-
-  display:inline-block;
-  position: relative;
-  overflow: hidden;
+	margin: 1 auto;
+	width: fit-content;
+	padding: 5px;
+	font-size: 20px;
+	background-color: rgba(255, 255, 255, 0.8);
+	border-radius: 16px 0px 16px 0px;
+	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+	display:inline-block;
+	position: relative;
+	overflow: hidden;
 }
 .buttons{
-  margin: 1px;
-  width: fit-content;
-  padding: 5px;
-  font-size: 20px;
-
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 16px 0px 16px 0px;
-  box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
-
-  display: inline-block;
-  position: relative;
-  overflow: hidden;
+	margin: 1px;
+	width: fit-content;
+	padding: 5px;
+	font-size: 20px;
+	background-color: rgba(255, 255, 255, 0.8);
+	border-radius: 16px 0px 16px 0px;
+	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
 }
-
+.image {
+	max-width: 20%;
+	height: auto;
+	padding: 10px;
+	font-size: 20px;
+	background-color: rgba(255, 255, 255, 0.8);
+	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+	display: inline-block;
+	position: relative;
+	padding-bottom: 15px;
+}
 img {
-  max-width: 23%;
-  height: auto;
-
-  padding: 10px;
-  font-size: 20px;
-
-  background-color: rgba(255, 255, 255, 0.8);
-  box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
-
-  display: inline-block;
-  position: relative;
-  overflow: hidden;
+    margin-left:auto;
+    margin-right:auto;
+	max-width:100%;
+	max-height:100%;
+	padding:0px;
+	margin:0px;
 }
-
 .slider {
-  -webkit-appearance: none;
-  width: 95%;
-  height: 5px;
-  border-radius: 5px;
-  background: #f2f2f2;
-  outline: none;
-  opacity: 0.8;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
+	-webkit-appearance: none;
+	width: 95%;
+	height: 5px;
+	border-radius: 5px;
+	background: #f2f2f2;
+	outline: none;
+	opacity: 0.8;
+	-webkit-transition: .2s;
+	transition: opacity .2s;
 }
-
 .slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #ecc94b;
-  cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #ecc94b;
+	cursor: pointer;
 }
-
 .slider::-moz-range-thumb {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #2a4365;
-  cursor: pointer;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #2a4365;
+	cursor: pointer;
 }
-
 .slider:hover {
-  opacity: 1; /* Fully shown on mouse-over */
+	opacity: 1;
+	/* Fully shown on mouse-over */
+}
+.bottom-img {
+	font-size: 15px;
+	margin: 0px;
+	padding: 0px;
+	bottom: 1px;
+	left: 10px;
+	position: absolute;
 }

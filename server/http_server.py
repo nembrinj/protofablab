@@ -19,6 +19,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = 'ProtoFabLab'
 config = toml.load('../config.toml')['Server']
 
+DATA = [
+    {'id': '0', 'text': ''}
+]
+
 # dev = SilhouetteCameo(dry_run=False)
 # state = dev.status()  # hint at loading paper, if not ready.
 
@@ -70,8 +74,6 @@ def send_to_silhouette():
         contours = get_paths(filename)
         contours = scale(contours, width, height, 100)
 
-        print(contours)
-
         # dev.setup(media=132, pen=True, pressure=10, speed=3)
         # dev.plot(pathlist=contours, offset=(5, 5))
 
@@ -82,7 +84,6 @@ def upload_file():
         if request.form.getlist('undo'):
             undo()
             return redirect(request.url)
-
 
         if request.form.get('send-to-silhouette'):
             send_to_silhouette()
@@ -100,17 +101,18 @@ def upload_file():
         # check if the post request has the file part
         file = request.files['file']
         if file and allowed_file(file.filename):
-            # filename = secure_filename(file.filename)
             delete_files_in_folder('./staticFiles/images/pngs/')
             delete_files_in_folder('./staticFiles/images/svgs/')
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], '0.png'))
             height, width = cv2.imread(UPLOAD_FOLDER + '0.png').shape[:2]
             svg = f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg"></svg>'
             write_svg(svg, 0)
+            DATA.clear()
+            DATA.append({'id': '0', 'text': ''})
             return redirect(request.url)
         root(blurs, threshold_type, invert, dilate_iterations, erode_iterations, contour_type, cleanliness, smoothness)
         return redirect(request.url)
-    return render_template('index.html')
+    return render_template('index.html', data=DATA)
 
 
 def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode_iterations: int, contour_type: int,
@@ -119,8 +121,10 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
     img = cv2.imread('./staticFiles/images/pngs/' + str(idx) + '.png')
     height, width = img.shape[:2]
     svg = f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg"></svg>'
+    description = ''
 
-    if blurs is not ['1', '1']:
+    if blurs != ['1', '1']:
+        description += 'Blurs, '
         if int(blurs[0]) > 1:
             img = cv2.medianBlur(img, int(blurs[0]))
         if int(blurs[1]) > 1:
@@ -131,13 +135,16 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
 
     if dilate_iterations is not None and dilate_iterations != 0:
         img = cv2.dilate(img, np.ones((5, 5), np.uint8), iterations=dilate_iterations)
+        description += 'Dilate, '
     if erode_iterations is not None and erode_iterations != 0:
         img = cv2.erode(img, np.ones((5, 5), np.uint8), iterations=erode_iterations)
+        description += 'Erode, '
 
     if threshold_type is not None:
         if len(img.shape) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img = pipeline.threshold(img, **{'method': threshold_type})['img']
+        description += 'Threshold, '
 
     if contour_type is not None:
         if len(img.shape) > 2:
@@ -160,6 +167,13 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
             contours = arr
         svg = pipeline.contours2svg(contours, width, height)
 
+    description = description[:-2]
+    if idx < 3:
+        DATA.append({'id': str(idx+1), 'text': description})
+    else:
+        for i in range(IMG_AMT-1):
+            DATA[i]['text'] = DATA[i+1]['text']
+        DATA[IMG_AMT-1]['text'] = description
     add_img(img, svg, idx)
 
 
@@ -200,9 +214,8 @@ def undo():
     idx = get_latest_img()
     if idx > 0:
         os.remove('./staticFiles/images/pngs/' + str(idx) + '.png')
-        svg_path = './staticFiles/images/svgs/' + str(idx) + '.svg'
-        if os.path.exists(svg_path):
-            os.remove(svg_path)
+        os.remove('./staticFiles/images/svgs/' + str(idx) + '.svg')
+        DATA.pop()
 
 
 def delete_files_in_folder(path):
