@@ -39,9 +39,10 @@ void setup()
   mqtt.subscribe("drop_rate", [](const char *val) { dropRate = atof(val); });
   mqtt.subscribe("door_action", [](const char *val) {
     if (!strcmp(val, "open")) {
+      // here we would activate the servo motor
       digitalWrite(LED_BUILTIN, HIGH);
       Serial.println("opening door");
-      delay(5000);
+      delay(5000); 
       digitalWrite(LED_BUILTIN, LOW);
   }});
 }
