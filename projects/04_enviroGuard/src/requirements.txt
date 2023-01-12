@@ -5,3 +5,8 @@ influxdb
 grafanalib
 mariadb==1.0.11
 influxdb
+board
+digitalio
+smbus
+adafruit_bme280
+adafruit_ccs811
