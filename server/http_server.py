@@ -20,7 +20,7 @@ app.config['SECRET_KEY'] = 'ProtoFabLab'
 config = toml.load('../config.toml')['Server']
 
 DATA = [
-    {'id': '0', 'text': ''}
+    {'id': '0', 'png_text': '', 'svg_text': ''}
 ]
 
 # dev = SilhouetteCameo(dry_run=False)
@@ -121,39 +121,48 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
     img = cv2.imread('./staticFiles/images/pngs/' + str(idx) + '.png')
     height, width = img.shape[:2]
     svg = f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg"></svg>'
-    description = ''
+    png_text = ''
 
     if blurs != ['1', '1']:
-        description += 'Blurs, '
+        png_text += 'Blur, '
         if int(blurs[0]) > 1:
             img = cv2.medianBlur(img, int(blurs[0]))
         if int(blurs[1]) > 1:
             img = cv2.GaussianBlur(img, (int(blurs[1]), int(blurs[1])), 0)
 
     if invert is not None:
+        png_text += 'Invert, '
         img = ~img
 
     if dilate_iterations is not None and dilate_iterations != 0:
         img = cv2.dilate(img, np.ones((5, 5), np.uint8), iterations=dilate_iterations)
-        description += 'Dilate, '
+        png_text += 'Dilate, '
     if erode_iterations is not None and erode_iterations != 0:
         img = cv2.erode(img, np.ones((5, 5), np.uint8), iterations=erode_iterations)
-        description += 'Erode, '
+        png_text += 'Erode, '
 
     if threshold_type is not None:
+        png_text += str(threshold_type)[0].upper() + str(threshold_type)[1:] + ', '
         if len(img.shape) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img = pipeline.threshold(img, **{'method': threshold_type})['img']
-        description += 'Threshold, '
 
+    svg_text = ''
     if contour_type is not None:
         if len(img.shape) > 2:
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         else:
             gray = img
+        if contour_type == 1:
+            svg_text += 'Simple'
+        elif contour_type == 2:
+            svg_text += 'Tc89_l1'
+        else:
+            svg_text += 'tc89_kcos'
         contours, _ = cv2.findContours(gray, cv2.RETR_LIST, contour_type)
 
         if cleanliness is not None and cleanliness > 0:
+            svg_text += ', ' + str(cleanliness) + ' px'
             arr = []
             for cont in contours:
                 if cv2.arcLength(cont, False) > cleanliness:
@@ -161,19 +170,22 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
             contours = arr
 
         if smoothness is not None and smoothness > 0:
+            svg_text += ', ' + str(cleanliness)
             arr = []
             for cont in contours:
                 arr.append(cv2.approxPolyDP(cont, smoothness, False))
             contours = arr
         svg = pipeline.contours2svg(contours, width, height)
 
-    description = description[:-2]
+    png_text = png_text[:-2]
     if idx < 3:
-        DATA.append({'id': str(idx+1), 'text': description})
+        DATA.append({'id': str(idx+1), 'png_text': png_text, 'svg_text': svg_text})
     else:
         for i in range(IMG_AMT-1):
-            DATA[i]['text'] = DATA[i+1]['text']
-        DATA[IMG_AMT-1]['text'] = description
+            DATA[i]['png_text'] = DATA[i+1]['png_text']
+            DATA[i]['svg_text'] = DATA[i + 1]['svg_text']
+        DATA[IMG_AMT - 1]['png_text'] = png_text
+        DATA[IMG_AMT-1]['svg_text'] = svg_text
     add_img(img, svg, idx)
 
 

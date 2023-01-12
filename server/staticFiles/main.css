@@ -1,26 +1,19 @@
 .title-box {
 	font-size: 25px;
-	font-weight: 500;
+	font-weight: 250;
 	text-align: center;
 	text-shadow: 1px 1px hsl(0deg 0% 0% / 0.48);
 	background-color: whitesmoke;
 	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
 	margin-bottom: 3px;
 }
+body {
+	font-family: 'montserrat', sans-serif;
+	background-image: url('./images/pattern.svg');
+}
 * {
 	margin: 1px;
 	padding: 1px;
-}
-.pmbutton{
-	padding: 0;
-	margin: 0;
-	width: 20px;
-	height: 20px;
-	border: 1px;
-	background: white;
-}
-.pmbutton:hover{
-	background: lightgray;
 }
 input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button {
 	-webkit-appearance: none;
@@ -29,40 +22,41 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 input[type=number] {
 	-moz-appearance:textfield;
 }
-body {
-	font-family: 'montserrat', sans-serif;
-	background-image: url( './images/pattern.svg' );
-}
 .boxes{
 	margin: 1 auto;
 	width: fit-content;
-	padding: 5px;
-	font-size: 20px;
-	background-color: rgba(255, 255, 255, 0.8);
-	border-radius: 16px 0px 16px 0px;
-	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
-	display:inline-block;
+	padding: 3px;
+	font-size: 15px;
+	background-color: rgba(255, 255, 255, 0.75);
+	border-radius: 8px 0px 8px 0px;
+	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.5);
+	display: inline-block;
 	position: relative;
 	overflow: hidden;
 }
 .buttons{
-	margin: 1px;
+	margin: 1 auto;
 	width: fit-content;
-	padding: 5px;
-	font-size: 20px;
-	background-color: rgba(255, 255, 255, 0.8);
-	border-radius: 16px 0px 16px 0px;
-	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+	padding: 0px;
+	font-size: 15px;
+	background-color: #e9e9ed;
+	border-radius: 8px 0px 8px 0px;
+	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.5);
 	display: inline-block;
 	position: relative;
 	overflow: hidden;
+}
+input[type=submit]{
+    padding: 3px;
+    outline: none;
+    border: 0;
 }
 .image {
 	max-width: 20%;
 	height: auto;
 	padding: 10px;
 	font-size: 20px;
-	background-color: rgba(255, 255, 255, 0.8);
+	background-color: rgba(255, 255, 255, 1);
 	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
 	display: inline-block;
 	position: relative;
@@ -114,4 +108,5 @@ img {
 	bottom: 1px;
 	left: 10px;
 	position: absolute;
+	color: black;
 }

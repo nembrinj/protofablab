@@ -9,11 +9,11 @@
     <h1>Silhouetize</h1>
 </div>
 <form id="form" method=post enctype=multipart/form-data>
-    <div class="buttons">
-        <p>Upload Image:</p>
-        <input type=file name=file value="Choose an Image" class = "upload-button"
+    <div class="boxes">
+        <span>Upload Image:</span><br>
+        <input type=file name=file class = "upload-button"
                onchange="document.getElementById('form').submit();">
-    </div>
+    </div><br>
 
     <div class="boxes">
         <span>Blur Type:</span><br>
@@ -91,7 +91,7 @@
         {% for item in data %}
         <div class="image">
             <img src='../staticFiles/images/pngs/{{item.id}}.png' onerror="this.onerror=null; this.remove();"/>
-            <div class="bottom-img">{{item.text}}</div>
+            <div class="bottom-img">{{item.png_text}}</div>
         </div>
         {% endfor %}
     </div>
@@ -100,6 +100,7 @@
         {% for item in data %}
         <div class="image">
             <img src='../staticFiles/images/svgs/{{item.id}}.svg' onerror="this.onerror=null; this.remove();"/>
+            <div class="bottom-img">{{item.svg_text}}</div>
         </div>
         {% endfor %}
     </div>
