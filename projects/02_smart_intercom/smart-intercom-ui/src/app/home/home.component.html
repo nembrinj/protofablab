@@ -7,10 +7,16 @@
 </div>
 
 <div *ngIf="arePermissionsGranted() && isPushSubscriptionSucess">
-  <div *ngIf="doorbellEvtTime">
-    Last recorded doorbell event: {{doorbellEvtTime}}
+  <div class="doorbell" *ngIf="doorbellEvtTime">
+    Last recorded doorbell event: {{ doorbellEvtTime | date:'dd.MM.yyyy "at" HH:mm:ss'}}
   </div>
-  <div>
+  <div class="dooraction">
+    Click here to trigger the door opening mechanic
     <button (click)="openDoor()">Open door</button>
   </div>
+  <div class="configuration">
+    Configure your smart intercom:
+    <button (click)="configure()">Configure</button>
+  </div>
 </div>
+

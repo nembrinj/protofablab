@@ -6,11 +6,23 @@ const cors = require('@koa/cors');
 const TOPIC_BELL_RINGING = 'smart_intercom/bell_ringing'
 const TOPIC_DOOR_ACTION = 'smart_intercom/door_action'
 
+const TOPIC_CONFIG_AMP = 'smart_intercom/bell_amp'
+const TOPIC_CONFIG_DURATION  = 'smart_intercom/bell_duration'
+const TOPIC_CONFIG_SAMPLE  = 'smart_intercom/sample_rate'
+const TOPIC_CONFIG_DROP  = 'smart_intercom/drop_rate'
+
 const PUSH_SUBSCRIPTION_INSERT_STATEMENT = 'INSERT INTO PUSH_SUBSCRIPTION(id, subscription) VALUES($1, $2)'
 const DOORBELL_INSERT_STATEMENT = 'INSERT INTO DOORBELL(evt_time, evt_data) VALUES (NOW(), $1)'
 
 let maxSubscriptionId = 0
 let pushSubscriptions = {}
+
+let sensorConfig = {
+  amp: 50,
+  duration: 500,
+  sample_rate: 1000,
+  drop_rate: 1000
+}
 
 // database
 const { Client } = require('pg')
@@ -41,6 +53,8 @@ router.get('/ping', ping)
   .post('/notify', sendNotification)
   .get('/doorbell', getDoorbell)
   .post('/door', doorAction)
+  .get('/sensorconfig', getSensorConfig)
+  .post('/sensorconfig', setSensorConfig)
 
 async function ping(ctx) {
   ctx.body = {
@@ -105,20 +119,21 @@ async function sendNotificationToAllSubcriptions(message) {
 }
 
 async function getDoorbell(ctx) {
+  let res
   try {
-    const res = await pgClient.query('SELECT EVT_TIME, EVT_DATA FROM DOORBELL WHERE EVT_TIME = (SELECT MAX(EVT_TIME) FROM DOORBELL)')
-    if(res.rows.length === 0) {
-      ctx.throw(404, {'error': 'no doorbell events found'})
-    }
-    ctx.body = {
-      time: res.rows[0].evt_time,
-      data: res.rows[0].evt_data
-    }
-    ctx.status = 200
+    res = await pgClient.query('SELECT EVT_TIME, EVT_DATA FROM DOORBELL WHERE EVT_TIME = (SELECT MAX(EVT_TIME) FROM DOORBELL)')
   } catch(err) {
     console.error(err)
     ctx.throw(500, {'error': 'database error'})
   }
+  if(res.rows.length === 0) {
+    ctx.throw(404, {'error': 'no doorbell events found'})
+  }
+  ctx.body = {
+    time: res.rows[0].evt_time,
+    data: res.rows[0].evt_data
+  }
+  ctx.status = 200
 }
 
 async function doorAction(ctx) {
@@ -130,6 +145,34 @@ async function doorAction(ctx) {
   console.log('sending action to door:', body.action)
   mqttClient.publish(TOPIC_DOOR_ACTION, body.action)
   ctx.status = 200
+}
+
+async function getSensorConfig(ctx) {
+  ctx.body = sensorConfig
+  ctx.status = 200
+}
+
+async function setSensorConfig(ctx) {
+  const body = ctx.request.body
+  console.log('received sensor config', body)
+  if (body.amp) {
+    sensorConfig.amp = parseInt(body.amp)
+    mqttClient.publish(TOPIC_CONFIG_AMP, sensorConfig.amp.toString(), {retain: true})
+  }
+  if (body.duration) {
+    sensorConfig.duration = parseInt(body.duration)
+    mqttClient.publish(TOPIC_CONFIG_DURATION, sensorConfig.duration.toString(), {retain: true})
+  }
+  if (body.sample_rate) {
+    sensorConfig.sample_rate = parseInt(body.sample_rate)
+    mqttClient.publish(TOPIC_CONFIG_SAMPLE, sensorConfig.sample_rate.toString(), {retain: true})
+  }
+  if (body.drop_rate) {
+    sensorConfig.drop_rate = parseInt(body.drop_rate)
+    mqttClient.publish(TOPIC_CONFIG_DROP, sensorConfig.drop_rate.toString(), {retain: true})
+  }
+  ctx.status = 200
+  console.log('updated sensor_config', sensorConfig)
 }
 
 async function initDB() {
@@ -169,19 +212,51 @@ mqttClient.on('connect', () => {
   console.log('mqtt connected')
   mqttClient.subscribe(TOPIC_BELL_RINGING, function (err) {
     if (!err) {
-      console.log('mqtt subscribed to doorbell topic')
+      console.log('mqtt subscribed to topic', TOPIC_BELL_RINGING)
+    }
+  })
+  mqttClient.subscribe(TOPIC_CONFIG_AMP, function (err) {
+    if (!err) {
+      console.log('mqtt subscribed to topic', TOPIC_CONFIG_AMP)
+    }
+  })
+  mqttClient.subscribe(TOPIC_CONFIG_DURATION, function (err) {
+    if (!err) {
+      console.log('mqtt subscribed to topic', TOPIC_CONFIG_DURATION)
+    }
+  })
+  mqttClient.subscribe(TOPIC_CONFIG_SAMPLE, function (err) {
+    if (!err) {
+      console.log('mqtt subscribed to topic', TOPIC_CONFIG_SAMPLE)
+    }
+  })
+  mqttClient.subscribe(TOPIC_CONFIG_DROP, function (err) {
+    if (!err) {
+      console.log('mqtt subscribed to topic', TOPIC_CONFIG_DROP)
     }
   })
 })
 mqttClient.on('error', err => console.error('mqtt error', err))
 mqttClient.on('message', async (topic, message) => {
   console.log('mqtt message received (topic, msg):', topic, message.toString())
-  if(topic === TOPIC_BELL_RINGING && !!message) {
+  if(topic === TOPIC_BELL_RINGING && 'true' === message.toString()) {
     const data = {
       source: 'mqtt'
     }
     await pgClient.query(DOORBELL_INSERT_STATEMENT, [JSON.stringify(data)])
     await sendNotificationToAllSubcriptions('Doorbell is ringing!')
+  }
+  if(topic === TOPIC_CONFIG_AMP) {
+    sensorConfig.amp = parseInt(message)
+  }
+  if(topic === TOPIC_CONFIG_DURATION) {
+    sensorConfig.duration = parseInt(message)
+  }
+  if(topic === TOPIC_CONFIG_SAMPLE) {
+    sensorConfig.sample_rate = parseInt(message)
+  }
+  if(topic === TOPIC_CONFIG_DROP) {
+    sensorConfig.drop_rate = parseInt(message)
   }
 })
 

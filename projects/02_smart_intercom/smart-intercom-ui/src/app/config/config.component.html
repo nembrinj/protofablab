@@ -1,0 +1,21 @@
+<div class="config">
+  <label for="amp">Minimal Bell Amplitude</label>
+  <input id="amp" type="number" [ngModel]="sensorConfig.amp" (ngModelChange)="ampChanged($event)" />
+</div>
+
+<div class="config">
+  <label for="duration">Minimal Bell Duration</label>
+  <input id="duration" type="number" [ngModel]="sensorConfig.duration" (ngModelChange)="durationChanged($event)" />
+</div>
+
+<div class="config">
+  <label for="sample_rate">Sample Rate</label>
+  <input id="sample_rate" type="number" [ngModel]="sensorConfig.sample_rate" (ngModelChange)="sampleRateChanged($event)" />
+</div>
+
+<div class="config">
+  <label for="drop_rate">Drop Rate</label>
+  <input id="drop_rate" type="number" [ngModel]="sensorConfig.drop_rate" (ngModelChange)="dropRateChanged($event)" />
+</div>
+
+<button [disabled]="!configChanged" (click)="saveConfig()">Save Configuration</button>
