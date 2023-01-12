@@ -1,0 +1,7 @@
+Flask
+Flask_socketio
+Flask_mqtt
+influxdb
+grafanalib
+mariadb==1.0.11
+influxdb
