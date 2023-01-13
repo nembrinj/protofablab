@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --host 0.0.0.0 --disable-host-check",
-    "build": "ng build",
+    "build": "ng build --output-path=/ui-dist",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
