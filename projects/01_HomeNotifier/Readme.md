@@ -45,11 +45,11 @@ This problem is completely eliminated if we use the water sensor together with H
 
 The scheme of the project is modular. Each module consists of a sensor that is connected to an ESP32 Feather. Depending on the sensor and its use, the ESP32 Feather will be programmed to send and receive data via Wi-Fi to the Twilio server to later be transmitted as WhatsApp messages to the user.
 
-![Figure1](https://ucf7d26b82c39a6ffcaa8ad5715b.previews.dropboxusercontent.com/p/thumb/ABytSse8BDttl5yVXDi32gKEenvZkEvcy3oVCyBlNsiRsuYQ0FNRsrZf-ezfF1xsPkSb-E8hspzBYPO3nFGHz5tejDUO2TjsSkll7-H88CLp_8-4Z8LIb1Vd4vdP4OiFfNm0Wel47ynTn6bzZyYBxgyyiMo_qJrA5A9a-sp6X0JdQMM2BfCzsHrjbAI2BM_QWbMKURZaWpK-kLdpA93TXjK2SFKnc1mTgxn6ho6mtcNmWFe97NpSeUx58QVsvtfRqqkAc1yA5RMF0CabwAz0OUhNfcF-huKpNBei3k3QNNX_2OcSVDqZkDhPThvG_BnhdDyOwPOYqqgUE7T8FMBQp7BikXqwkU6p9oShh620aA1chTXlQHfCEUp18tqeBvgJlF8hU5fJ-ojoaRJjKbtlPN4e4D-BguKyXNZpiMeo7OEoSg/p.png)
+![Figure1](https://raw.githubusercontent.com/nembrinj/protofablab/main/projects/01_HomeNotifier/Images/General_schema.png)
 
 In this tutorial, we focus on the application of detecting the water level in a bathtub as it fills up. Other possible uses may be to detect the temperature of a pot until it boils.
 
-![Figure2](https://ucb7f89455edaa7604d7ce1cb1b5.previews.dropboxusercontent.com/p/thumb/ABwVLqOHD_VAjsOtcGIKHfINqapkPnnTYPJqQL76e_Dk_HA3EN3arUqAC2R6e0pGegIQ6gkbdbSztyRsJwxVV2SI_VgLYjOH25OfTuffiFon_X6Xze3X5nRCsXM3xvDcpg8Ysc2T3NvKYXCcF-cgVJ8OiEZGG7MXLOCnvS6Ez2K_WBWaiuWe6W-H2OoPBKKkgX9vnRRYRcAPcPErnJvA-eAiLBgwbc2NNdJiOXCRCjT7IGxFQHgK3e-elEwIbbdQe_lfXmubZMmhRp35W9y6lBq7JnB3bhlqCFMjMnIreGStLVwPkcVNqDCM4nkcYhkG6kzeXt1RJgJJARyOVxuuQFz6Js7B6cvNWPNlUht20dudsPUfFY5oxSntByHdaC4TZG5Pv_hPqltavkssWW6rsugw4zBe5AeqdImUqwTtB_2esA/p.png)
+![Figure2](https://raw.githubusercontent.com/nembrinj/protofablab/main/projects/01_HomeNotifier/Images/Device_schema.png)
 
 To determine the water levels in the bathtub application we have used the VL53L0X TOF sensor. This is an infrared emitter and receiver that measures the flight time that elapses between a pulse leaving the sensor and returning reflected. The sensor uses this time to calculate the distance at which the reflective surface is.
 
@@ -64,8 +64,7 @@ The connection between the TOF VL53L0X sensor and the ESP32 Feather is straightf
 - SCL in sensor to SCL in ESP32 Feather
 - SDA in sensor to SDA in ESP32 Feather
 
-![Figure3](https://uc47e333b6839944b9c5cd5d556c.previews.dropboxusercontent.com/p/thumb/ABx6PyepFs9GtezquKLWkJSyWGYefK30I51Oge8Fvto-pXmX85kGWtdTqxUZfVBLKvCpp-Ws0fdlVmoslAW3c7eMfUOhMjCmCsm4WElbVasZdcjjhMxZr89zMuKOhVrhRCeobe98LBOKvGSrxlflXIMyu_b1K0HBSPmWrACJWqSuj5z881hnlo8MmxyYjASR3CvDlRryu7URxK79sq4eql9EFhouwy08Wep8t9_uHCUz1pI68qIHDyfPMGl8kWesDbn1ivBM15hIETnoCvwZ2d_tC3r_kAnBJyVyPWnlwihv7Cs-DN0m_xHPhs3wzvzCn3WxewuCviGNYeW3Nq_xdRfcx0q-IgCmdxCLarNtCR2HeVJtQBgGW1XaarlrNYu48vNrm7KnaXslxf_4HeAUhrBjtxC7UL5L89IAZ0rNwVQ0wQ/p.png)
-(Source: https://learn.adafruit.com/adafruit-vl53l0x-micro-lidar-distance-sensor-breakout/python-circuitpython)
+![Figure3](https://raw.githubusercontent.com/nembrinj/protofablab/main/projects/01_HomeNotifier/Images/VL53L0X_schema.png)
 
 
 * * *
