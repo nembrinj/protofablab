@@ -33,10 +33,20 @@ with open('../pipeline/pipeline.json') as f:
 
 
 def allowed_file(filename):
+    """
+    A method that checks whether a file has a valid extension.
+    So far we allow png, jpg, jpeg extensions.
+    :param filename, which is a string
+    :return: True if the extension is valid and False otherwise
+    """
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def send_to_silhouette():
+    """
+    The method that handles sending the svg to the Silhouette machine.
+    It does so by using the inkscape silhouette python code.
+    """
     def get_paths(filename):
         paths: list[Path] = svg2paths(filename)[0]
         contours = []
@@ -81,6 +91,16 @@ def send_to_silhouette():
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
+    """api
+    The upload_file method handles the POST and GET requests from the API.
+    Upon a GET request it simply renders the html file.
+    Upon a POST request it checks what was posted from the html form.
+    There are 4 different processes that can happen. Undo, Upload image, Process image, and Send to silhouette.
+    Undo undoes the last changes made.
+    Upload image starts the whole process from the beginning with a new image.
+    Process image applies the current chosen settings to the image.
+    Send to silhouette takes the most recent svg and sends it to the machine.
+    """
     if request.method == 'POST':
         if request.form.getlist('undo'):
             undo()
@@ -118,6 +138,22 @@ def upload_file():
 
 def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode_iterations: int, contour_type: int,
          cleanliness: float, smoothness: float):
+    """
+    The root method handles the entire image processing. The pipeline is
+    Blurring -> inverting -> Dilate/erode -> Thresholding -> Contouring.
+    The image stays in RGB until thresholding gets applied afterwards it's Black & White.
+    :param blurs: An array of 2 integers that represent [Median Blur Kernel Size, Gaussian Blur Kernel Size]
+    :param threshold_type: a string that says which thresholding should be applied: otsu, triangle...
+    :param invert: A value which states whether an image should be inverted.
+    :param dilate_iterations: An integer with how often the image should be dilated.
+    :param erode_iterations: An integer with how often the image should be eroded.
+    :param contour_type: An integer that says what type of contouring should be applied.
+    1 for simple, 2 for Tc89_l1 and 3 for Tc89_kcos
+    :param cleanliness: A value that removes short paths from the image.
+    Useful when you want to remove short lines such as signatures.
+    :param smoothness: A value that states how much the lines should be smoothed.
+    The higher, the more straight the lines become
+    """
     idx = get_latest_img()
     img = cv2.imread('./staticFiles/images/pngs/' + str(idx) + '.png')
     height, width = img.shape[:2]
@@ -191,18 +227,40 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
 
 
 def get_latest_img():
+    """
+    Finds out what the most recent image value is. Since the images are saved as 0.png, 1.png , ...
+    This is then later used as an index.
+    :return: integer of the most recent image.
+    """
     for i in range(IMG_AMT)[::-1]:
         path = './staticFiles/images/pngs/' + str(i) + '.png'
         if os.path.exists(path):
             return i
+    return 0
 
 
 def write_svg(svg, idx):
+    """
+    A simple method to write an svg file in the './staticFiles/images/svgs/' folder.
+    Our svgs are also 0.svg, 1.svg, ...
+    :param svg: The svg file which should be written
+    :param idx: Which place it should take
+    :return:
+    """
     with open('staticFiles/images/svgs/' + str(idx) + '.svg', 'w+') as f:
         f.write(svg)
 
 
 def add_img(png, svg, idx):
+    """
+    Saves the images in './staticFiles/images/pngs/' and handles the edge cases.
+    If there are already IMG_AMT images in the folder then the oldest gets deleted and every image name changes.
+    3.png -> 2.png -> 1.png -> 0.png -> nothing
+    and then 3.png is free and can be written to.
+    :param png: The image from the cv2 pipeline
+    :param svg: saves the recent svg as well
+    :param idx: the current location, as to know if we're in an edge case
+    """
     path = './staticFiles/images/pngs/'
     if idx < IMG_AMT - 1:
         cv2.imwrite(path + str(idx + 1) + '.png', png)
@@ -224,6 +282,11 @@ def add_img(png, svg, idx):
 
 
 def undo():
+    """
+    Undoes the most recent processing steps taken. It does so by deleting the most recent image in the
+    './staticFiles/images/' folder. so if we have 0.png, 1.png then 1.png gets deleted and we are back
+    to working on 0.png. The same is done for svg files.
+    """
     idx = get_latest_img()
     if idx > 0:
         os.remove('./staticFiles/images/pngs/' + str(idx) + '.png')
@@ -232,12 +295,22 @@ def undo():
 
 
 def delete_files_in_folder(path):
+    """
+    A simple and very dangerous method to delete all files in a specific location.
+    Used upon a reset of the app.
+    :param path: Tells which location to decimate
+    """
     all_files = os.listdir(path)
     for f in all_files:
         os.remove(path + f)
 
 
 def restart():
+    """
+    Used upon startup of the app, as to have a clean slate.
+    Deletes all images in './staticFiles/images/' and takes the backup image and writes it to 0.png and 0.svg.
+    Afterwards you can upload your own image of choice.
+    """
     imgs = './staticFiles/images/'
     pngs = imgs + 'pngs/'
     svgs = imgs + 'svgs/'
