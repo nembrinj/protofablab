@@ -86,3 +86,10 @@ image in a dict:
 
 The pipeline supports various methods which are further explained in the [pipeline README](./pipeline/README.md) in
 conjunction with the [pipeline JSON](./pipeline/pipeline.json).
+
+### Server
+
+The server is a simple [Flask](https://palletsprojects.com/p/flask/) server which may only handle one client for
+simplicity.
+It serves a simple UI [explained above](#ui-explained).
+The UI is essentially an HTML form which is parsed by the backend server.
