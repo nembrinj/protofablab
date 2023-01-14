@@ -1,7 +1,8 @@
 import json
+import os
+
 import cv2
 import numpy as np
-import os
 import toml
 from flask import Flask, request, render_template, redirect
 from svgpathtools import svg2paths, Path
@@ -108,7 +109,7 @@ def upload_file():
             svg = f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg"></svg>'
             write_svg(svg, 0)
             DATA.clear()
-            DATA.append({'id': '0', 'text': ''})
+            DATA.append({'id': '0', 'png_text': '', 'svg_text': ''})
             return redirect(request.url)
         root(blurs, threshold_type, invert, dilate_iterations, erode_iterations, contour_type, cleanliness, smoothness)
         return redirect(request.url)
