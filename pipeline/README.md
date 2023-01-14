@@ -12,8 +12,8 @@ The overall structure is a list of methods and their descriptions:
 
 ```json
 {
-    "method 1": { ... }
-    "method 2": { ... }
+    "method 1": { ... },
+    "method 2": { ... },
     ...
 }
 ```
@@ -27,15 +27,15 @@ A single method with arguments is described like the following:
 ```json
 "method name": {
     "argument 1": {
-        "constraint 1": /* ... */,      // e.g. "min": 0
-        "constraint 2": /* ... */,      // e.g. "step": 2
-        // ...
-        "recommended": /* ... */,       // e.g. "recommended": 127
-        "description": "...",           // can potentially be omitted
+        "constraint 1": ...,        // e.g. "min": 0
+        "constraint 2": ...,        // e.g. "step": 2
+        ...
+        "recommended": ...,         // e.g. "recommended": 127
+        "description": "..."        // can potentially be omitted
     },
-    "argument 2": { /* ... */ },
-    // ...
-    "description": "..."                // can potentially be omitted
+    "argument 2": { ... },
+    ...
+    "description": "..."            // can potentially be omitted
 }
 ```
 
@@ -43,11 +43,12 @@ For a method with different implementations, the description looks a bit more so
 
 ```json
 "method name": {
-    "methods": ["f1", "f2", /* ... */],
-    "f1": { /* ... */ },                    // method description like above
-    "f2": { /* ... */ },
-    "recommended": /* ... */,               // e.g. "recommended" = "f1"
-    "description": "..."                    // can potentially be omitted
+    "methods": ["f1", "f2", ...],
+    "f1": { ... },                  // method description like above
+    "f2": { ... },
+    ...
+    "recommended": ... ,            // e.g. "recommended" = "f1"
+    "description": "..."            // can potentially be omitted
 }
 ```
 
@@ -70,9 +71,13 @@ E.g., kernel sizes in `{3, 6, 9, ..., 15}` can be expressed like following:
 "kernel": {
     "min": 3,
     "max": 15,
-    "step": 3,
+    "step": 3
 }
 ```
+
+## Examples
+
+See the [pipeline.json](pipeline.json).
 
 # Calling the pipeline
 
@@ -84,15 +89,54 @@ following form:
 
 ```json
 {
-    "img": /* ... */,
+    "img": ...,
     "pipeline": [
-        "method_1": {
-            // ... arguments
+        "method 1": {
+            "argument 1": ...,
+            ...
         },
-        "method_2": {
-            // ... arguments
+        "method 2": {
+            "argument 1": ...,
+            ...
+        },
+        ...
+    ]
+}
+```
+
+## Example
+
+A full pipeline could look like this:
+
+```json
+{
+    "img": ...,
+    "pipeline": [
+        "blur": {
+            "method": "gaussian",
+            "kernel": 7,
+            "sigma": 0.75
+        },
+        "blur": {
+            "method": "median",
+            "kernel": 5
+        },
+        "threshold": {
+            "method": "otsu"
+        },
+        "dilate": {
+            "kernel": 7,
+            "iterations": 3
+        },
+        "find_contours": {
+            "method": "simple"
+        },
+        "smooth_contours": {
+            "accuracy": 10
+        },
+        "clean_contours": {
+            "threshold": 20
         }
-        // ...
     ]
 }
 ```
