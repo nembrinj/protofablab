@@ -8,7 +8,7 @@ import toml
 from flask import Flask, request, render_template, redirect
 from svgpathtools import svg2paths, Path
 
-import pipeline.pipeline as pipeline
+import pipeline
 
 sys.path.append('../inkscape-silhouette')
 # from silhouette.Graphtec import SilhouetteCameo
@@ -22,9 +22,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = 'ProtoFabLab'
 config = toml.load('../config.toml')['Server']
 
-DATA = [
-    {'id': '0', 'png_text': '', 'svg_text': ''}
-]
+DATA = [{'id': '0', 'png_text': '', 'svg_text': ''}]
 
 # dev = SilhouetteCameo(dry_run=False)
 # state = dev.status()  # hint at loading paper, if not ready.
@@ -49,6 +47,7 @@ def send_to_silhouette():
     The method that handles sending the svg to the Silhouette machine.
     It does so by using the inkscape silhouette python code.
     """
+
     def get_paths(filename):
         paths: list[Path] = svg2paths(filename)[0]
         contours = []
@@ -87,8 +86,7 @@ def send_to_silhouette():
         contours = get_paths(filename)
         contours = scale(contours, width, height, 100)
 
-        # dev.setup(media=132, pen=True, pressure=10, speed=3)
-        # dev.plot(pathlist=contours, offset=(5, 5))
+        # dev.setup(media=132, pen=True, pressure=10, speed=3)  # dev.plot(pathlist=contours, offset=(5, 5))
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -218,13 +216,13 @@ def root(blurs, threshold_type: str, invert: bool, dilate_iterations: int, erode
 
     png_text = png_text[:-2]
     if idx < 3:
-        DATA.append({'id': str(idx+1), 'png_text': png_text, 'svg_text': svg_text})
+        DATA.append({'id': str(idx + 1), 'png_text': png_text, 'svg_text': svg_text})
     else:
-        for i in range(IMG_AMT-1):
-            DATA[i]['png_text'] = DATA[i+1]['png_text']
+        for i in range(IMG_AMT - 1):
+            DATA[i]['png_text'] = DATA[i + 1]['png_text']
             DATA[i]['svg_text'] = DATA[i + 1]['svg_text']
         DATA[IMG_AMT - 1]['png_text'] = png_text
-        DATA[IMG_AMT-1]['svg_text'] = svg_text
+        DATA[IMG_AMT - 1]['svg_text'] = svg_text
     add_img(img, svg, idx)
 
 
