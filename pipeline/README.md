@@ -7,7 +7,9 @@ constraints are listed here along with a recommended value. This recommendation,
 being applied to. Therefore, user discretion is advised and the values only serve as a guide line.
 
 ## Structure
+
 The overall structure is a list of methods and their descriptions:
+
 ```json
 {
     "method 1": { ... }
@@ -17,9 +19,11 @@ The overall structure is a list of methods and their descriptions:
 ```
 
 ### Methods
+
 Each method is either a direct function with arguments, or has different implementations which can be chosen.
 
 A single method with arguments is described like the following:
+
 ```json
 "method name": {
     "argument 1": {
@@ -36,6 +40,7 @@ A single method with arguments is described like the following:
 ```
 
 For a method with different implementations, the description looks a bit more sophisticated:
+
 ```json
 "method name": {
     "methods": ["f1", "f2", /* ... */],
@@ -49,14 +54,18 @@ For a method with different implementations, the description looks a bit more so
 Some methods may not contain any parameters and only a short description.
 
 ### Constraints
+
 The constraints typically define a (potentially unclosed) domain of values like
+
 ```json
 "min": 0
 "max": 255
 ```
+
 Whereas the `step` key defines the step size in which to move inside this domain.
 
 E.g., kernel sizes in `{3, 6, 9, ..., 15}` can be expressed like following:
+
 ```json
 "kernel": {
     "min": 3,
@@ -66,17 +75,24 @@ E.g., kernel sizes in `{3, 6, 9, ..., 15}` can be expressed like following:
 ```
 
 # Calling the pipeline
+
 Inside `pipeline.py` we provide all methods of the pipeline.
 These methods take an image and a dictionary as arguments.
 
-In order to go from a dict of pipeline arguments to the targeted methods, the global dict argument must have the following form:
+In order to go from a dict of pipeline arguments to the targeted methods, the global dict argument must have the
+following form:
+
 ```json
 {
     "img": /* ... */,
-    "pipeline": {
-        "method": {
+    "pipeline": [
+        "method_1": {
+            // ... arguments
+        },
+        "method_2": {
             // ... arguments
         }
-    }
+        // ...
+    ]
 }
 ```
