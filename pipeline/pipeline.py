@@ -267,7 +267,7 @@ def contours2svg(contours: list[list], width: int = None, height: int = None) ->
     return s + '</svg>'
 
 
-def call_pipeline(args: dict) -> dict:
+def call_pipeline(args: dict[str, np.ndarray | list[dict]]) -> dict:
     """
     Calls the pipeline according to the content and parameters.
     :param args: the arguments of how a pipeline call.
