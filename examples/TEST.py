@@ -8,8 +8,7 @@
 import sys, os
 from svgpathtools import svg2paths, Path, Line
 
-sys.path.append('/usr/share/inkscape/extensions')
-sys.path.append(os.path.expanduser('~/.config/inkscape/extensions/'))
+sys.path.append('../inkscape-silhouette')
 from silhouette.Graphtec import SilhouetteCameo
 
 
@@ -73,7 +72,7 @@ def write_progress(done, total, msg):
     print("%d%% %s\r" % (perc, msg))
 
 
-file_name = "../pipeline/img.svg"
+file_name = "../pipeline/clean.svg"
 contours = get_paths(file_name)
 print(contours)
 
