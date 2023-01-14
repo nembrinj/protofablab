@@ -100,3 +100,12 @@ It serves a simple UI [explained above](#ui-explained).
 This [webpage](./server/templateFiles/index.html) is essentially an HTML form which is sent to the backend server.
 The server, on the other hand, parses this form and performs pre-defined operations - when present in the form - on the
 current image in the image stack and sends the results back.
+
+## Issues encountered
+
+1. The idea to dynamically create the UI from the pipeline description first sounds great, but is highly complex.
+   Even though we tried various things, they never worked out.
+   Somehow even creating a simple HTML button proves to be futile until we started hard coding the template.
+2. As the original pipeline file used `dict`s to get its arguments automatically, it was more cumbersome to call from
+   the server which first parsed the form and had the arguments in variables instead of the `dict` format needed for the
+   pipeline file.
