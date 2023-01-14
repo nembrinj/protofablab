@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 import cv2
 import numpy as np
@@ -9,6 +10,7 @@ from svgpathtools import svg2paths, Path
 
 import pipeline.pipeline as pipeline
 
+sys.path.append('../inkscape-silhouette')
 # from silhouette.Graphtec import SilhouetteCameo
 
 UPLOAD_FOLDER = './staticFiles/images/pngs/'
