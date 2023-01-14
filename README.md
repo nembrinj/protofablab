@@ -47,3 +47,42 @@ The more pipelines you apply, the more images you will see.
 Currently, a stack of 5 states are saved. This may be adapted manually in the source code. <br>
 The top row shows the last images, whereas the bottom row shows the corresponding contours/SVG.
 
+## Quickstart to clone/run the code
+
+In order to run the code you have to clone the project with
+
+```shell
+git clone ${PROJECT_URL}
+```
+
+The server can be started with
+
+## Code Explained
+
+Due to some (potentially legacy) decisions, the code for the pipeline operations and the server are split into the
+folders
+
+```markdown
+- pipeline/
+- server/
+```
+
+whereas the git submodule with the silhouette-specific API stems from the inkspace plugin
+
+```shell
+- inkspace-silhouette/
+```
+
+### Pipeline
+
+The pipeline code was meant to be called with `dict` arguments from, e.g., a JSON object and returning the resulting
+image in a dict:
+
+```python
+{
+    'result': // image data
+}
+```
+
+The pipeline supports various methods which are further explained in the [pipeline README](./pipeline/README.md) in
+conjunction with the [pipeline JSON](./pipeline/pipeline.json).
