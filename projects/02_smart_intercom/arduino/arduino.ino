@@ -62,7 +62,7 @@ void loop()
   unsigned amp = analogRead(A1);
 
   // update max, or drecrease slowly
-  if (amp > maxAmp)
+  if (amp > maxAmp - dropRate / sampleRate)
     maxAmp = amp;
   else
     maxAmp -= dropRate / sampleRate;
