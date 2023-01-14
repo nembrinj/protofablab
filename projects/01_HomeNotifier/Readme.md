@@ -7,6 +7,7 @@
   - [Electrical schema](#electrical-schema)
   - [Procedure](#procedure)
   - [Preview of the code and functionality](#preview-of-the-code-and-functionality)
+  - [The technical difficulties and how they were overcome](#the-technical-difficulties-and-how-they-were-overcome)
   - [Project value](#project-value)
   - [**Demo** video](#demo-video)
 
@@ -138,6 +139,23 @@ preferences.putBool("level1_bool", true);
 With **preferences.begin()** we can initialize the **preferences** object with a certain set of values correlated with the **App** string. We can get and save various values related to the String **level1_bool**.
 
 A better implementation variant would give us the possibility to have an unlimited number of levels that can be saved, this would be a possible future development.
+
+* * * 
+
+## The technical difficulties and how they were overcome
+- Entering new Wi-Fi credentials on the device without connecting to a computer or manually modifying the code.
+
+This was successfully achieved using the WiFiManager library
+
+- Record the values ​​of the water levels so that they can be used after the device is rebooted.
+
+This was successfully accomplished.  The values ​​are written to the flash memory using the Preferences.h library.
+
+- Movement of the water and reflection on the walls of the container produce false measurements.
+
+This was partially solved. Incorrect measurements because the reflected wave did not return to the sensor are recorded by the distance sensor as measurements with values ​​over 8 meters.  The sensor can only detect distances lower than 2 meters, so these incorrect measurements can be easily ruled out.
+
+However, when the tub is filled the water oscillates which can cause incorrect measurements.  It can detect that the water is at a level that is not the real one.  This problem requires a deeper analysis which was not carried out in this project.
 
 * * *
 
