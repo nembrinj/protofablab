@@ -87,9 +87,16 @@ image in a dict:
 The pipeline supports various methods which are further explained in the [pipeline README](./pipeline/README.md) in
 conjunction with the [pipeline JSON](./pipeline/pipeline.json).
 
+Originally, this JSON was supposed to be read in automatically from the server to create the UI dynamically.
+This should have then included the method descriptions when hovering the mouse of such items.
+However, we ran into many issues to automatically parse and create the corresponding HTML file.
+In the end we opted for a simpler approach "which just works" described below.
+
 ### Server
 
 The server is a simple [Flask](https://palletsprojects.com/p/flask/) server which may only handle one client for
 simplicity.
 It serves a simple UI [explained above](#ui-explained).
-The UI is essentially an HTML form which is parsed by the backend server.
+This [webpage](./server/templateFiles/index.html) is essentially an HTML form which is sent to the backend server.
+The server, on the other hand, parses this form and performs pre-defined operations - when present in the form - on the
+current image in the image stack and sends the results back.
