@@ -2,16 +2,16 @@
 
 ## Origins
 
-Imagine you want to play around with some advanced image editing like
+Imagine you want to play around with some advanced image editing and want to do things like
 
-- applying gaussian or median blur
-- binarizing the image with some threshold
-- performing some edge detection
+- applying Gaussian or median blur
+- binarizing the image with thresholds
+- performing edge detection
 - dilate shapes in a binary image or make them smaller
 - find contours in an image and maybe apply them as a mask over the original image
 
-This all sounds fun and games until you think of actually printing these contours onto a paper. <br>
-Sure, you could just open the SVG in your favourite image viewer and press 'Print'. <br>
+This all sounds like fun and games until you want a physical copy of your work. <br>
+Sure, you could just manually open and edit the SVG in your favorite image viewer and press 'Print'. <br>
 But where's the fun in that? And what if you wanted to cut these contours into a birthday card instead? <br>
 Then you will need a plotter/cutter device. Like the `Silhouette Cameo 4 Pro`, e.g.:
 
@@ -19,7 +19,12 @@ Then you will need a plotter/cutter device. Like the `Silhouette Cameo 4 Pro`, e
 
 ## Solution (prototyping in the LearningLab)
 
-[//]: # (TODO)
+Hence, we present our project Silhouetize.<br> 
+A piece of software with which you can iteratively modify images and create svgs from said images.
+These svgs are then translated into Silhouette commands. 
+Our software together with a Silhouette machine allow us to physically cut or drawn any image with very little manual intervention.
+This presents a nice alternative to the official Silhouette editor, which is neither open source nor free.
+Furthermore, it brings the fun back into using the Silhouette machine.
 
 ## UI Explained
 
@@ -85,9 +90,10 @@ In the following image a simple processing example can be seen.
 Starting off with the initial image we firstly blur and remove details. We can see that the signature has become less readable. 
 Afterwards we apply thresholding as to get the outline of our image. This works decently well, however we see some remainders from the signature 
 in the svg file and a border around the whole svg. 
-To remove these 2 problems we invert the image and also remove short paths and smooth the svg file.
+To remove these 2 problems we invert the image and also remove short paths and smooth the svg file. The steps taken can be seen underneath the images.
+Each text shortly describes what has been applied since the last iteration.
 
-In the end we can press the "Send To Silhouette" button and draw the final svg file.
+In the end we can press the "Send To Silhouette" button and draw/cut the final svg file in the bottom right.
 
 
 
@@ -152,3 +158,4 @@ current image in the image stack and sends the results back.
 2. As the original pipeline file used `dict`s to get its arguments automatically, it was more cumbersome to call from
    the server which first parsed the form and had the arguments in variables instead of the `dict` format needed for the
    pipeline file.
+3. Working with the Silhouette machine, which is proprietary and located in a different city provided us with some difficulties.
