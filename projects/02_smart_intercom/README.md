@@ -1,8 +1,8 @@
 # Smart Intercom
 
-*Turn an existing intercom into a smarter one.*
+_Turn an existing intercom into a smarter one._
 
-***
+---
 
 When renting a flat or apartment, the pre-installed intercom system is often very basic and does not support any interesting features. Our `smart intercom` is a device that can be placed **on top of an existing intercom system** and add smart features to it.
 
@@ -38,7 +38,7 @@ Another challenge: the sound is a waveform, but we can only read the current amp
 
 We define 4 configurable parameters for our algorithm, so that it be adjusted to work with different doorbells.
 
-First, we have the **sample rate**, which specifies how many times we read the input every second. Then, the **bell amplitude** and **bell duration**, which define how loud and how long a sound should be to be considered as the doorbell sound. Finally, we have the **release time**, which specifies how fast we consider the loudness to decrease (this is called *drop rate* in the web app).
+First, we have the **sample rate**, which specifies how many times we read the input every second. Then, the **bell amplitude** and **bell duration**, which define how loud and how long a sound should be to be considered as the doorbell sound. Finally, we have the **release time**, which specifies how fast we consider the loudness to decrease (this is called _drop rate_ in the web app).
 
 This last parameter is helpful in cases where the doorbell sound isn't a steady sound, but rather multiple sounds with silences in between notes. By increasing the release time, we can make sure such doorbells get detected correctly.
 
@@ -52,15 +52,15 @@ Right now, the only event published by the smart intercom device is the `bell_ri
 
 The device is subscribed to various topics that let the user configure the device and open the door remotely. These events are being published by the web API, which is also running on the Raspberry Pi.
 
-| Topic | Result | Possible values |
-|---|---|---|
-| `door_action` | Pushes the intercom button that opens the entrance door. | `open` |
-| `sample_rate` | Updates the bell duration (in Hz). | `1000`, `2000`, ... |
-| `bell_amp` | Updates the bell amplitude (undefined units). | `50`, `100`, `200`, ... |
-| `bell_duration` | Updates the bell duration (in ms). | `500`, `1000`, ... |
-| `drop_rate` | Updates the release time (amp/s). | `1000`, `2000`, ... |
+| Topic           | Result                                                   | Possible values         |
+| --------------- | -------------------------------------------------------- | ----------------------- |
+| `door_action`   | Pushes the intercom button that opens the entrance door. | `open`                  |
+| `sample_rate`   | Updates the bell duration (in Hz).                       | `1000`, `2000`, ...     |
+| `bell_amp`      | Updates the bell amplitude (undefined units).            | `50`, `100`, `200`, ... |
+| `bell_duration` | Updates the bell duration (in ms).                       | `500`, `1000`, ...      |
+| `drop_rate`     | Updates the release time (amp/s).                        | `1000`, `2000`, ...     |
 
-To make MQTT message handling easier, we wrote a wrapper class around the Arduino MQTT client library (*PubSubClient*), which automatically handles reconnections, and makes us able to subscribe to topics using lambda functions:
+To make MQTT message handling easier, we wrote a wrapper class around the Arduino MQTT client library (_PubSubClient_), which automatically handles reconnections, and makes us able to subscribe to topics using lambda functions:
 
 ```cpp
 mqtt.subscribe("bell_amp", [](char * val) { bellAmp = atof(val); });
@@ -83,21 +83,43 @@ A `Raspberry Pi`, located in the same local network as the intercom, acts as the
 
 The different parts of the server are containerized. They are built and run using `docker-compose`. The following containers exist:
 
-- Database
-  - A PostgreSQL database running on the local port `5432`. It is only being used by the api application.
 - Web API
   - A Node.js application providing a REST API for the web application using [koa.js](https://koajs.com/).
   - Communicates with the intercom over MQTT.
   - Sends push notifications to the web application using [Web Push](https://web.dev/notifications/).
   - Runs on local port `3000`.
+- Database
+  - A PostgreSQL database running on the local port `5432`. It is only being used by the API application.
 - Nginx
   - Serves the pre-built angular web application on ports `80` and `443`.
-  - Redirects requests to https://protofablab.ch/api to the api application.
-- Certbot
-  - Is only used initially to generate the SSL certificate for the web application.
+  - Redirects requests to https://protofablab.ch/api to the web API application.
 - MQTT
   - The MQTT broker running on port `1883`, available on the local network.
-  - Used by intercom and api application.
+  - Used by intercom and web API application.
+- Certbot
+  - Is only used initially to generate the SSL certificate for the web application.
+
+### Web API
+
+The API application handles all the REST-requests from the web application running in the browser on a mobile phone or another computer. The following endpoints are provided:
+
+| Endpoint              | Method | Description                                                                                                        |
+| --------------------- | ------ | ------------------------------------------------------------------------------------------------------------------ |
+| /api/ping             | GET    | Ping application to check availability Only used for debugging.                                                    |
+| /api/pushsubscription | POST   | Save a PushSubscription for receiving Web Push notifications to the database.                                      |
+| /api/notify           | POST   | Endpoint to send a message to all notification subscribers. Only used for debugging.                               |
+| /api/doorbell         | GET    | Get the date of the last detected doorbell ringing. Returns with status code 404 if no such event occured.         |
+| /api/door             | POST   | Send a door action to the smart intercom device. The smart intercom only supports the action `open` at the moment. |
+| /api/sensorconfig     | GET    | Get the values of the current configuration of the doorbell detection algorithm.                                   |
+| /api/sensorconfig     | POST   | Override the configuration of the doorbell detection algorithm.                                                    |
+
+The application is subscribed to the the MQTT topic `bell_ringing`. If it receives a message on this topic, the event is saved to the database and a notification is sent to each device with a valid notification subscription.
+
+### Web application
+
+The code for the web application is located in the `smart-intercom-ui` subfolder. The ui application itself is a very basic [Angular 12](https://angular.io/) app with only two different pages.
+
+Angular uses the [Node Package Manager (NPM)](https://www.npmjs.com/) and has alot of dependencies. The step `npm install`, which installs all the dependencies of the project takes a very long time on the Raspberry Pi. For this reason the application is pre-built in the folder `smart-intercom-ui/ui-dist`, so it does not have to be built directly on the Raspberry Pi.
 
 ### Installation
 
