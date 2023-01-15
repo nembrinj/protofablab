@@ -93,13 +93,12 @@ In the end we can press the "Send To Silhouette" button and draw the final svg f
 
 ## Quickstart to clone/run the code
 
-In order to run the code you have to clone the project with
+In order to run the code, make sure that the `inkspace-silhouette` submodule is registered correctly with
 
 ```shell
-git clone ${PROJECT_URL}
+git submodule init
+git submodule update
 ```
-
-The server can be started with
 
 ## Code Explained
 
