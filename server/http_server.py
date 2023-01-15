@@ -245,7 +245,6 @@ def write_svg(svg, idx):
     Our svgs are also 0.svg, 1.svg, ...
     :param svg: The svg file which should be written
     :param idx: Which place it should take
-    :return:
     """
     with open('staticFiles/images/svgs/' + str(idx) + '.svg', 'w+') as f:
         f.write(svg)

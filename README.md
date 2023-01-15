@@ -24,7 +24,7 @@ Then you will need a plotter/cutter device. Like the `Silhouette Cameo 4 Pro`, e
 ## UI Explained
 
 In the following section we will explain all elements of the user interface.
-When first entering the application you are greeted by the following user interface.
+When first entering the application you are greeted by the following interface.
 
 <img src="./readmeImages/startup_screen.png" style="width: 75%;"/>
 
@@ -37,15 +37,59 @@ Taking a closer look at all the parts individually, we begin with the buttons.
 
 The first two buttons on the top beside the pipeline options are **Start** and **Undo**. <br>
 **Start** applies the selected image processing pipeline and updates the current image and SVG accordingly. <br>
-**Undo** reverts the last pipeline to the last image. <br>
+**Undo** removes the most recent image and svg. This reverts the pipeline to the previous image. 
+If there is only a single image, nothing is done.<br>
 **Send To Silhouette** is situated below the images/SVGs. Once pressed, it sends the current SVG to the Silhouette
 machine for printing/cutting.
 
-<img alt="The image/SVG stack of pipeline results." src="./readmeImages/ui_images.png" title="Image results" width="20%"/>
-Inbetween the pipeline options and the `Send to Silhouette` button you initially see 2 images.
+### Graphical Output
+
+<img alt="The image/SVG stack of pipeline results." src="./readmeImages/ui_images.png" title="Image results" width="20%"/><br>
+
+In between the pipeline options and the `Send to Silhouette` button you initially see 2 images.
 The more pipelines you apply, the more images you will see.
-Currently, a stack of 5 states are saved. This may be adapted manually in the source code. <br>
-The top row shows the last images, whereas the bottom row shows the corresponding contours/SVG.
+Currently, a stack of 4 states are saved. This may be adapted manually in the source code. <br>
+The top row shows the last images, whereas the bottom row shows the corresponding contours/SVG.<br>
+
+### Pipeline Options
+
+<img alt="The image/SVG stack of pipeline results." src="./readmeImages/boxes.png" title="Image results" width="40%"/><br>
+
+The boxes above the graphical output contain the image processing options. The options are as follows.<br>
+
+**Blurs** which can be divided into <a href="https://en.wikipedia.org/wiki/Median_filter">median blur</a> and 
+<a href="https://en.wikipedia.org/wiki/Gaussian_blur">gaussian blur</a>. 
+Median blur is useful for removing salt and pepper noise, while gaussian blur smooths the image.
+Applying blurs makes edge detection more robust and contouring work better.
+Furthermore, the slider picks a kernel size for the blurs. With a kernel size of 1 the image does not get blurred.<br>
+
+**Remove Details** does so by dilating and eroding the image. Dilating an images makes bright spots wider and eroding makes them smaller.
+Applying both would cause the loss of details and beneficial effects such as connecting broken lines.
+The slider decides how often the image gets dilated/eroded.<br>
+
+**Thresholding** distributes all pixels in an image into two distinct groups. 
+There are different thresholding options such as otsu, triangle, gaussian and mean, which all choose the thresholds differently.
+Marking all pixels inside an object into group 1 and all pixels outside into group 0 makes finding the silhouette of an image simple.
+There is also an invert option in case the inside gets mapped as the outside.<br>
+
+**Create SVG** defines the contouring type. This only affects the SVG file and leaves the PNG file unaffected. 
+The ignore path slider removes short paths from the image such as handwriting and dots. The Accuracy slider reduces the
+amount of points in each path. This makes the lines more straight and easier to draw.<br>
+
+**Upload Image** can be used to change the original image. This way any image can be processed and drawn by the Silhouette machine.
+
+### Processing example
+
+In the following image a simple processing example can be seen.
+<img alt="The image/SVG stack of pipeline results." src="./readmeImages/use_case.png" title="Image results" width="75%"/><br>
+Starting off with the initial image we firstly blur and remove details. We can see that the signature has become less readable. 
+Afterwards we apply thresholding as to get the outline of our image. This works decently well, however we see some remainders from the signature 
+in the svg file and a border around the whole svg. 
+To remove these 2 problems we invert the image and also remove short paths and smooth the svg file.
+
+In the end we can press the "Send To Silhouette" button and draw the final svg file.
+
+
 
 ## Quickstart to clone/run the code
 
