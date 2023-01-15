@@ -1,0 +1,9 @@
+[Server]
+host = "localhost"
+port = 8000
+log_level = "info"
+log_file = "server.log"
+
+[Client]
+log_level = "info"
+log_file = "client.log"

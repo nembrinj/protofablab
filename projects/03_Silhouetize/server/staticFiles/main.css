@@ -1,0 +1,112 @@
+.title-box {
+	font-size: 25px;
+	font-weight: 250;
+	text-align: center;
+	text-shadow: 1px 1px hsl(0deg 0% 0% / 0.48);
+	background-color: whitesmoke;
+	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+	margin-bottom: 3px;
+}
+body {
+	font-family: 'montserrat', sans-serif;
+	background-image: url('./images/pattern.svg');
+}
+* {
+	margin: 1px;
+	padding: 1px;
+}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+input[type=number] {
+	-moz-appearance:textfield;
+}
+.boxes{
+	margin: 1 auto;
+	width: fit-content;
+	padding: 3px;
+	font-size: 18px;
+	background-color: rgba(255, 255, 255, 0.75);
+	border-radius: 8px 0px 8px 0px;
+	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.5);
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+}
+.buttons{
+	margin: 1 auto;
+	width: fit-content;
+	padding: 0px;
+	font-size: 15px;
+	background-color: #e9e9ed;
+	border-radius: 8px 0px 8px 0px;
+	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.5);
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+}
+input[type=submit]{
+    padding: 3px;
+    outline: none;
+    border: 0;
+}
+.image {
+	max-width: 20%;
+	height: auto;
+	padding: 10px;
+	font-size: 20px;
+	background-color: rgba(255, 255, 255, 1);
+	box-shadow: 2px 2px 2px hsl(0deg 0% 0% / 0.48);
+	display: inline-block;
+	position: relative;
+	padding-bottom: 15px;
+}
+img {
+    margin-left:auto;
+    margin-right:auto;
+	max-width:100%;
+	max-height:100%;
+	padding:0px;
+	margin:0px;
+}
+.slider {
+	-webkit-appearance: none;
+	width: 95%;
+	height: 5px;
+	border-radius: 5px;
+	background: #f2f2f2;
+	outline: none;
+	opacity: 0.8;
+	-webkit-transition: .2s;
+	transition: opacity .2s;
+}
+.slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #ecc94b;
+	cursor: pointer;
+}
+.slider::-moz-range-thumb {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #2a4365;
+	cursor: pointer;
+}
+.slider:hover {
+	opacity: 1;
+	/* Fully shown on mouse-over */
+}
+.bottom-img {
+	font-size: 15px;
+	margin: 0px;
+	padding: 0px;
+	bottom: 1px;
+	left: 10px;
+	position: absolute;
+	color: black;
+}

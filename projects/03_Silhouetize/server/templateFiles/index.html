@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <link rel="stylesheet" href='/staticFiles/main.css'/>
+</head>
+<body>
+
+<div class="title-box">
+    <h1>Silhouetize</h1>
+</div>
+<form id="form" method=post enctype=multipart/form-data>
+    <div class="boxes">
+        <span>Upload Image:</span><br>
+        <input type=file name=file class = "upload-button"
+               onchange="document.getElementById('form').submit();">
+    </div><br>
+
+    <div class="boxes">
+        <span>Blur Type:</span><br>
+        <input type="range" id="gauInput" name="blur" class="slider" min="1" max="21" value="1" step="2"
+            oninput="document.getElementById('gau-amt').innerHTML = this.value;"><br>
+        <label for="gauInput">
+            Gauss Blur Size: <span id="gau-amt">1</span>
+        </label><br>
+        <input type="range" id="medInput" name="blur" class="slider" min="1" max="21" value="1" step="2"
+            oninput="document.getElementById('med-amt').innerHTML = this.value;"><br>
+        <label for="medInput">
+            Median Blur Size: <span id="med-amt">1</span>
+        </label><br>
+    </div>
+
+    <div class="boxes">
+        <p>Remove Details:</p>
+        <input type="range" id="dilate" name="dilate" class="slider" min="0" max="5" value="0"
+               oninput="document.getElementById('dilate-amt').innerHTML = this.value;"><br>
+        <label for="dilate">
+            Dilate <span id="dilate-amt">0</span> times
+        </label><br>
+        <input type="range" id="erode" name="erode" class="slider" min="0" max="5" value="0"
+               oninput="document.getElementById('erode-amt').innerHTML = this.value;"><br>
+        <label for="erode">
+            Erode <span id="erode-amt">0</span> times
+        </label>
+    </div>
+
+    <div class="boxes">
+        <p>Threshold Type:</p>
+        <input type="radio" id="otsu" name="threshold" value="otsu">
+        <label for="otsu">otsu</label><br>
+        <input type="radio" id="triangle" name="threshold" value="triangle">
+        <label for="triangle">triangle</label><br>
+        <input type="radio" id="gaussian" name="threshold" value="gaussian">
+        <label for="gaussian">gaussian</label><br>
+        <input type="radio" id="mean" name="threshold" value="mean">
+        <label for="mean">mean</label><br>
+
+        <input type="checkbox" id="invert" name="invert" value="False">
+        <label>Invert</label>
+    </div>
+
+    <div class="boxes">
+        <p>Create SVG:</p>
+        <input type="radio" id="simple" name="contour" value=1 checked>
+        <label for="simple">simple</label><br>
+        <input type="radio" id="tc89_l1" name="contour" value=2>
+        <label for="tc89_l1">tc89_l1</label><br>
+        <input type="radio" id="tc89_kcos" name="contour" value=3>
+        <label for="tc89_kcos">tc89_kcos</label><br>
+        <input type="range" id="clean" name="clean" class="slider" min="0" max="100" value="0"
+               oninput="document.getElementById('clean-amt').innerHTML = this.value;"><br>
+        <label for="clean">
+            Ignore <span id="clean-amt">0</span>px Paths
+        </label><br>
+        <input type="range" id="smooth" name="smooth" class="slider" min="0" max="100" value="0"
+               oninput="document.getElementById('smooth-amt').innerHTML = this.value / 10;"><br>
+        <label for="smooth">
+            Accuracy: <span id="smooth-amt">0</span>
+        </label>
+    </div>
+
+    <div class="buttons">
+        <input type="submit" value="Start">
+    </div>
+
+    <div class="buttons">
+        <input type="submit" value="Undo" name="undo">
+    </div>
+
+    <div class="frame">
+        {% for item in data %}
+        <div class="image">
+            <img src='../staticFiles/images/pngs/{{item.id}}.png' onerror="this.onerror=null; this.remove();"/>
+            <div class="bottom-img">{{item.png_text}}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="frame">
+        {% for item in data %}
+        <div class="image">
+            <img src='../staticFiles/images/svgs/{{item.id}}.svg' onerror="this.onerror=null; this.remove();"/>
+            <div class="bottom-img">{{item.svg_text}}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="buttons">
+        <input type="submit" value="Send to Silhouette" name="send-to-silhouette">
+    </div>
+</form>
+</body>
+</html>

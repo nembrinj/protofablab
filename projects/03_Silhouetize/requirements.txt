@@ -1,0 +1,7 @@
+toml~=0.10.2
+# headless as this would be running on the RPi 4
+opencv-python-headless==4.7.0.68
+flask~=2.2.2
+numpy==1.24.1
+svgpathtools~=1.5.1
+matplotlib~=3.6.2
