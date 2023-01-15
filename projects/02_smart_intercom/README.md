@@ -28,7 +28,7 @@ Note that since we couldn't figure out how to make the servo motor work, there i
 
 We decided to detect the doorbell simply by detecting loud noises. This means we are not trying to recognize the waveform of the doorbell, so we must be careful not to detect random sounds, such as the door closing.
 
-We faced multiple challenges when writing the detection algorithm. First, the input waveform has a variable DC offset, depending on the gain. To overcome this, we compute the average amplitude over time, and we subtract this value from the amplitude. This makes the waveform centred around zero.
+We faced multiple challenges when writing the detection algorithm. First, the input waveform has a variable [DC offset](https://en.wikipedia.org/wiki/DC_bias), depending on the gain. To overcome this, we compute the average amplitude over time, and we subtract this value from the amplitude. This makes the waveform centred around zero.
 
 ![DC offset example](images/dc_offset.png)
 
@@ -60,7 +60,7 @@ The device is subscribed to various topics that let the user configure the devic
 | `bell_duration` | Updates the bell duration (in ms).                       | `500`, `1000`, ...      |
 | `drop_rate`     | Updates the release time (amp/s).                        | `1000`, `2000`, ...     |
 
-To make MQTT message handling easier, we wrote a wrapper class around the Arduino MQTT client library (_PubSubClient_), which automatically handles reconnections, and makes us able to subscribe to topics using lambda functions:
+To make MQTT message handling easier, we wrote a wrapper class around the [Arduino MQTT client library](https://github.com/knolleary/pubsubclient), which automatically handles reconnections, and makes us able to subscribe to topics using lambda functions:
 
 ```cpp
 mqtt.subscribe("bell_amp", [](char * val) { bellAmp = atof(val); });
@@ -69,7 +69,7 @@ mqtt.subscribe("bell_duration", [](char * val) { bellDuration = atof(val); });
 
 ### Setting up the device
 
-To setup the smart intercom device, start by connecting the microphone module to the ESP32 Feather. In our case, we used the Adafruit MAX9814 module with the gain set to `Vdd` (40 dB), but other microphones and different gains should work just as well. The analog output must then be connected to the **A1** pin of the Arduino board.
+To setup the smart intercom device, start by connecting the microphone module to the ESP32 Feather. In our case, we used the [MAX9814](https://www.adafruit.com/product/1713) module with the gain set to `Vdd` (40 dB), but other microphones and different gains should work just as well. The analog output must then be connected to the **A1** pin of the Arduino board.
 
 Unfortunately, we were not able to connect and use the servo motor successfully, so we won't describe this step here.
 
@@ -113,13 +113,13 @@ The API application handles all the REST-requests from the web application runni
 | /api/sensorconfig     | GET    | Get the values of the current configuration of the doorbell detection algorithm.                                   |
 | /api/sensorconfig     | POST   | Override the configuration of the doorbell detection algorithm.                                                    |
 
-The application is subscribed to the the MQTT topic `bell_ringing`. If it receives a message on this topic, the event is saved to the database and a notification is sent to each device with a valid notification subscription.
+The application is subscribed to the MQTT topic `bell_ringing`. If it receives a message on this topic, the event is saved to the database and a notification is sent to each device with a valid notification subscription.
 
 ### Web application
 
-The code for the web application is located in the `smart-intercom-ui` subfolder. The ui application itself is a very basic [Angular 12](https://angular.io/) app with only two different pages.
+The code for the web application is located in the `smart-intercom-ui` subfolder. The UI application itself is a very basic [Angular 12](https://angular.io/) app with only two different pages.
 
-Angular uses the [Node Package Manager (NPM)](https://www.npmjs.com/) and has alot of dependencies. The step `npm install`, which installs all the dependencies of the project takes a very long time on the Raspberry Pi. For this reason the application is pre-built in the folder `smart-intercom-ui/ui-dist`, so it does not have to be built directly on the Raspberry Pi.
+Angular uses the [Node Package Manager (NPM)](https://www.npmjs.com/) and has a lot of dependencies. The step `npm install`, which installs all the dependencies of the project takes a very long time on the Raspberry Pi. For this reason the application is pre-built in the folder `smart-intercom-ui/ui-dist`, so it does not have to be built directly on the Raspberry Pi.
 
 ### Installation
 
