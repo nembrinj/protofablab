@@ -8,7 +8,7 @@ When renting a flat or apartment, the pre-installed intercom system is often ver
 
 The smart intercom device is able to detect the doorbell and will send a push notification to a registered browser application, that can also be used on a mobile phone. The user is then able to trigger the opening of the door in this application.
 
-![](images/schema.png)
+![System setup](images/schema.png)
 
 ## Intercom System - ESP32 Feather
 
@@ -18,7 +18,7 @@ The doorbell detection algorithm runs on this device. If the ringing of the door
 
 The smart intercom also listens for a command to open the door. In this case, the servo motor would be activated to press the button on the underlying intercom. This does not work in our prototype, since we were not able to integrate a working servo motor with the system.
 
-![](images/device.jpg)
+![Smart inetrcom device](images/device.jpg)
 
 The source code for the smart intercom device is located in the `arduino` subfolder.
 
@@ -30,19 +30,19 @@ We decided to detect the doorbell simply by detecting loud noises. This means we
 
 We faced multiple challenges when writing the detection algorithm. First, the input waveform has a variable DC offset, depending on the gain. To overcome this, we compute the average amplitude over time, and we subtract this value from the amplitude. This makes the waveform centred around zero.
 
-[ INSERT SKETCH HERE ]
+![DC offset example](images/dc_offset.png)
 
-Another challenge: the sound is a waveform, but we can only read the current amplitude on each iteration. Because the input oscillates, we can't tell whether we are hearing a loud noise during a single iteration. Thus, we have to write an algorithm to detect the "maximum amplitude" over a short period of time, which gives us an approximation of the current **loudness** of the sound.
+Another challenge: the sound is a waveform, but we can only read the current amplitude on each iteration. Because the input oscillates, we can't tell whether we are hearing a loud noise during a single iteration. Thus, we have to write an algorithm to detect the "maximum amplitude" over a short period of time, which gives us an approximation of the current **loudness level** of the sound.
 
-[ INSERT SKETCH HERE ]
+![Loudness level example](images/loudness_level.png)
 
-We define 4 configurable parameters for our algorithm, so that it be adjusted to work with different doorbells.
+We define 4 configurable parameters for our algorithm, so that it can be adjusted to work with different doorbells.
 
 First, we have the **sample rate**, which specifies how many times we read the input every second. Then, the **bell amplitude** and **bell duration**, which define how loud and how long a sound should be to be considered as the doorbell sound. Finally, we have the **release time**, which specifies how fast we consider the loudness to decrease (this is called _drop rate_ in the web app).
 
 This last parameter is helpful in cases where the doorbell sound isn't a steady sound, but rather multiple sounds with silences in between notes. By increasing the release time, we can make sure such doorbells get detected correctly.
 
-[ INSERT SKETCH HERE ]
+![Release time example](images/release_time.png)
 
 ### MQTT messages handling
 
