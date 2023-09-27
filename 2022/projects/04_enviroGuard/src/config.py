@@ -1,0 +1,10 @@
+SECRET_KEY = 'applesandpears'
+DEBUG = True
+INFLUXDB_DATABASE = 'test'
+INFLUXDB_HOST = '0.0.0.0'
+MQTT_BROKER_URL = 'maqiatto.com'
+MQTT_BROKER_PORT = 1883
+MQTT_USERNAME = 'mathias.tonini@gmail.com'
+MQTT_PASSWORD = '123456789'
+MQTT_KEEPALIVE = 15
+MQTT_TLS_ENABLED = False

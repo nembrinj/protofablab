@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 projects/02_smart_intercom/mqtt/data/mosquitto.db
+
+.idea/
+.vscode/

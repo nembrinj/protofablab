@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>lux meter</title>
+<style>
+html { 
+  font-family: Helvetica; 
+  display: inline-block; 
+  margin: 0px auto; 
+  text-align: center;}
+
+body {
+  margin-top: 50px;
+} 
+
+h1 {
+  font-size: 20pt; 
+  color: #444444;
+  margin: 50px auto 30px;
+} 
+
+h3 {
+  font-size: 14pt; 
+  color: #444444;
+  margin-bottom: 50px;
+}
+.flex{
+  display: flex;
+  flex-wrap: wrap;
+}
+.main{
+  display: flex;
+  flex-wrap: wrap;
+}
+.val-container{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  width: calc(50% - 20px);
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  background-color: #e1e1e1;
+  padding-bottom: 5px;
+}
+.values{
+  width: calc(100% - 20px);
+  margin-left: 10px;
+  margin-right:10px;
+  justify-content: center;
+  align-content: space-around;
+}
+.graph{
+  width: 100%;
+}
+.val{
+    width: calc(100% - 15px);
+    margin-left: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    /*height: 150px;*/
+    border-radius: 10px;
+    background-color: #e1e1e1;
+}
+</style>
+</head>
+
+<body>
+
+<div>
+    <h1>Project 04</h3><br>
+    <h2>Hello {{username}}</h1>
+    <div class="main">
+      <div class="menu">
+        <div class="head-menu">
+          <h3>Project 04 v1</h3>
+        </div>
+        <!-- <div class="items-menu">
+          <div class="menu-item">Paramètre</div>
+          <div class=""></div>
+        </div> -->
+      </div>
+      <div class="flex values">
+        <div class="val-container">
+          <h4>Temperature</h4>
+          <div class="val" id="temp"></div>
+          <div class="graph" id="tempGraph"></div>
+        </div>
+        <div class="val-container">
+          <h4>Co2</4>
+          <div class="val" id="c02"></div>
+          <div class="graph" id="c02Graph"></div>
+        </div>
+        <div class="val-container">
+          <h4>humidity</h4>
+          <div class="val" id="humidity"></div>
+          <div class="graph" id="humGraph"></div>
+        </div>
+        <div class="val-container">
+          <h4>pressure</h4>
+          <div class="val" id="pressure"></div>
+          <div class="graph" id="pressureGraph"></div>
+        </div>
+        <div class="val-container">
+          <h4>Lux</h4>
+          <div class="val" id="lux"></div>
+          <div class="graph" id="luxGraph"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+<!--c02
+  <iframe src="http://192.168.137.96:3001/d-solo/rvzKJqRgz/new-dashboard?orgId=1&from=1671631536877&to=1671674736877&panelId=2" width="450" height="200" frameborder="0"></iframe>
+!-->
+<!-- humidity
+  <iframe src="http://192.168.137.96:3001/d-solo/rvzKJqRgz/new-dashboard?orgId=1&from=1671631523478&to=1671674723478&panelId=4" width="450" height="200" frameborder="0"></iframe>
+-->
+<!--lux
+  <iframe src="http://192.168.137.96:3001/d-solo/rvzKJqRgz/new-dashboard?orgId=1&from=1671631507933&to=1671674707933&panelId=6" width="450" height="200" frameborder="0"></iframe>
+-->
+<!--TVoc (air quality ?)
+<iframe src="http://192.168.137.96:3001/d-solo/rvzKJqRgz/new-dashboard?orgId=1&from=1671631464286&to=1671674664286&panelId=10" width="450" height="200" frameborder="0"></iframe>
+-->
+<!-- Temp
+ <iframe src="http://192.168.137.96:3001/d-solo/rvzKJqRgz/new-dashboard?orgId=1&from=1671631489478&to=1671674689478&panelId=8" width="450" height="200" frameborder="0"></iframe>
+-->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    document.ready = () => {
+      Notification.requestPermission().then(function(permission) { console.log('permiss', permission)});   
+    };
+    
+    const localIp = "{{localIp}}" ;
+    upDateGraphtempertaure();
+    function upDateGraphtempertaure(){
+      const now =  new Date().getTime();
+      const oneHour = now -( 12*60*60*1000);
+      document.getElementById("tempGraph").innerHTML ='<iframe src="http://'+localIp+':/dashboard-solo/new?orgId=1&from='+oneHour+'&to='+now+'&panelId=10" width="450" height="200" frameborder="0"></iframe>';
+      document.getElementById("c02Graph").innerHTML = '<iframe src="http://'+localIp+':/dashboard-solo/new?orgId=1&from='+oneHour+'&to='+now+'&panelId=2" width="450" height="200" frameborder="0"></iframe>';
+      document.getElementById("humGraph").innerHTML = '<iframe src="http://'+localIp+':/dashboard-solo/new?orgId=1&from='+oneHour+'&to='+now+'&panelId=4" width="450" height="200" frameborder="0"></iframe>';
+      document.getElementById("luxGraph").innerHTML = '<iframe src="http://'+localIp+':/dashboard-solo/new?orgId=1&from='+oneHour+'&to='+now+'&panelId=8" width="450" height="200" frameborder="0"></iframe>';
+      document.getElementById("pressureGraph").innerHTML = '<iframe src="http://'+localIp+':/dashboard-solo/new?orgId=1&from='+oneHour+'&to='+now+'&panelId=6" width="450" height="200" frameborder="0"></iframe>';
+      
+    }
+    var socket = io();
+    socket.on('connect', function() {
+      console.log("Connected") 
+      getData();
+    });
+
+
+    function getData(){
+      console.log("get data")
+      socket.emit('message')
+      setTimeout(getData, 50000);
+    }
+   
+    socket.on("message",function(message){
+        message = JSON.parse(message)
+        console.log(message.temperature)
+        document.getElementById("temp").innerHTML = message.temperature
+        document.getElementById("lux").innerHTML = message.lux
+        document.getElementById("c02").innerHTML = message.c02
+        document.getElementById("pressure").innerHTML = message.pressure
+        document.getElementById("humidity").innerHTML = message.humidity
+
+        if(parseInt(message.lux) < 200){
+            const n = new Notification('Your light level is getting low. You might turn the light on.');
+        }
+        if(parseInt(message.lux) > 1500){
+            const n = new Notification('Light level above 1500 Lux');
+        }
+        if(parseInt(message.c02) > 1000){
+          const n = new Notification('Too much c02 in the room');
+        }
+        if(parseInt(message.temperature) > 20){
+          const n = new Notification('Room temperature above 22°C');
+        }
+        if(parseInt(message.temperature) < 18){
+          const n = new Notification('Room temperature under 18°C');
+        }
+        if(parseInt(message.humidity) > 80){
+          const n = new Notification('Room humidity above 80%');
+        }
+    });
+
+    </script>
+
+
+

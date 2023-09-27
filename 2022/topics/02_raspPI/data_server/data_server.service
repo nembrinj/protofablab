@@ -11,4 +11,4 @@ ExecStart=/usr/bin/python3 /home/pi/data_server/data_server.py &> /home/pi/data_
 
 [Install]
 WantedBy=network-online.target
-
+WantedBy=default.target
