@@ -1,0 +1,10 @@
+[Unit]
+Description=data recorder
+
+[Timer]
+OnUnitActiveSec=30s
+OnBootSec=30s
+AccuracySec=2s
+
+[Install]
+WantedBy=timers.target
