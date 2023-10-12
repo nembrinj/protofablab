@@ -1,0 +1,29 @@
+
+version: '3.3'
+services:
+
+  data_recorder:
+    build: data_recorder
+    image: profab_recorder:latest
+    environment:
+      - TZ=Europe/Berlin
+    restart: always
+    network_mode: host
+    volumes:
+      - data_volume:/usr/src/app/data      
+              
+  data_server:
+    build: data_server
+    image: profab_server:latest
+    environment:
+      - TZ=Europe/Berlin
+    restart: always
+    network_mode: host
+    ports:
+      - "5000:5000"
+    volumes:
+      - data_volume:/usr/src/app/data      
+
+volumes:
+    data_volume:
+    
