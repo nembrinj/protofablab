@@ -1,0 +1,11 @@
+b1 = from(bucket: "examplesystem")
+  |> range(start: v.timeRangeStart, stop:v.timeRangeStop)
+  |> filter(fn: (r) => r._field == "illuminance" )
+  |> yield(name: "table 1")
+b2 = from(bucket: "examplesystem")
+  |> range(start: v.timeRangeStart, stop:v.timeRangeStop)
+  |> filter(fn: (r) => r._field == "illuminance" )
+  |> timedMovingAverage(every:5s,period:1h)
+  |> yield(name: "table 2")
+join(tables: {b1, b2}, on: ["illuminance"])
+

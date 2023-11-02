@@ -1,0 +1,93 @@
+
+version: '3.3'
+services:
+
+
+  mqttbroker:
+    hostname: mosquitto
+    container_name: mosquitto
+    image: eclipse-mosquitto:latest
+    restart: always
+    volumes:
+      - ./mqtt_broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mqtt_broker/mosquitto.passwd:/mosquitto/config/mosquitto.passwd
+      - ./mqtt_broker/log/mosquitto.log:/mosquitto/log/mosquitto.log
+      - ./mqtt_broker/data:/mosquitto/data
+    networks:
+      - iot
+    ports:
+      - 1883:1883
+    privileged: true
+
+
+
+
+  influxdb:
+    image: influxdb
+    container_name: influxdb
+    restart: always
+    ports:
+      - "8086:8086"
+    networks:
+      - iot
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+      - influxdb-config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=user
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password
+      - DOCKER_INFLUXDB_INIT_ORG=profab
+      - DOCKER_INFLUXDB_INIT_BUCKET=examplesystem
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=4eYvsu8wZCJ6tKuE2sxvFHkvYFwSMVK0011hEEiojvejzpSaij86vYQomN_12au6eK-2MZ6Knr-Sax201y70w==
+  
+  telegraf:
+    image: telegraf
+    container_name: telegraf
+    restart: always
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - mqttbroker
+      - influxdb
+    networks:
+      - iot
+  
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - iot
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - influxdb
+
+  node-red:
+    image: nodered/node-red:latest
+    container_name: node-red
+    restart: always
+    environment:
+      - TZ=Europe/Berlin
+    ports:
+      - "1880:1880"
+    networks:
+      - iot
+    volumes:
+      - ./node-red:/data
+    depends_on:
+      - mqttbroker
+
+networks:
+  iot:
+
+volumes:
+  grafana-data:
+  influxdb-data:
+  influxdb-config:
+  data_volume:
+    
