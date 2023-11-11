@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  unilock_mongo:
+    container_name: mongodb
+    image: mongo:latest
+    env_file: ./../.env
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    ports:
+      - "27017:27017"
+    networks:
+      - unilock-network
+
+networks:
+  unilock-network:
