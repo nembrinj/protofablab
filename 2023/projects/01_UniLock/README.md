@@ -45,6 +45,8 @@ ADMIN=admin
 
    The `-d` flag runs the containers in the background.
 
+7. To instantiate the QR Scanner, go to the qr_scanner directory and follow the instructions in the README.md.
+
 Now, you should have both the Streamlit app and MongoDB containers running. Your Streamlit app should be accessible at `http://localhost:8501`.
 
 Ensure that you have your environment variables correctly defined in the .env file for your application to work as expected.
