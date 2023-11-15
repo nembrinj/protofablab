@@ -1,4 +1,4 @@
-To instantiate the entire application, you'll need to run `docker-compose` for both the Streamlit app in the `unilock_app` directory and the MongoDB container in the `unilock_db` directory.
+To instantiate the entire application, you'll need to run `docker-compose` for both the Streamlit app in the `docker-app` directory and the MongoDB container in the `docker-db` directory.
 
 Before you begin, ensure that you have the required environment variables defined in an `.env` file located in the `./unilock` directory. These environment variables should include any necessary secrets or configurations for your application.
 
@@ -11,10 +11,10 @@ ADMIN=admin
 
 1. Open a terminal and navigate to the root directory of your project (`unilock`).
 
-2. First, go to the `unilock_db` directory where your MongoDB container is defined:
+2. First, go to the `docker-db` directory where your MongoDB container is defined:
 
    ```bash
-   cd unilock_db
+   cd docker-db
    ```
 
 3. Run `docker-compose` to start the MongoDB container, which will automatically create the 'unilock-network' network:
@@ -31,10 +31,10 @@ ADMIN=admin
    cd ..
    ```
 
-5. Go to the `unilock_app` directory where your Streamlit app is located:
+5. Go to the `docker-app` directory where your Streamlit app is located:
 
    ```bash
-   cd unilock_app
+   cd docker-app
    ```
 
 6. Run `docker-compose` to start the Streamlit app container:
