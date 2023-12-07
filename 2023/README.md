@@ -98,7 +98,7 @@ keyfile /mosquitto/certs/broker.key
 
 
 
-## example of paho usage with a certificate
+## example of client paho usage with a certificate
 
 
 assuming the certificate is stored as ./certs/ca.crt
