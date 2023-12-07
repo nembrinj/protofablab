@@ -1,12 +1,10 @@
     include <constructive-compiled.scad>
-    
     // units are in millimeter
-    
     $fn=21; // directs the number of faces for round pieces
     
     dx = 34;
     dy = 83;
-    dz = 50;
+    dz = 40;
     
     diam = 4.5;
     
@@ -15,7 +13,6 @@
     
     g(TOUP() ) 
     {
-    
     // the base 
     box(x=dx+extra,y=dy+extra,z=3);
     box(x=dx+extra+2*thickness,y=dy+extra+2*thickness,z=thickness);
@@ -44,8 +41,7 @@
             
              remove()Z(-2*thickness) 
              box(x=dx+extra,y=dy+extra,z=dz);  
-          }
-            
+          }      
       }
     } 
     
