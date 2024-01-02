@@ -5,11 +5,11 @@ from pathlib import Path
 
 import paho.mqtt.client as mqtt
 
-mqttServer = "yourname.local"  # <------ CHANGE HERE
+mqttServer = "steve.local"  # <------ CHANGE HERE
 mqttPort = 1883
 mqttUser = "mqttuser";
 mqttPassword = "password";
-mqttTopic = "esp32/lux"
+mqttTopic = "TEST"
 
 # see documentation from https://pypi.org/project/paho-mqtt/
 def on_connect(client, userdata, flags, rc):

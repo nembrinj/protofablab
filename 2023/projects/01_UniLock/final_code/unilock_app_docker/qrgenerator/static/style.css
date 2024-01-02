@@ -1,0 +1,181 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: -webkit-linear-gradient(bottom, #1976D2, #008CBA);
+    background-repeat: no-repeat;
+  }
+
+.center-box {
+  width: 300px;
+  min-height: 100px;
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 1px 2px 8px rgba(0, 0, 0, 0.65);
+  margin: 6rem auto 8.1rem auto;
+
+}
+
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-name {
+  margin: 4px 2px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#closeImgContainer {
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+#closeImgContainer img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#qrCodeContainer {
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+#qrCodeContainer img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#middle-text-section {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.middle-text {
+  text-align: center;
+  margin: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.bottom-section {
+  display: flex;
+  justify-content: space-between;
+}
+
+.unlock-btn {
+  padding: 8px 16px;
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.lock-btn {
+  padding: 8px 16px;
+  background-color: #cc402e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#welcome-msg {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  margin: 15px;
+}
+
+.login-sec1{
+  align-self: center;
+}
+
+.login-form {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.button {
+  background-color: #04AA6D;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+.system-btn {
+  background-color: white; 
+  color: black;
+  border: 2px solid #008CBA;
+}
+
+.system-btn:hover {
+  background-color: #008CBA;
+  color: white; 
+  border: 2px solid #008CBA;
+}
+
+.system-btn:active {
+  background-color: white; 
+  color: black;
+}
+
+.unlock-btn {
+  background-color: #04AA6D;
+  color: white;
+  border: 2px solid #04AA6D;
+}
+
+.unlock-btn:hover {
+  background-color: white; 
+  color: black; 
+  border: 2px solid #04AA6D;
+}
+
+.unlock-btn:active {
+  background-color: #04AA6D;
+  color: white;
+}
+
+.lock-btn {
+  background-color: #f44336;
+  color: white;
+  border: 2px solid #f44336;
+}
+
+.lock-btn:hover {
+  background-color: white; 
+  color: black; 
+  border: 2px solid #f44336;
+}
+
+.lock-btn:active {
+  background-color: #f44336;
+  color: white;
+}

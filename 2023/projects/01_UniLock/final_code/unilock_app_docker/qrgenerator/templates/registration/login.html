@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}UniLock Login{% endblock %}
+
+{% block content %}
+
+<div class="center-box">
+
+    <div class="login-sec1">
+      <h2>UniLock Login</h2>
+    </div>
+
+    <div class="login-sec2">
+      <form method="post" class="login-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input class="button system-btn" type="submit" name="submit" value="LOGIN" />
+      </form>
+    </div>
+
+</div>
+
+{% endblock %}

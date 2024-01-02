@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}UniLock QR{% endblock %}
+
+{% block content %}
+{% load static %}
+
+{% if user.is_authenticated %}
+
+<div class="center-box">
+
+    <div class="top-section">
+        <button class="button system-btn" onclick="location.href='{% url 'logout' %}'">Log Out</button>
+        <span class="user-name">{{ user.username }}</span>
+    </div>
+
+    <div id="qrCodeContainer"></div>
+    <div id="closeImgContainer">
+      <img src="{% static 'closed_info.png' %}">
+    </div>
+
+    <div id="welcome-msg">
+        <h2>Welcome to UniLock!</h2>
+        {% if is_door_close %}
+          <p>The door is currently close. Push <b>Unlock</b> to create a one-time QR code to access the FabLab.</p>
+        {% else %}
+          <p>The door is currently open. When you leave, remember to push <b>Lock</b> to close the door.</p>
+        {% endif %}
+    </div>
+
+    <div id="middle-text-section">
+        Remaining time: <p id="remainingTime" class="middle-text"></p>s
+    </div>
+
+    <div id='buttons' class="bottom-section">
+      
+      {% if is_door_close %}
+        <button class="button unlock-btn" onclick="generateQR()">Unlock</button>
+      {% else %}
+        <button class="button lock-btn" onclick="lockDoor()">Lock</button>
+      {% endif %}
+
+    </div>
+
+</div>
+
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a>
+{% endif %}
+{% endblock %}

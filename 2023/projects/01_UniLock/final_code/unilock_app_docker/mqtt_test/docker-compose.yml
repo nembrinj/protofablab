@@ -1,0 +1,13 @@
+services:
+  mqttbroker:
+    hostname: mosquitto
+    image: eclipse-mosquitto:latest
+    restart: always
+    volumes:
+      - ./mqtt_broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mqtt_broker/mosquitto.passwd:/mosquitto/config/mosquitto.passwd
+      - ./mqtt_broker/log/mosquitto.log:/mosquitto/log/mosquitto.log
+      - ./mqtt_broker/data:/mosquitto/data
+    ports:
+      - 1883:1883
+    privileged: true

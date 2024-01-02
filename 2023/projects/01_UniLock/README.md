@@ -245,6 +245,77 @@ This UniLock physical arrangement ensures protection, usability, maintains funct
 
 ## 3. Installation
 
+To set the web app do the following.
+
+Within the project root directory, create a `.env` with the following content:
+```txt
+REAL_EXTERNAL_API_ENDPOINT=FALSE 
+REAL_CAMERA_API_ENDPOINT=TRUE
+EXTERNAL_PROJECT_API_ENDPOINT = "replace when needed"
+CAMERA_API_ENDPOINT = "http://<ip/hostname of the scanner>:5000"
+
+MQTT_SERVER_HOST=localhost
+MQTT_SERVER_PORT=1883
+```
+
+Go to the unilock_app_docker directory and Create docker image:
+
+```bash
+docker build -t unilock_app_image .
+```
+
+Instantiate container from docker image:
+```bash
+docker-compose up -d
+```
+
+
+Enjoy your application on http://localhost:8000.
+
+To set up and start the scanner software on your aiy vision pi do the following.
+
+0. (optional) Flash the custom scanner image onto your rasberry pi zero :
+
+   If you got your hands on a AYI vision kit you can just the reset of this guide. since you can just flash the custome image files using  the rasberry pi imaging tool. 
+
+   Just get the imager, and download custom image from the realase page. https://www.raspberrypi.com/software/
+
+
+1. First, clone the github repo : 
+
+```bash
+
+   git clone https://github.com/jack-unibe/FaceGuard.git
+
+```
+
+2. Install the python dependencies :
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Navigate to qr scanner folder :
+
+   ```bash
+   cd ./unilock_scanner
+   ```
+
+5. Open up port 5000 on your aiy vision pi : 
+
+   ```bash
+   ufw allow 5000
+   ```
+
+6. Start the server : 
+
+   ```bash
+   bash ./start.sh
+   ```
+
+From here on you can just navigate to http://<your-rip-ip/hostname>:5000 to activate the cammera and scan qrcodes 
+
+
 ## 4. Instructions
 ### Connecting to Local Area Network
 To access UniLock after system setup, connect to the local network by scanning a nearby QR code on the glass wall. Your device will seamlessly join UniLock's LAN without the need for manual WiFi credentials insertion, enabling the use of the UniLock system's functions.
