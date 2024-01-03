@@ -286,32 +286,51 @@ docker-compose up -d
 Enjoy your application on [http://localhost:8000](http://localhost:8000).
 
 ### Scanner
+<details>
+<summary>Flash the custome image</summary>
 
-Optionally flash the custom scanner image `images/unilock-scanner-v1` onto your Raspberry Pi Zero. If you have an AIY Vision kit, you can easily obtain the custom image from the [release page](https://www.raspberrypi.com/software/operating-systems/), flash it using the [Rasberry Pi imaging tool](https://www.raspberrypi.com/software/), and proceed with the remaining steps in this guide.
+If you already have a assembed AI vision kit you can just use the [Rasberry Pi imaging tool](https://www.raspberrypi.com/software/) to flash our preconfigured os image.
 
-??? do we have to move inside the pi?
-??? how did you create the image?
-??? Do the installation instructions make sense?
+This way you can just use the imager to do the initial network and account configuration. From there you can just plug in the pi and the qr scanner software will activate on boot.
 
-Navigate to the `unilock_scanner` directory:
-```
-cd code/unilock_scanner
-```
+</details>
 
-Install the python dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-Open up port 5000 on your AIY Vision Pi:
-```bash
-ufw allow 5000
-```
-
-Start the server:
-```bash
-bash ./start.sh
-```
+<details>
+<summary>Install and Configure from scatch</summary>
+    
+  Clone the protofab github repo:
+  ```bash
+   git clone https://github.com/nembrinj/protofablab.git
+  ```
+  
+  Navigate to the `unilock_scanner` directory:
+  ```
+  cd 2023/projects/01_UniLock/code/unilock_scanner
+  ```
+  Install the python dependencies:
+  ```bash
+  pip install -r requirements.txt
+  ```
+  
+  Open up port 5000 on rasberry PI:
+  ```bash
+  ufw allow 5000
+  ```
+  
+  Start the server:
+  ```bash
+  bash ./start.sh
+  ```
+  
+  (Optional) Modify the start script:
+  
+  if you are install this software on some other rasberry pi we alreayd have a version meant to run on other PIs.
+  
+  just change the first line to look like the following
+  ```txt
+  export FLASK_APP=pi4_qr_scanner.py
+  ```
+</details>
 
 From here on, just navigate to [http://<your-rip-ip/hostname>:5000](http://<your-rip-ip/hostname>:5000) to activate the cammera and scan the qr codes.
 
