@@ -1,4 +1,3 @@
-
 To set up and start the scanner software on your aiy vision pi do the following.
 
 0. (optional) Flash the custom scanner image onto your rasberry pi zero :

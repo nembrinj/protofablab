@@ -125,7 +125,6 @@ Initially, we developed the web app with [StreamLit](https://streamlit.io/), an 
 #### Specifications
 UniLock camera continuously scans for QR codes for up to 30 seconds. When a QR code is scanned, UniLock extracts its embedded string and sends it to the web app for validation. If no QR is detected within this time, the system triggers a failure message and returns a null value. Meanwhile, a yellow LED lights up to visually indicate the ongoing scanning process to users.
 
-#TODO file path, docker?
 **`unilock_scanner/aiy_qr_scanner`**
 ```python
 def activate_camera(cap) -> Union[str, None]:
@@ -245,76 +244,76 @@ This UniLock physical arrangement ensures protection, usability, maintains funct
 
 ## 3. Installation
 
-To set the web app do the following.
+First, clone the github repository: 
+```bash
+   git clone https://github.com/nembrinj/protofablab.git
+```
 
-Within the project root directory, create a `.env` with the following content:
+Move to the UniLock project directory:
+```bash
+cd 2023/projects/01_UniLock
+```
+
+Now, follow the following instructions to instantiate both the web application and the scanner.
+
+### Web application
+
+Create a `.env` file in the UniLock root directory with the following content:
 ```txt
 REAL_EXTERNAL_API_ENDPOINT=FALSE 
 REAL_CAMERA_API_ENDPOINT=TRUE
 EXTERNAL_PROJECT_API_ENDPOINT = "replace when needed"
 CAMERA_API_ENDPOINT = "http://<ip/hostname of the scanner>:5000"
-
 MQTT_SERVER_HOST=localhost
 MQTT_SERVER_PORT=1883
 ```
 
-Go to the unilock_app_docker directory and Create docker image:
+Navigate to the `unilock_app_docker` directory:
+```
+cd code/unilock_app_docker
+```
 
+Create a docker image:
 ```bash
 docker build -t unilock_app_image .
 ```
 
-Instantiate container from docker image:
+Instantiate a container from the docker image:
 ```bash
 docker-compose up -d
 ```
 
+Enjoy your application on [http://localhost:8000](http://localhost:8000).
 
-Enjoy your application on http://localhost:8000.
+### Scanner
 
-To set up and start the scanner software on your aiy vision pi do the following.
+Optionally flash the custom scanner image `images/unilock-scanner-v1` onto your Raspberry Pi Zero. If you have an AIY Vision kit, you can easily obtain the custom image from the [release page](https://www.raspberrypi.com/software/operating-systems/), flash it using the [Rasberry Pi imaging tool](https://www.raspberrypi.com/software/), and proceed with the remaining steps in this guide.
 
-0. (optional) Flash the custom scanner image onto your rasberry pi zero :
+??? do we have to move inside the pi?
+??? how did you create the image?
+??? Do the installation instructions make sense?
 
-   If you got your hands on a AYI vision kit you can just the reset of this guide. since you can just flash the custome image files using  the rasberry pi imaging tool. 
-
-   Just get the imager, and download custom image from the realase page. https://www.raspberrypi.com/software/
-
-
-1. First, clone the github repo : 
-
-```bash
-
-   git clone https://github.com/jack-unibe/FaceGuard.git
-
+Navigate to the `unilock_scanner` directory:
+```
+cd code/unilock_scanner
 ```
 
-2. Install the python dependencies :
+Install the python dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+Open up port 5000 on your AIY Vision Pi:
+```bash
+ufw allow 5000
+```
 
-4. Navigate to qr scanner folder :
+Start the server:
+```bash
+bash ./start.sh
+```
 
-   ```bash
-   cd ./unilock_scanner
-   ```
-
-5. Open up port 5000 on your aiy vision pi : 
-
-   ```bash
-   ufw allow 5000
-   ```
-
-6. Start the server : 
-
-   ```bash
-   bash ./start.sh
-   ```
-
-From here on you can just navigate to http://<your-rip-ip/hostname>:5000 to activate the cammera and scan qrcodes 
-
+From here on, just navigate to [http://<your-rip-ip/hostname>:5000](http://<your-rip-ip/hostname>:5000) to activate the cammera and scan the qr codes.
 
 ## 4. Instructions
 ### Connecting to Local Area Network
