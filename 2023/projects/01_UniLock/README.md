@@ -313,19 +313,15 @@ Assembly the AIY Vision kit and use the [Rasberry Pi imaging tool](https://www.r
   ```bash
   ufw allow 5000
   ```
+
+  Modify the script `start.sh` by changing the first line to look like the following:
+  ```txt
+  export FLASK_APP=pi4_qr_scanner.py
+  ```
   
   Start the server:
   ```bash
   bash ./start.sh
-  ```
-  
-  (Optional) Modify the start script:
-  
-  if you are install this software on some other rasberry pi we alreayd have a version meant to run on other PIs.
-  
-  just change the first line to look like the following
-  ```txt
-  export FLASK_APP=pi4_qr_scanner.py
   ```
 
 From here on, just navigate to [http://<your-rip-ip/hostname>:5000](http://<your-rip-ip/hostname>:5000) to activate the cammera and scan the qr codes.
