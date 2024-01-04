@@ -287,19 +287,13 @@ Enjoy your application on [http://localhost:8000](http://localhost:8000).
 
 ### Scanner
 
-There are two options for setting up the scanner. If you already have a AIY vision kit you can just directly flash our custom image. If not then you can ssh into your rasberry pi and setup the software from scatch.  
+There are two options for setting up the scanner. If you already have a AIY vision kit you can just directly flash our custom image. If not then you can ssh into your Rasberry Pi and setup the software from scratch.  
 
-<details>
-<summary>Flash the custom image</summary>
+#### A) Flash the custom image
 
-If you already have a assembed AI vision kit you can just use the [Rasberry Pi imaging tool](https://www.raspberrypi.com/software/) to flash our preconfigured os image.
+Assembly the AIY Vision kit and use the [Rasberry Pi imaging tool](https://www.raspberrypi.com/software/) to flash our preconfigured os image `unilock-scanner-v1.img.gz` onto the AIY's sd card. This opreation automatically does the initial network and account configuration. From there you can just plug in the Pi and the qr scanner software will activate on boot.
 
-This way you can use the unilock-scanner-v1.img.gz file to flash the image onto the AIY's sd card. As well as do the initial network and account configuration. From there you can just plug in the pi and the qr scanner software will activate on boot.
-
-</details>
-
-<details>
-<summary>Install and Configure from scatch</summary>
+#### B) Install and configure from scratch
     
   Clone the protofab github repo:
   ```bash
@@ -333,7 +327,6 @@ This way you can use the unilock-scanner-v1.img.gz file to flash the image onto 
   ```txt
   export FLASK_APP=pi4_qr_scanner.py
   ```
-</details>
 
 From here on, just navigate to [http://<your-rip-ip/hostname>:5000](http://<your-rip-ip/hostname>:5000) to activate the cammera and scan the qr codes.
 
