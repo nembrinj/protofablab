@@ -286,12 +286,15 @@ docker-compose up -d
 Enjoy your application on [http://localhost:8000](http://localhost:8000).
 
 ### Scanner
+
+There are two options for setting up the scanner. If you already have a AIY vision kit you can just directly flash our custom image. If not then you can ssh into your rasberry pi and setup the software from scatch.  
+
 <details>
-<summary>Flash the custome image</summary>
+<summary>Flash the custom image</summary>
 
 If you already have a assembed AI vision kit you can just use the [Rasberry Pi imaging tool](https://www.raspberrypi.com/software/) to flash our preconfigured os image.
 
-This way you can just use the imager to do the initial network and account configuration. From there you can just plug in the pi and the qr scanner software will activate on boot.
+This way you can use the unilock-scanner-v1.img.gz file to flash the image onto the AIY's sd card. As well as do the initial network and account configuration. From there you can just plug in the pi and the qr scanner software will activate on boot.
 
 </details>
 
