@@ -287,11 +287,11 @@ Enjoy your application on [http://localhost:8000](http://localhost:8000).
 
 ### Scanner
 
-There are two options for setting up the scanner. If you already have a AIY vision kit you can just directly flash our custom image. If not then you can ssh into your Rasberry Pi and setup the software from scratch.  
+There are two options for setting up the scanner. If you already have a AIY vision kit you can just directly flash our custom image. If not then you can ssh into your Raspberry Pi and setup the software from scratch.  
 
 #### A) Flash the custom image
 
-Assembly the AIY Vision kit and use the [Rasberry Pi imaging tool](https://www.raspberrypi.com/software/) to flash our preconfigured os image `unilock-scanner-v1.img.gz` onto the AIY's sd card. This opreation automatically does the initial network and account configuration. From there you can just plug in the Pi and the qr scanner software will activate on boot.
+Assembly the AIY Vision kit and use the [Raspberry Pi imaging tool](https://www.raspberrypi.com/software/) to flash our preconfigured os image `unilock-scanner-v1.img.gz` onto the AIY's sd card. This operation automatically does the initial network and account configuration. From there you can just plug in the Pi and the qr scanner software will activate on boot.
 
 #### B) Install and configure from scratch
     

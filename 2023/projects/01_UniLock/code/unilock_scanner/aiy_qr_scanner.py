@@ -3,26 +3,24 @@ import asyncio
 import datetime
 import time
 from typing import Union
-
-
 import cv2
 import numpy as np
-
 from pyzbar.pyzbar import decode
 from flask import Flask
-
-
 from aiy.leds import (Leds, Pattern, PrivacyLed, RgbLeds, Color)
-
 
 timeout = 30
 
 def decoder(image) -> Union[str, None]:
+    """
+    Decodes QR code from the given image captured from the webcam using the ZBar library.
 
-    # input : image captured from the webcam
-    # output : either a string extrated from a qr code or None if no qrcode was detected 
-    # use pyzbar to extra the infromation from the qrcode 
+    Parameters:
+    image (numpy.ndarray): The input image containing the QR code.
 
+    Returns:
+    Union[str, None]: The decoded QR code data as a string, or None if no QR code is found.
+    """
     gray_img = cv2.cvtColor(image,0)
     qrcode = decode(gray_img)
     
@@ -32,22 +30,23 @@ def decoder(image) -> Union[str, None]:
         (x,y,w,h) = obj.rect
         pts = np.array(points, np.int32)
         pts = pts.reshape((-1, 1, 2))
-
         qrcodeData = obj.data.decode("utf-8")
         qrcodeType = obj.type
-    
-
         return str(qrcodeData)
     
     return None
 
 def activate_camera(cap) -> Union[str, None]:
+    """
+    Activates the camera and LEDs, scans for a QR code, and returns the decoded data if found within the given timeout.
 
-    # output : either a string extrated from a qr code or None if no qrcode was detected by the timeout
-    # controls the leds and camera attachted to rasberry pi 
-    # runs for how many seconds until the timeout is met 
+    Parameters:
+    cap (cv2.VideoCapture): The camera capture object.
+
+    Returns:
+    Union[str, None]: The decoded QR code data as a string, or None if no QR code is found.
+    """
     with Leds() as leds:
-
         endTime = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
         leds.update(Leds.rgb_on(Color.YELLOW)) 
         while datetime.datetime.now() <= endTime :
@@ -69,11 +68,9 @@ app = Flask(__name__)
 
 @app.route('/turn_on')
 def main():
-
     cap = cv2.VideoCapture(0)
-    # main flask server 
+    # main Flask server 
     qrcode = activate_camera(cap)
-    
     print(qrcode)
     if qrcode: 
         return qrcode

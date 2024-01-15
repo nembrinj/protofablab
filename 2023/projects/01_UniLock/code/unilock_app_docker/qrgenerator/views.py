@@ -26,28 +26,25 @@ load_dotenv(".env")
 REAL_EXTERNAL_API_ENDPOINT = ("TRUE" == os.getenv("REAL_EXTERNAL_API_ENDPOINT"))
 REAL_CAMERA_API_ENDPOINT =  ("TRUE" == os.getenv("REAL_CAMERA_API_ENDPOINT"))
 CAMERA_API_ENDPOINT = os.getenv("CAMERA_API_ENDPOINT") 
-
 MQTT_SERVER_HOST = os.getenv("MQTT_SERVER_HOST") 
 MQTT_SERVER_PORT = int(os.getenv("MQTT_SERVER_PORT"))
-
-
 mqttPubTopicScanner = "webapp_to_lock"
 current_door_state = "unlocked"
-
 temp_qr_codes = [None]
 
-def change_door_state(new_door_state : str):
+def change_door_state(new_door_state: str):
+    """
+    Changes the state of the door and publishes the new state to the MQTT scanner topic.
 
+    Parameters:
+    new_door_state (str): The desired state of the door ("unlocked" or "locked").
+    """
     if new_door_state ==  "unlocked":
-
         client.publish(mqttPubTopicScanner, payload="unlocked", qos=1, retain=False)
         current_door_state = "unlocked"
     else:
-
         client.publish(mqttPubTopicScanner, payload="lock", qos=1, retain=False)
         current_door_state = "lock"
-
-
 
 def pre_render_function(view_func: Callable) -> Callable:
     """
@@ -60,7 +57,7 @@ def pre_render_function(view_func: Callable) -> Callable:
     Callable: The wrapper function that modifies the request context.
     """
     def wrapper(request, *args, **kwargs):
-        
+
         # API request logic
         if REAL_EXTERNAL_API_ENDPOINT:
             response = requests.get(EXTERNAL_PROJECT_API_ENDPOINT + '/is_door_close')
@@ -114,21 +111,17 @@ def turn_on_camera(request: HttpRequest) -> 'JsonResponse':
     """
     qr_code = temp_qr_codes[0]
     response = JsonResponse({})
+
     if REAL_CAMERA_API_ENDPOINT:
-
         camera_response = requests.get(CAMERA_API_ENDPOINT + '/turn_on').text
-
         qr_code = temp_qr_codes[0] 
-
         print(camera_response, " : " ,qr_code)
 
-        if camera_response == qr_code :
-            
+        if camera_response == qr_code:
             change_door_state('unlocked')
             return JsonResponse({'message': 'Camera turned on successfully', 'code' : camera_response})
         else:
             return JsonResponse({'message': 'Camera failed to turn on'})
-
     else:
         response.ok = True
     
@@ -147,15 +140,10 @@ def generate_qr_code(user: User) -> 'QRCode':
     Returns:
     'QRCode': The generated QR code object.
     """
-
     random_string = generate_random_string(10)
     temp_qr_codes[0] = random_string
-
     qr_code = QRCode.objects.create(qr_value=random_string, user=user)
-
-
     return qr_code
-
 
 def string_to_qr(qr_string: str) -> str:
     """
