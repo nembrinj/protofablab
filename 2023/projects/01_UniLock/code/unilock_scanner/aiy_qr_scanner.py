@@ -26,12 +26,8 @@ def decoder(image) -> Union[str, None]:
     
     if len(qrcode) != 0:
         obj = qrcode[0]
-        points = obj.polygon
-        (x,y,w,h) = obj.rect
-        pts = np.array(points, np.int32)
-        pts = pts.reshape((-1, 1, 2))
-        qrcodeData = obj.data.decode("utf-8")
-        qrcodeType = obj.type
+        
+        qrcodeData = obj.data.decode("utf-8") 
         return str(qrcodeData)
     
     return None
