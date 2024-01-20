@@ -128,7 +128,6 @@ The 3D pieces are located in the folder [3D_objects](https://github.com/nembrinj
 * [3D printer (Original Prusa i3 MK3S+)](https://www.prusa3d.com/category/original-prusa-i3-mk3s/)
 
 
-
 ## Technical Difficulties
 
 The technical difficulties faced during the project can be categorized;
@@ -150,8 +149,13 @@ The technical difficulties faced during the project can be categorized;
 
 ## Project Value
 
-- **Interaction between real world and IT** 
-![alt text](https://github.com/nembrinj/protofablab/blob/main/2023/projects/03_DEUS-EX/images/demo.mp4)
+- **Interaction between real world and IT**
+
+    This project combines both IT and real world system. It teached us some possible interaction as well as some issue than can follow.
+
+- **Automating an existing system**
+    
+    DEUS-EX is a simple way to test a new system without extensive cost and worktime, using the actual system in place. It shows that a simple solution might as well serve as a _Proof of concept_.
 
 ## Conclusion
 
