@@ -1,15 +1,19 @@
 # DEUX-EX 
 *by Henchoz Tristan & Peiris Ghamaathige*
 ## Table of Contents
-- [Introduction](#introduction)
-- [The Idea](#the-idea)
-- [Implementation](#implementation)
-- [Installation](#installation)
-    - [Software](#software)
-    - [Hardware](#hardware)
-- [Technical Difficulties](#technical-difficulties)
-- [Project Value](#project-value)
-- [Conculsion](#conclusion)
+- [DEUX-EX](#deux-ex)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [The Idea](#the-idea)
+  - [Implementation](#implementation)
+  - [Installation](#installation)
+      - [Software](#software)
+        - [Motor control unit](#motor-control-unit)
+        - [Switch control unit](#switch-control-unit)
+      - [Hardware](#hardware)
+  - [Technical Difficulties](#technical-difficulties)
+  - [Project Value](#project-value)
+  - [Conclusion](#conclusion)
 
 
 
@@ -113,7 +117,9 @@ Required Technologies:
 * [OpenSCAD](https://openscad.org/)
 * [Original Prusa i3 MK3S+](https://www.prusa3d.com/category/original-prusa-i3-mk3s/)
 
-Connect the motorshield,switch and Arduino UNO-Feather by the relevant pin numbers in the files.
+Connect the motorshield, switch and Arduino UNO-Feather by the relevant pin numbers in the files.
+
+![alt text](https://github.com/nembrinj/protofablab/blob/main/2023/projects/03_DEUS-EX/images/pic_general.JPG)
 
 To 3D print the components, move to the directory :
 
