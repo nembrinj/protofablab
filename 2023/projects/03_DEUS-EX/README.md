@@ -47,8 +47,7 @@ The implementation was done in 3 main steps:
 
 2. Checking the current status of the door lock
 
-    [Mini Microswitch SPDT (Roller Lever)](https://www.play-zone.ch/de/sparkfun-mini-microswitch-mit-roller-lever.html) which is triggered by the physical door lock is attached to the door by a new 3D printed piece that slides through to a side of the door. The readings of the microswitch are then sent to the ESP32 Feather.
-    ![alt text](https://github.com/nembrinj/protofablab/blob/main/2023/projects/03_DEUS-EX/images/pic_lock_sensor.JPG)
+    [Mini Microswitch SPDT (Roller Lever)](https://www.play-zone.ch/de/sparkfun-mini-microswitch-mit-roller-lever.html) which is triggered by the physical door lock is [attached to the door by a new 3D printed piece](https://github.com/nembrinj/protofablab/blob/main/2023/projects/03_DEUS-EX/images/pic_lock_sensor.JPG) that slides through to a side of the door. The readings of the microswitch are then sent to the ESP32 Feather.
 
 3. Unlock/Lock the door respectively
 
