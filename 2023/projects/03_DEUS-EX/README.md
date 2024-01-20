@@ -18,7 +18,8 @@
 
 
 ## Introduction
-Unlocking the door in the Learning lab with the help of an external authentication server.
+
+An electronic locking system could be useful in many situation, from managing a large number of user to remotly closing the windows in case of bad weather. But changing the whole lock system can be expensive and time consuming. DEUS-EX is a solution to get those advantage without having to change anything, as it uses the actual system in place and make it smarter.
 
 ## The Idea
 
@@ -30,6 +31,8 @@ Due to the new automated authentication system of the Learning lab door, this pr
 Furthermore, this system enables a manual override mechanism during an emergency.
 
 ## Implementation
+
+The implementation was done in 3 main steps:
 
 1. Accepting and responding to the new authentication system
 
@@ -45,6 +48,7 @@ Furthermore, this system enables a manual override mechanism during an emergency
 2. Checking the current status of the door lock
 
     [Mini Microswitch SPDT (Roller Lever)](https://www.play-zone.ch/de/sparkfun-mini-microswitch-mit-roller-lever.html) which is triggered by the physical door lock is attached to the door by a new 3D printed piece that slides through to a side of the door. The readings of the microswitch are then sent to the ESP32 Feather.
+    ![alt text](https://github.com/nembrinj/protofablab/blob/main/2023/projects/03_DEUS-EX/images/pic_lock_sensor.JPG)
 
 3. Unlock/Lock the door respectively
 
@@ -112,20 +116,18 @@ const String mqttPass = "";
 
 #### Hardware
 
-Required Technologies:
-
-* [OpenSCAD](https://openscad.org/)
-* [Original Prusa i3 MK3S+](https://www.prusa3d.com/category/original-prusa-i3-mk3s/)
-
-Connect the motorshield, switch and Arduino UNO-Feather by the relevant pin numbers in the files.
-
+As the main goal of this project is to interact with the physical world, it also requires a lot of differents hardware.
 ![alt text](https://github.com/nembrinj/protofablab/blob/main/2023/projects/03_DEUS-EX/images/pic_general.JPG)
 
-To 3D print the components, move to the directory :
+On the electronics side, this project uses an Arduino Uno R3 with an Arduino Motorshield R3, a esp32 Feather and a stepper motor. This is connected to the door using a belt and some 3D printed pieces.
 
-```bash
-cd 2023/projects/03_DEUX-EX/3D_objects
-```
+The 3D pieces are located in the folder [3D_objects](https://github.com/nembrinj/protofablab/blob/main/2023/projects/03_DEUS-EX/3D_objects) and require the following:
+
+* [OpenSCAD](https://openscad.org/)
+* [BOSL library](https://github.com/revarbat/BOSL)
+* [3D printer (Original Prusa i3 MK3S+)](https://www.prusa3d.com/category/original-prusa-i3-mk3s/)
+
+
 
 ## Technical Difficulties
 
@@ -149,9 +151,10 @@ The technical difficulties faced during the project can be categorized;
 ## Project Value
 
 - **Interaction between real world and IT** 
+![alt text](https://github.com/nembrinj/protofablab/blob/main/2023/projects/03_DEUS-EX/images/demo.mp4)
 
 ## Conclusion
 
-The Deux-ex project featured in a door unlocking system of the Learning Lab enables a new automated authentication. With several distinct features, Deux-ex highlights
+The DEUS-EX project featuring a door unlocking system of the Learning Lab enables a new automated unlocking system. With several distinct features, this project allows for automated system without having to change any existing setup.
 
 
