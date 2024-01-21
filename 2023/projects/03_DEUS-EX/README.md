@@ -157,9 +157,11 @@ The technical difficulties faced during the project can be categorized;
     DEUS-EX is a simple way to test a new system without extensive cost and worktime, using the actual system in place. It shows that a simple solution might as well serve as a _Proof of concept_.
 
 - **Ease of use & customization**
+  
     The documentation of DEUS-EX gives the users a quick guide to setup the system and the code is comprehensive with comments. Users can easily change the parameters of the 3D printed parts which enables use with different sizes of door knobs and locks.
   
 - **Manual Override**
+  
     The system allows users with a manual override mechanism which will benefit in the emergency situations.
 
 
