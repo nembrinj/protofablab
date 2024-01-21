@@ -1,4 +1,4 @@
-# DEUX-EX 
+# DEUS-EX 
 *by Henchoz Tristan & Peiris Ghamaathige*
 ## Table of Contents
 - [DEUX-EX](#deux-ex)
@@ -70,7 +70,7 @@ Clone the repository :
 Move to the project DEUX EX directory :
 
 ```bash
-cd 2023/projects/03_DEUX-EX
+cd 2023/projects/03_DEUS-EX
 ```
 
 Move to the software code directory :
@@ -95,7 +95,7 @@ Open the **switch_control_with_mqtt.ino** in Arduino IDE and install the followi
 * [PubSubClient.h](https://www.arduino.cc/reference/en/libraries/pubsubclient/)
 * [ezButton.h](https://www.arduino.cc/reference/en/libraries/ezbutton/)
 
-**``protofablab/2023/projects/03_DEUX-EX/code/switch_control_with_mqtt.ino``**
+**``protofablab/2023/projects/03_DEUS-EX/code/switch_control_with_mqtt.ino``**
 
 Enter the SSID and the password of the WIFI network in the following lines of the file.
 
@@ -155,6 +155,13 @@ The technical difficulties faced during the project can be categorized;
 - **Automating an existing system**
     
     DEUS-EX is a simple way to test a new system without extensive cost and worktime, using the actual system in place. It shows that a simple solution might as well serve as a _Proof of concept_.
+
+- **Ease of use & customization**
+    The documentation of DEUS-EX gives the users a quick guide to setup the system and the code is comprehensive with comments. Users can easily change the parameters of the 3D printed parts which enables use with different sizes of door knobs and locks.
+  
+- **Manual Override**
+    The system allows users with a manual override mechanism which will benefit in the emergency situations.
+
 
 ## Conclusion
 
