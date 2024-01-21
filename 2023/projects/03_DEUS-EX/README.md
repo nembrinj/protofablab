@@ -1,7 +1,7 @@
 # DEUS-EX 
 *by Henchoz Tristan & Peiris Ghamaathige*
 ## Table of Contents
-- [DEUX-EX](#deux-ex)
+- [DEUS-EX](#deus-ex)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [The Idea](#the-idea)
