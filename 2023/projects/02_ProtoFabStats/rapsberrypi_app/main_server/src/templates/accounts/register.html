@@ -1,0 +1,56 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-4"></div>
+  <div class="col-md-4">
+    <main class="form-signin w-100 m-auto">
+      <form role="form" method="post" action="">
+        {{ form.csrf_token }}
+        <h1 class="h3 mb-3 fw-normal text-center">Please register</h1>
+
+        <p>Only domains {{ form.FORMATTED_ALLOWLISTED_DOMAINS }} are accepted.</p>
+
+        <div class="form-floating">
+          {{ form.email(placeholder="email", class="form-control mb-2") }}
+          {{ form.email.label }}
+            {% if form.email.errors %}
+              {% for error in form.email.errors %}
+                <div class="alert alert-danger" role="alert">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-floating">
+          {{ form.password(placeholder="password", class="form-control mb-2") }}
+          {{ form.password.label }}
+            {% if form.password.errors %}
+              {% for error in form.password.errors %}
+                <div class="alert alert-danger" role="alert">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-floating">
+          {{ form.confirm(placeholder="Confirm Password", class="form-control mb-2") }}
+          {{ form.confirm.label }}
+            {% if form.confirm.errors %}
+              {% for error in form.confirm.errors %}
+                <div class="alert alert-danger" role="alert">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% endif %}
+        </div>
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Request Access</button>
+        <p class="text-center mt-3">Already have access? <a href="{{ url_for('accounts.login') }}">Login now</a></p>
+      </form>
+    </main>
+  </div>
+  <div class="col-md-4"></div>
+</div>
+
+{% endblock %}

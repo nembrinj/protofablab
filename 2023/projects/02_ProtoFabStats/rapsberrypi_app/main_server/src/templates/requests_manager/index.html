@@ -1,0 +1,75 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<h1 class="text-center">Requests Manager</h1>
+
+<script>
+  const URL_BASE_ENABLE = 'http://127.0.0.1:5000/requests_manager/enable?id=';
+  const URL_BASE_DISABLE = 'http://127.0.0.1:5000/requests_manager/disable?id=';
+
+  function OnCheckboxChecked(user_id) {
+    console.log("OnCheckboxChecked called.") 
+    console.log(user_id)
+
+    const url = URL_BASE_ENABLE + user_id
+    const Http = new XMLHttpRequest();
+    Http.open("GET", url);
+    Http.send();
+   Http.onreadystatechange = (e) => {
+      console.log(Http.responseText)
+    }
+  } 
+
+  function OnCheckboxUnchecked(user_id) {
+    console.log("OnCheckboxUnchecked called.") 
+    console.log(user_id)
+
+    const url = URL_BASE_DISABLE + user_id
+    const Http = new XMLHttpRequest();
+    Http.open("GET", url);
+    Http.send();
+   Http.onreadystatechange = (e) => {
+      console.log(Http.responseText)
+    }
+  } 
+</script>
+
+<div>
+  <table class="table">
+    <thead class="thead-dark text-bg-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Email</th>
+        <th scope="col">Admin</th>
+        <th scope="col">Enabled</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td scope="row">{{ loop.index }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+          {% if user.is_admin %}
+          <input type="checkbox" disabled checked>
+          {% else %}
+          <input type="checkbox" disabled>
+          {% endif %}
+        </td>
+        <td>
+          <form method="post">
+            {% if user.is_enabled %}
+            <input type="checkbox" checked onclick="OnCheckboxUnchecked({{user.id}})">
+            {% else %}
+            <input type="checkbox" onclick="OnCheckboxChecked({{user.id}})">
+          {% endif %}
+        </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
