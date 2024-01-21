@@ -1,0 +1,1646 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 19,
+      "panels": [],
+      "title": "Main",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "FO59L1ggk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "stepAfter",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "min": -1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "purple",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "alias": "event",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"event\" FROM \"APDS9960\"\n",
+          "rawQuery": true,
+          "refId": "event",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "occupancy",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "hide": false,
+          "query": "SELECT \"occupancy\" FROM \"APDS9960_processed\"\n\n\n",
+          "rawQuery": true,
+          "refId": "occupancy",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "APDS9960",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "FO59L1ggk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time:dddd"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 13,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "alias": "occupancy",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT MAX(occupancy) FROM \"APDS9960_processed\" WHERE time > now() - 7d GROUP BY time(1d)  ORDER BY time ASC",
+          "rawQuery": true,
+          "refId": "occupancy",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "APDS9960 - Occupancy last 7 days",
+      "transformations": [],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "FO59L1ggk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time:dddd"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 14,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT average FROM \"APDS9960_days_of_week\" ORDER BY time DESC LIMIT 7 ",
+          "rawQuery": true,
+          "refId": "occupancy",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "APDS9960 - Days of Week Average",
+      "transformations": [],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "FO59L1ggk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time:H"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 15,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT average FROM \"APDS9960_hour\" ORDER BY time DESC\n",
+          "rawQuery": true,
+          "refId": "occupancy",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "APDS9960 - Hours Average",
+      "transformations": [],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "FO59L1ggk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": false,
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "stepAfter",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "yellow",
+                  "index": 0,
+                  "text": "UNKNOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "ENTER"
+                },
+                "-1": {
+                  "color": "red",
+                  "index": 2,
+                  "text": "LEAVE"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 1,
+          "min": -1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "open_closed.status"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "query": "SELECT event_type FROM \"user_events_1\" ",
+          "rawQuery": true,
+          "refId": "raw",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "User Events",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "FO59L1ggk"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "derivative(median)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "non_negative_derivative(median)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "VL53L4CX.measurement"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "VL53L4CX.measurement"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "hide": false,
+          "query": "SELECT * FROM \"VL53L4CX\"",
+          "rawQuery": true,
+          "refId": "raw",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "hide": true,
+          "query": "SELECT MEAN(\"measurement\") FROM \"VL53L4CX\" GROUP BY TIME(1s) \n",
+          "rawQuery": true,
+          "refId": "mean",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "hide": false,
+          "query": "SELECT MEDIAN(\"measurement\") FROM \"VL53L4CX\" GROUP BY TIME(500ms) \n",
+          "rawQuery": true,
+          "refId": "median",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "hide": true,
+          "query": "SELECT DERIVATIVE(\"measurement\", 1s) FROM \"VL53L4CX\" ",
+          "rawQuery": true,
+          "refId": "derivative",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": true,
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT  NON_NEGATIVE_DERIVATIVE(\"measurement\", 1s) FROM \"VL53L4CX\" \n",
+          "rawQuery": true,
+          "refId": "non_negative_derivative",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "non_negative_derivative(median)",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "hide": true,
+          "query": "SELECT NON_NEGATIVE_DERIVATIVE(mean_value, 1s) AS \"non_negative_derivative(median)\"\nFROM (\n    SELECT MEAN(\"measurement\") AS mean_value \n    FROM \"VL53L4CX\" \n    GROUP BY time(500ms)\n)",
+          "rawQuery": true,
+          "refId": "non_negative_derivative(median)",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "derivative(median)",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "hide": true,
+          "query": "SELECT measurement_derivative AS \"derivative(median)\"\nFROM (\nSELECT DERIVATIVE(mean_value, 1s) AS measurement_derivative\nFROM (\n    SELECT MEAN(\"measurement\") AS mean_value \n    FROM \"VL53L4CX\" \n    GROUP BY time(500ms)\n)\n)\nWHERE measurement_derivative > 0",
+          "rawQuery": true,
+          "refId": "derivative(median)",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "hide": true,
+          "query": "SELECT MEDIAN(\"measurement\") FROM \"VL53L4CX\" GROUP BY TIME(3s) \n\n",
+          "rawQuery": true,
+          "refId": "median 3s",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "user_events",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "hide": false,
+          "query": "SELECT * FROM \"user_events_1\"",
+          "rawQuery": true,
+          "refId": "user_events",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "VL53L4CX",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "FO59L1ggk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": false,
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "stepAfter",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "open_closed.status"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 25
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "alias": "number_of_users",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "query": "SELECT number FROM \"number_of_users_1\" ",
+          "rawQuery": true,
+          "refId": "raw",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Number of Users",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 33
+      },
+      "id": 17,
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisGridShow": false,
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 0,
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "color": "yellow",
+                      "index": 0,
+                      "text": "UNKNOWN"
+                    },
+                    "1": {
+                      "color": "red",
+                      "index": 1,
+                      "text": "LOCKED"
+                    },
+                    "2": {
+                      "color": "green",
+                      "index": 2,
+                      "text": "UNLOCKED"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "max": 2,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Time"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "time:DD/MM/YYYY HH:mm:ss"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 34
+          },
+          "id": 6,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "auto",
+            "stacking": "none",
+            "text": {
+              "valueSize": 0
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xField": "Time",
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "pluginVersion": "9.3.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "FO59L1ggk"
+              },
+              "query": "SELECT status, time FROM \"locked_unlocked\" ",
+              "rawQuery": true,
+              "refId": "locked_unlocked",
+              "resultFormat": "time_series"
+            }
+          ],
+          "title": "Locked/Unlocked",
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisGridShow": false,
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 0,
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "color": "yellow",
+                      "index": 0,
+                      "text": "UNKNOWN"
+                    },
+                    "1": {
+                      "color": "red",
+                      "index": 1,
+                      "text": "OPEN"
+                    },
+                    "2": {
+                      "color": "green",
+                      "index": 2,
+                      "text": "CLOSED"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "max": 2,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Time"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "time:DD/MM/YYYY HH:mm:ss"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 34
+          },
+          "id": 7,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "auto",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "pluginVersion": "9.3.6",
+          "targets": [
+            {
+              "alias": "test",
+              "datasource": {
+                "type": "influxdb",
+                "uid": "FO59L1ggk"
+              },
+              "hide": false,
+              "query": "SELECT status FROM \"open_closed\" \n",
+              "rawQuery": true,
+              "refId": "status",
+              "resultFormat": "time_series"
+            }
+          ],
+          "title": "Open/Closed",
+          "transformations": [],
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "FO59L1ggk"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0,
+                "spanNulls": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "open_closed.status"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "orange",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "options": {
+                          "0": {
+                            "index": 0,
+                            "text": "UNKWNON"
+                          },
+                          "1": {
+                            "color": "green",
+                            "index": 1,
+                            "text": "OPEN"
+                          },
+                          "2": {
+                            "color": "red",
+                            "index": 2,
+                            "text": "CLOSED"
+                          }
+                        },
+                        "type": "value"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "locked_unlocked.status"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "green",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "options": {
+                          "0": {
+                            "index": 0,
+                            "text": "UNKNOWN"
+                          },
+                          "1": {
+                            "color": "red",
+                            "index": 1,
+                            "text": "LOCKED"
+                          },
+                          "2": {
+                            "color": "green",
+                            "index": 2,
+                            "text": "UNLOCKED"
+                          }
+                        },
+                        "type": "value"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Time"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "time:DD/MM/YYYY HH:mm:ss"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 6,
+            "y": 42
+          },
+          "id": 2,
+          "options": {
+            "alignValue": "left",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "mergeValues": true,
+            "rowHeight": 0.9,
+            "showValue": "auto",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.3.6",
+          "targets": [
+            {
+              "alias": "",
+              "datasource": {
+                "type": "influxdb",
+                "uid": "FO59L1ggk"
+              },
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "hide": false,
+              "orderByTime": "ASC",
+              "policy": "default",
+              "query": "SELECT status FROM \"locked_unlocked\"",
+              "rawQuery": true,
+              "refId": "locked_unlocked/raw",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            },
+            {
+              "alias": "",
+              "datasource": {
+                "type": "influxdb",
+                "uid": "FO59L1ggk"
+              },
+              "hide": false,
+              "query": "SELECT status FROM \"open_closed\"",
+              "rawQuery": true,
+              "refId": "open_closed/raw",
+              "resultFormat": "time_series"
+            }
+          ],
+          "title": "Door Events",
+          "type": "state-timeline"
+        }
+      ],
+      "title": "Door Status",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "id": 21,
+      "panels": [],
+      "title": "Draft",
+      "type": "row"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "ProtoFabStats",
+  "uid": "zNCHqxRgk",
+  "version": 52,
+  "weekStart": ""
+}

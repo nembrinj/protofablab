@@ -1,0 +1,8 @@
+[Unit]
+Description=PortoFabStats Day Of Week Stats Service
+
+[Service]
+Type=oneshot
+User=pi
+WorkingDirectory=/home/pi/day_of_week_stats_service
+ExecStart=/usr/bin/python /home/pi/day_of_week_stats_service/day_of_week_stats.py

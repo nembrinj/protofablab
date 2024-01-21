@@ -1,0 +1,8 @@
+[Unit]
+Description=PortoFabStats Preprocessing Service
+
+[Service]
+Type=oneshot
+User=pi
+WorkingDirectory=/home/pi/data_preprocessing_service
+ExecStart=/usr/bin/python /home/pi/data_preprocessing_service/proto_fab_stats_preprocessing.py

@@ -1,0 +1,8 @@
+[Unit]
+Description=PortoFabStats Hour Stats Service
+
+[Service]
+Type=oneshot
+User=pi
+WorkingDirectory=/home/pi/hour_stats_service
+ExecStart=/usr/bin/python /home/pi/hour_stats_service/hour_stats.py

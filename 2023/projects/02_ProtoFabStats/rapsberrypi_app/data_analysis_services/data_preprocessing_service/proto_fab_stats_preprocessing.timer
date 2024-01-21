@@ -1,0 +1,10 @@
+[Unit]
+Description=PortoFabStats Preprocessing Timer
+
+[Timer]
+OnUnitActiveSec=10m
+OnBootSec=30s
+AccuracySec=2s
+
+[Install]
+WantedBy=timers.target

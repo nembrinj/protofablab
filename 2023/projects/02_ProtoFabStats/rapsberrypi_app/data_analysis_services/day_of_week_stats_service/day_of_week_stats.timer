@@ -1,0 +1,10 @@
+[Unit]
+Description=PortoFabStats Day Of Week Stats Timer
+
+[Timer]
+Daily at 4:00am
+OnCalendar=*-*-* 04:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

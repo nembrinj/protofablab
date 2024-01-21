@@ -1,0 +1,10 @@
+[Unit]
+Description=PortoFabStats Day Of Week Stats Timer
+
+[Timer]
+OnUnitActiveSec=1h
+OnBootSec=30s
+AccuracySec=2s
+
+[Install]
+WantedBy=timers.target

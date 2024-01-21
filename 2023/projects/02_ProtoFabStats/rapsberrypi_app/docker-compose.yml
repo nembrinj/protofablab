@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  mqttbroker:
+    hostname: mosquitto
+    container_name: mosquitto
+    image: eclipse-mosquitto:latest
+    restart: always
+    volumes:
+      - ./mqtt_broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mqtt_broker/mosquitto.passwd:/mosquitto/config/mosquitto.passwd
+      - ./mqtt_broker/log/mosquitto.log:/mosquitto/log/mosquitto.log
+      - ./mqtt_broker/data:/mosquitto/data
+    networks:
+      - profab
+    ports:
+      - 1883:1883
+    privileged: true
+
+  influxdb:
+    image: mendhak/arm32v6-influxdb
+    container_name: influxdb
+    restart: always
+    ports:
+      - "8086:8086"
+    networks:
+      - profab
+    volumes:
+      - influxdb-data:/root/.influxdb/data/
+      - influxdb-config:/tmp/backups/
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=user
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password
+      - DOCKER_INFLUXDB_INIT_ORG=profab
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=4eYvsu8wZCJ6tKuE2sxvFHkvYFwSMVK0011hEEiojvejzpSaij86vYQomN_12au6eK-2MZ6Knr-Sax201y70w==
+
+  telegraf:
+    image: mik9/telegraf:armv6
+    container_name: telegraf
+    restart: always
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    networks:
+      - profab
+    depends_on:
+      - mqttbroker
+      - influxdb
+
+  main_server:
+    build: main_server
+    container_name: main_server
+    image: main_server:latest
+    environment:
+      - TZ=Europe/Zurich
+    restart: always
+    network_mode: host
+    ports:
+      - "5000:5000"
+    volumes:
+      - data-volume:/usr/src/app/data
+    depends_on:
+      - influxdb
+
+networks:
+  profab:
+
+
+volumes:
+  grafana-storage:
+  influxdb-data:
+  influxdb-config:
+  data-volume:

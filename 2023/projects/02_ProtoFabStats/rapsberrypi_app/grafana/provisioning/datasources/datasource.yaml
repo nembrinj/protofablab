@@ -1,0 +1,12 @@
+apiVersion: 1
+
+datasources:
+  - name: ProFabDatasource
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    isDefault: true
+    database: profab
+    # user: profab_admin
+    jsonData:
+      dbName: profab
