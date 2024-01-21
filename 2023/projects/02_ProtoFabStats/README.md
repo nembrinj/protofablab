@@ -15,13 +15,15 @@
       - [MQTT](#mqtt)
       - [ESP32](#esp32)
       - [Raspberry Pi](#raspberry-pi)
+        - [Grafana](#grafana)
+  - [Setup Example](#setup-example)
   - [Appendix](#appendix)
 
 ## Introduction
 
 ### Background
 
-...
+Our goal for this semester was to implement projects useful for extending the access to the Learning Lab. Its current situation does not permit students that are part of the BeNeFri network but not enrolled at University of Fribourg to access the Learning Lab on their own. 
 
 ### Motivation
 
@@ -29,7 +31,7 @@ While the other 2 projects (*UniLock* and *DEUS-EX*) focus on access at a softwa
 
 ### High Level Overview 
 
-...
+We can see the project as having two big components: a component responsible of fetching the data and another one that acts as a server that, when accessed, presents statistics for the Learning Lab's usage.
 
 ## Project Directory Structure
 
@@ -42,30 +44,32 @@ The main directory contains 3 pdfs, one for each of the three different presenta
 For this project the following pieces of hardware are required (in addition a breadboard and cables to connect the components together):
 * *Raspberry Pi Zero* 
   <div style="text-align:left">
-    <img src="images/raspberry_pi_zero.jpg?" height="200px;"/>
+    <img src="images/raspberry_pi_zero.jpg?" height="300px;"/>
   </div>
   
 * *Adafruit ESP32-S3 Feather* 
   <div style="text-align:left">
-    <img src="images/esp32.jpg" height="200px;"/>
+    <img src="images/esp32.jpg" height="300px;"/>
   </div>
 
 * *Adafruit VL53L4CX*
   <div style="text-align:left">
-    <img src="images/VL53L4CX.jpg" height="200px;"/>
+    <img src="images/VL53L4CX.jpg" height="300px;"/>
   </div>
   This is a Time of Flight sensor that can detect objects that are up to 6m away from it. 
   Furthermore, it offers support for multi-object detection. This is not something that the ProtoFabStats project needs, but there is a simple solution: we are keeping only the closest object detected for each reading. The ... is that the sensor
 
 * *Adafruit APDS9960*
   <div style="text-align:left">
-    <img src="images/APDS9960.jpg" height="200px;"/>
+    <img src="images/APDS9960.jpg" height="300px;"/>
   </div>
   This is a sensor for Proximity, Light, RGB, and Gesture. However, we only used its gesture capabilities. The sensor is capable of detecting gestures in the following directions: up, down, left and right. 
 
 
-There is one more sensor that we have tried to use but fail: *Adafruit VL53L0X*. Another Time of Flight sensor, a predecesor of *Adafruit VL53L4X*, this sensor does not offer multi-object detection and proved to be difficult to work with.
-
+There is one more sensor that we have tried to use but fail: *Adafruit VL53L0X*. Another Time of Flight sensor, a predecesor of *Adafruit VL53L4X*, this sensor does not offer multi-object detection and proved to be difficult to work with. In terms of appearances and connection protocols, the two sensors are similar.
+<div style="text-align:left">
+  <img src="images/VL53L0CX.jpg" height="300px;"/>
+</div>
 
 ### Methodology
 
@@ -129,9 +133,54 @@ We use this board to subscribe to the MQTT topics where sensor readings are publ
 
 In addition, 4 other application run in docker containers:
 * *Mosquitto*
+  * The MQTT broker runs on this board
 * *Telegraf*
 * *InfluxDB V1*
 * *Flask Service*
+
+##### Grafana
+
+We use Grafana to display all the statistics:
+* Locked/Unlocked events
+  <div style="text-align:left">
+    <img src="images/locked_unlocked.jpg" height="400px;"/>
+  </div>
+* Open/Closed events
+  <div style="text-align:left">
+    <img src="images/open_closed.jpg" height="400px;"/>
+  </div>
+* Door events together (for detecting bad readings)
+  <div style="text-align:left">
+    <img src="images/door_events.jpg" height="400px;"/>
+  </div>
+* Data collected by the Adafruit APDS9960 sensor, together with the number of people in the laboratory at any given point in time
+  <div style="text-align:left">
+    <img src="images/apds9960_grafana.jpg" height="400px;"/>
+  </div>
+* Average occupancy per weekday
+  <div style="text-align:left">
+    <img src="images/avg_day.jpg" height="400px;"/>
+  </div>
+* Average occupancy per hour
+  <div style="text-align:left">
+    <img src="images/avg_hour.jpg" height="400px;"/>
+  </div>
+* Maximum number of people per day during the last 7 days
+  <div style="text-align:left">
+    <img src="images/occupancy_7_days.jpg" height="400px;"/>
+  </div>
+* The times when the fake events (enter/leave events) had to be added at midnight to reset the people counter to 0. This is done in order to prevent the errors to propagate from one day to the next one.
+  <div style="text-align:left">
+    <img src="images/forced_events.jpg" height="400px;"/>
+  </div>
+
+## Setup Example
+
+We placed the ESP32 with its two sensors on a breadboard, and we taped it to a wall next to the door we are interested in monitoring (see pictures below). The placement has to be done in such a way that, when the door opens, it does not swing in front of the sensor.
+<div style="text-align:left">
+  <img src="images/setup_board.jpg?" height="300px;"/>
+  <img src="images/setup_wall.jpg?" height="300px;"/>
+</div>
 
 ## Appendix
 
