@@ -25,13 +25,13 @@ def decoder(image) -> Union[str, None]:
     
     if len(qrcode) != 0:
         obj = qrcode[0]
-      
-        qrcodeData = obj.data.decode("utf-8")
+        
+        qrcodeData = obj.data.decode("utf-8") 
         return str(qrcodeData)
     
     return None
 
-def activate_camera() -> Union[str, None]:
+def activate_camera(cap) -> Union[str, None]:
     """
     Activates the camera and LEDs, scans for a QR code, and returns the decoded data if found within the given timeout.
 
@@ -41,28 +41,29 @@ def activate_camera() -> Union[str, None]:
     Returns:
     Union[str, None]: The decoded QR code data as a string, or None if no QR code is found.
     """
-    endTime = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
-    cap = cv2.VideoCapture(0)
-    while datetime.datetime.now() <= endTime :
-        ret, frame = cap.read()
-        qrcode = decoder(frame)
-        if qrcode:
-            print("success : ", qrcode)
-            time.sleep(1)
-            return qrcode
+    with Leds() as leds:
+        endTime = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
+        while datetime.datetime.now() <= endTime :
+            ret, frame = cap.read()
+            qrcode = decoder(frame)
+            if qrcode:
+                print("success : ", qrcode)
+                time.sleep(1)
+                return qrcode
 
-        print("failed")
+        print("failed to detect qr code")
         time.sleep(1)
         return None
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/turn_on')
 def main():
-    # main flask server 
-    qrcode = activate_camera()
-    
+    print("Qr server active")
+    cap = cv2.VideoCapture(0)
+    qrcode = activate_camera(cap)
     if qrcode: 
         return qrcode
+    
     else:
         return "failed to get qr code"
