@@ -36,3 +36,5 @@ docker-compose up -d
 ```
 
 Enjoy your application on [http://localhost:8000](http://localhost:8000).
+
+if you wish to create your own mqtt password follow this guide http://www.steves-internet-guide.com/mqtt-username-password-example/
