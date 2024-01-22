@@ -55,7 +55,7 @@ def activate_camera(cap) -> Union[str, None]:
                 return qrcode
 
         leds.update(Leds.rgb_on(Color.RED))
-        print("failed")
+        print("failed to detect qr code")
         time.sleep(1)
         leds.update(Leds.rgb_on(Color.WHITE))
         return None
@@ -64,10 +64,9 @@ app = Flask(__name__)
 
 @app.route('/turn_on')
 def main():
+    print("Qr server active")
     cap = cv2.VideoCapture(0)
-    # main Flask server 
     qrcode = activate_camera(cap)
-    print(qrcode)
     if qrcode: 
         return qrcode
     
