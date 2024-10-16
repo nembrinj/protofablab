@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>lux meter</title>
+<style>
+html { 
+  font-family: Helvetica; 
+  display: inline-block; 
+  margin: 0px auto; 
+  text-align: center;}
+
+body {
+  margin-top: 50px;
+} 
+
+h1 {
+  font-size: 14pt; 
+  color: #444444;
+  margin: 50px auto 30px;
+} 
+
+h3 {
+  font-size: 12pt; 
+  color: #444444;
+  margin-bottom: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<div>
+  <h3>ESP32-S3 VEML7700 lux sensor with refresh</h4><br>
+  <h1>Illuminance</h1>
+  <h1> <span id="luxValue">0</span> [lux]</h1><br>
+  <br/>
+</div>
+
+<script>
+
+setInterval(function() {
+  // Call a function repeatedly with 2 seconds interval
+  getData();
+}, 2000); //2000mSeconds update rate
+
+function getData() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("luxValue").innerHTML =
+      this.responseText;
+    }
+  };
+  xhttp.open("GET", "http://localhost:5000/current", true);
+  xhttp.send();
+}
+</script>
+
+</body>
+</html>
+
