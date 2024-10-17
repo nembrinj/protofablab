@@ -48,6 +48,7 @@ def current():
         current = f.readline()
     response = make_response(current, 200)
     response.mimetype = "text/plain"
+    response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 if __name__ == '__main__':
