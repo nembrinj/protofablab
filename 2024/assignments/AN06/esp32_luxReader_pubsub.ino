@@ -39,7 +39,7 @@ void setup(){
   // Setup connection to ROS machine (server)
   nh.getHardware()->setConnection(server, 11411);
   nh.initNode();
-    nh.advertise(pub); // the topic must be advertised to the master
+  nh.advertise(pub); // the topic must be advertised to the master
 }
 
 void loop(){
