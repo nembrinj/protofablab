@@ -1,0 +1,40 @@
+
+version: '3.3'
+services:
+
+  image_treatment:
+    build: image_treatment
+    image: protofab_image_treatment:latest
+    environment:
+      - TZ=Europe/Berlin
+    restart: always
+    network_mode: host
+    devices:
+      - /dev/video0:/dev/video0
+    privileged: true
+    #If you use the host network mode for a container, that container's network stack isn't isolated from the Docker host (the container shares the host's networking namespace), and the container doesn't get its own IP-address allocated.
+      
+  mqttbroker:
+    hostname: mosquitto
+    image: eclipse-mosquitto:latest
+    restart: always
+    volumes:
+      - ./mqtt_broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mqtt_broker/mosquitto.passwd:/mosquitto/config/mosquitto.passwd
+      - ./mqtt_broker/log/mosquitto.log:/mosquitto/log/mosquitto.log
+      - ./mqtt_broker/data:/mosquitto/data
+    ports:
+      - 1883:1883
+    privileged: true
+  
+  arduino_communication:
+    build: arduino_communication
+    image: protofab_image_arduino_comm:latest
+    environment:
+      - TZ=Europe/Berlin
+    restart: always
+    network_mode: host
+    privileged: true
+    
+
+    
