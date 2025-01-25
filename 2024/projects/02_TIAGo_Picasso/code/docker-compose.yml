@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  # Define the backend service
+  backend:
+    build:
+      context: ./backend # Path to your backend Dockerfile
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000" # Map host port 5000 to container port 5000
+    env_file:
+      - ./backend/.env # Load environment variables from .env file
+
+  # Define the frontend service
+  frontend:
+    build:
+      context: ./frontend # Path to your frontend Dockerfile
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80" # Map host port 8080 to container port 8080
+    environment:
+      - VUE_APP_BACKEND_URL=http://backend:5000 # Set backend URL
+    depends_on:
+      - backend # Ensure the frontend waits for the backend to be ready
+
+  # MQTT broker service
+  mqttbroker:
+    hostname: mosquitto
+    image: eclipse-mosquitto:latest
+    restart: always
+    volumes:
+      - ./mqtt_broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mqtt_broker/mosquitto.passwd:/mosquitto/config/mosquitto.passwd
+      - ./mqtt_broker/log/mosquitto.log:/mosquitto/log/mosquitto.log
+      - ./mqtt_broker/data:/mosquitto/data
+    ports:
+      - "1883:1883"
+    privileged: true
