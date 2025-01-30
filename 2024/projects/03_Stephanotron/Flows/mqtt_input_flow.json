@@ -1,0 +1,764 @@
+[
+    {
+        "id": "0de15d8c3155b5e8",
+        "type": "tab",
+        "label": "LED-communication",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "abdef25bc7903c19",
+        "type": "ui-group",
+        "name": "Orders Status",
+        "page": "a7e23c182576fd11",
+        "width": "6",
+        "height": "1",
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "6deab72dfb72c0e7",
+        "type": "ui-group",
+        "name": "Robot Status",
+        "page": "a7e23c182576fd11",
+        "width": "6",
+        "height": "1",
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "22ac944233e5752f",
+        "type": "mqtt-broker",
+        "name": "RaspberryPiDRM",
+        "broker": "raspberrypidrm.local",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "22b084d9dfb9dbf9",
+        "type": "ros-server",
+        "url": "ws://profab.local:9090"
+    },
+    {
+        "id": "a7e23c182576fd11",
+        "type": "ui-page",
+        "name": "Stephanotron",
+        "ui": "cc0949821912be7b",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "3011e5abeeb7eac2",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 2,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "cc0949821912be7b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "showPageTitle": true,
+        "navigationStyle": "default",
+        "titleBarStyle": "default"
+    },
+    {
+        "id": "3011e5abeeb7eac2",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "571a0b03ef2d907f",
+        "type": "mqtt-broker",
+        "name": "RaspberryPiCG",
+        "broker": "raspcg.local",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "3c983eb0a177d43c",
+        "type": "ui-group",
+        "name": "Admin",
+        "page": "7a07d0f6f6ea6919",
+        "width": "6",
+        "height": "1",
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "7a07d0f6f6ea6919",
+        "type": "ui-page",
+        "name": "Admin",
+        "ui": "cc0949821912be7b",
+        "path": "/admin",
+        "icon": "lock",
+        "layout": "notebook",
+        "theme": "3011e5abeeb7eac2",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "c7d842345bff9aca",
+        "type": "function",
+        "z": "0de15d8c3155b5e8",
+        "name": "Add Order to List",
+        "func": "let orders = global.get(\"orders\") || [];\norders.push(msg.payload);\nglobal.set(\"orders\", orders);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\n\nlet orders = [];",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 240,
+        "wires": [
+            [
+                "555a9169d2496ee3",
+                "b3346f77fc866353"
+            ]
+        ]
+    },
+    {
+        "id": "c596767795016c67",
+        "type": "ui-text",
+        "z": "0de15d8c3155b5e8",
+        "group": "abdef25bc7903c19",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Waiting Orders",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "className": "",
+        "x": 1220,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "83856e4ccce07cd7",
+        "type": "mqtt in",
+        "z": "0de15d8c3155b5e8",
+        "name": "Get Customer Order",
+        "topic": "order/drink",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "571a0b03ef2d907f",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 290,
+        "y": 240,
+        "wires": [
+            [
+                "c7d842345bff9aca"
+            ]
+        ]
+    },
+    {
+        "id": "94f1cda79352b2b2",
+        "type": "ros-publish",
+        "z": "0de15d8c3155b5e8",
+        "server": "22b084d9dfb9dbf9",
+        "topicname": "move_base_simple/goal",
+        "typepackage": "",
+        "typename": "String",
+        "stampheader": false,
+        "x": 1370,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "029ce87deb7c3125",
+        "type": "function",
+        "z": "0de15d8c3155b5e8",
+        "name": "Send Move Command To Waiter",
+        "func": "if (msg.payload == \"go_to_customer\") {\n    msg.payload = \"{\\\"linear\\\": {\\\"x\\\": 1,\\\"y\\\":0,\\\"z\\\":0}, angular\\\": {\\\"x\\\":0, \\\"y\\\": 0, \\\"z\\\": 0}}\"\n} else if (msg.payload == \"go_to_bartender\") {\n    msg.payload = \"{\\\"linear\\\": {\\\"x\\\": 1,\\\"y\\\":1,\\\"z\\\":1}, angular\\\": {\\\"x\\\":0, \\\"y\\\": 0, \\\"z\\\": 0}}\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 520,
+        "wires": [
+            [
+                "90e3c9313579ebb5"
+            ]
+        ]
+    },
+    {
+        "id": "90e3c9313579ebb5",
+        "type": "json",
+        "z": "0de15d8c3155b5e8",
+        "name": "",
+        "property": "payload",
+        "action": "str",
+        "pretty": false,
+        "x": 1150,
+        "y": 520,
+        "wires": [
+            [
+                "94f1cda79352b2b2"
+            ]
+        ]
+    },
+    {
+        "id": "eb2c619750eb468e",
+        "type": "mqtt in",
+        "z": "0de15d8c3155b5e8",
+        "name": "Get Waiter Status",
+        "topic": "waiter/status",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "571a0b03ef2d907f",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 280,
+        "y": 160,
+        "wires": [
+            [
+                "de4d1dc9c80d42bb"
+            ]
+        ]
+    },
+    {
+        "id": "8934ba7d64347719",
+        "type": "ui-text",
+        "z": "0de15d8c3155b5e8",
+        "group": "6deab72dfb72c0e7",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Waiter Status",
+        "label": "Waiter Status",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "className": "",
+        "x": 1220,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "de4d1dc9c80d42bb",
+        "type": "function",
+        "z": "0de15d8c3155b5e8",
+        "name": "Set Waiter Status",
+        "func": "let status = msg.payload;\nglobal.set(\"waiter/status\", status);\n\nmsg.payload = status;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 100,
+        "wires": [
+            [
+                "555a9169d2496ee3",
+                "08e974140300555f"
+            ]
+        ]
+    },
+    {
+        "id": "555a9169d2496ee3",
+        "type": "function",
+        "z": "0de15d8c3155b5e8",
+        "name": "Check if ready to serve",
+        "func": "let orders = global.get(\"orders\") || [];\nlet status = global.get(\"waiter/status\") || \"unknown\";\n\nif (orders.length > 0 && status == \"free\") {\n    msg.payload = \"true\";\n} else {\n    msg.payload = \"false\";\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 880,
+        "y": 80,
+        "wires": [
+            [
+                "e2af712ec295f5f9"
+            ]
+        ]
+    },
+    {
+        "id": "1683ea8cacd4b871",
+        "type": "mqtt out",
+        "z": "0de15d8c3155b5e8",
+        "name": "Send Order Out",
+        "topic": "waiter/order/drink",
+        "qos": "2",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "571a0b03ef2d907f",
+        "x": 1340,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "e2af712ec295f5f9",
+        "type": "function",
+        "z": "0de15d8c3155b5e8",
+        "name": "Get Drink Order",
+        "func": "let orders = global.get(\"orders\") || [];\n\nif (msg.payload == \"true\") {\n    msg.payload = orders[0];\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 80,
+        "wires": [
+            [
+                "1683ea8cacd4b871"
+            ]
+        ]
+    },
+    {
+        "id": "b3346f77fc866353",
+        "type": "function",
+        "z": "0de15d8c3155b5e8",
+        "name": "Write Waiting Orders",
+        "func": "let orders = global.get(\"orders\") || [];\nmsg.payload = orders.join(\"<br>\");\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 260,
+        "wires": [
+            [
+                "c596767795016c67"
+            ]
+        ]
+    },
+    {
+        "id": "df43971b53ec94ca",
+        "type": "mqtt in",
+        "z": "0de15d8c3155b5e8",
+        "name": "Get Current Order Status",
+        "topic": "order/status",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "571a0b03ef2d907f",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 420,
+        "wires": [
+            [
+                "0fc08b593628aeec"
+            ]
+        ]
+    },
+    {
+        "id": "0fc08b593628aeec",
+        "type": "function",
+        "z": "0de15d8c3155b5e8",
+        "name": "Change Current Order Status",
+        "func": "let orders = global.get(\"orders\") || [];\nlet current_orders = global.get(\"current_orders\") || [];\n\nif (msg.payload == \"accepted\") {\n    current_orders.push(orders[0]);\n    global.set(\"current_orders\", current_orders);\n    orders.shift();\n    global.set(\"orders\", orders);\n    msg.payload = \"go_to_bartender\"\n} else if (msg.payload == \"drink_received\") {\n    msg.payload = \"go_to_customer\"\n} else if (msg.payload == \"drink_picked_up\") {\n    current_orders.shift();\n    global.set(\"current_orders\", current_orders);\n    msg.payload = \"go_to_bartender\"\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 420,
+        "wires": [
+            [
+                "b3346f77fc866353",
+                "be0083e12d62a447",
+                "029ce87deb7c3125",
+                "a3cef0f405aa7d66"
+            ]
+        ]
+    },
+    {
+        "id": "be0083e12d62a447",
+        "type": "function",
+        "z": "0de15d8c3155b5e8",
+        "name": "Write Current Orders",
+        "func": "let current_orders = global.get(\"current_orders\") || [];\nmsg.payload = current_orders.join(\"<br>\");\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 320,
+        "wires": [
+            [
+                "766ce64262ff8aae"
+            ]
+        ]
+    },
+    {
+        "id": "766ce64262ff8aae",
+        "type": "ui-text",
+        "z": "0de15d8c3155b5e8",
+        "group": "abdef25bc7903c19",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Current Orders",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "className": "",
+        "x": 1220,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "9cedb0789980fd4e",
+        "type": "ui-button",
+        "z": "0de15d8c3155b5e8",
+        "group": "3c983eb0a177d43c",
+        "name": "Delete Data Trigger",
+        "label": "Delete Data",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 330,
+        "y": 320,
+        "wires": [
+            [
+                "96246586a004e969"
+            ]
+        ]
+    },
+    {
+        "id": "96246586a004e969",
+        "type": "function",
+        "z": "0de15d8c3155b5e8",
+        "name": "Delete All Data",
+        "func": "\nglobal.set(\"current_orders\", []);\nglobal.set(\"orders\", []);\n\nglobal.set(\"waiter/status\", \"unknown\");\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 320,
+        "wires": [
+            [
+                "be0083e12d62a447",
+                "b3346f77fc866353",
+                "08e974140300555f"
+            ]
+        ]
+    },
+    {
+        "id": "08e974140300555f",
+        "type": "function",
+        "z": "0de15d8c3155b5e8",
+        "name": "Write Waiter Status",
+        "func": "let current_status = global.get(\"waiter/status\") || \"unknown\";\n\nif (current_status == \"busy\") {\n    msg.payload = \"🔴 Busy 🔴\"\n} else if (current_status == \"free\") {\n    msg.payload = \"🟢 Free 🟢\"\n} else if (current_status == \"unknown\") {\n    msg.payload = \"❔ Unknown ❔\"\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 200,
+        "wires": [
+            [
+                "8934ba7d64347719"
+            ]
+        ]
+    },
+    {
+        "id": "bd57aaafee22bc33",
+        "type": "ui-button",
+        "z": "0de15d8c3155b5e8",
+        "group": "3c983eb0a177d43c",
+        "name": "Set Waiter Free",
+        "label": "Set Waiter Free",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "free",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "#D8DDDE",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 280,
+        "y": 40,
+        "wires": [
+            [
+                "de4d1dc9c80d42bb"
+            ]
+        ]
+    },
+    {
+        "id": "286c3dbcfb149ef9",
+        "type": "ui-button",
+        "z": "0de15d8c3155b5e8",
+        "group": "3c983eb0a177d43c",
+        "name": "Set Waiter Busy",
+        "label": "Set Waiter Busy",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "busy",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "#D8DDDE",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 280,
+        "y": 100,
+        "wires": [
+            [
+                "de4d1dc9c80d42bb"
+            ]
+        ]
+    },
+    {
+        "id": "a3cef0f405aa7d66",
+        "type": "function",
+        "z": "0de15d8c3155b5e8",
+        "name": "Write Waiter Position Goal",
+        "func": "if (msg.payload == \"go_to_customer\") {\n    msg.payload = \"🍽️ Customer\"\n} else if (msg.payload == \"go_to_bartender\") {\n    msg.payload = \"🍺 Bartender\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 990,
+        "y": 380,
+        "wires": [
+            [
+                "36da28b7c229af8e"
+            ]
+        ]
+    },
+    {
+        "id": "36da28b7c229af8e",
+        "type": "ui-text",
+        "z": "0de15d8c3155b5e8",
+        "group": "6deab72dfb72c0e7",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Waiter Position Goal",
+        "label": "Waiter Position Goal",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "className": "",
+        "x": 1240,
+        "y": 380,
+        "wires": []
+    }
+]
