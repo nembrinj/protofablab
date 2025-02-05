@@ -1,0 +1,17 @@
+{
+    "name": "node-red-project",
+    "description": "A Node-RED Project",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "@flowfuse/node-red-dashboard": "~1.19.1",
+        "@sumit_shinde_84/node-red-dashboard-2-ui-webcam": "~1.0.2",
+        "node-red-contrib-image-tools": "~2.1.1",
+        "node-red-contrib-remote": "~1.6.1",
+        "node-red-contrib-ros": "~1.0.10",
+        "node-red-contrib-viseo-qrcode": "~0.3.0"
+    },
+    "scripts": {
+        "start": "node $NODE_OPTIONS node_modules/node-red/red.js $FLOWS"
+    }
+}
