@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Simon Ruffieux">
-<meta name="dcterms.date" content="2024-09-26">
+<meta name="dcterms.date" content="2025-09-25">
 <meta name="keywords" content="Human-IST, ProtoFab, LearningLab, UniFR">
 
 <title>Introduction to ROS and Turtlebot3</title>
@@ -102,7 +102,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 26, 2024</p>
+      <p class="date">September 25, 2025</p>
     </div>
   </div>
   
@@ -625,163 +625,168 @@ Note: Turtlebot3 OS - user: ubuntu, password: turtlebot. We will now refer to th
 <li>Start your controller (using rosrun, not the launcher) on your local pc</li>
 </ol>
 <p>Your Turtlebot3 should now move and avoid obstacle, behaving similarly to the simulation. This is one the the beauty of ROS, allowing to switch from simulation to real robot easily. You may however observe that in a real environment, the developed controller is probably a bit too simple and does not allow to avoid all types of obstacles. Much more work would be needed to allow the robot to navigate in real complex environments.</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co">##</span></span>
-<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="co">## CODE SOLUTION (Works with REAL robot &amp; simulation - DO NOT GIVE TO STUDENTS)</span></span>
-<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="co">##</span></span>
-<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env python3</span></span>
-<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rospy</span>
-<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geometry_msgs.msg <span class="im">import</span> Twist</span>
-<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sensor_msgs.msg <span class="im">import</span> LaserScan</span>
-<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
-<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a><span class="co">## LIDAR INFORMATION </span></span>
-<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Contrary to simulation, real robot does not receive exactly 360 measures every scan (more or less around 270). Therefore it is necessary to know where it started its scan, the angle between two measures (provided by the robot /scan topic). We can use this information to convert that to 0 - 360 information in order to facilitate processing. The lambda function below helps doing that. In the end, the user receives two arrays of same lengths. The first array contains the angles and the second array contains the distances. (0 degree is ahead, 90 is left, 180 is behind and 270 is right)</span></span>
-<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a><span class="co"># More information on how to process lidar data https://stanbaek.github.io/ece387/Module8_LIDAR/LIDAR.html</span></span>
-<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-17"><a href="#cb60-17" aria-hidden="true" tabindex="-1"></a><span class="co"># lambda function to convert rad to deg</span></span>
-<span id="cb60-18"><a href="#cb60-18" aria-hidden="true" tabindex="-1"></a>RAD2DEG <span class="op">=</span> <span class="kw">lambda</span> x: ((x)<span class="op">*</span><span class="fl">180.</span><span class="op">/</span>math.pi)</span>
-<span id="cb60-19"><a href="#cb60-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-20"><a href="#cb60-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-21"><a href="#cb60-21" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> CollisionAvoidance:</span>
-<span id="cb60-22"><a href="#cb60-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
-<span id="cb60-23"><a href="#cb60-23" aria-hidden="true" tabindex="-1"></a>        rospy.init_node(<span class="st">'collision_avoidance_controller'</span>, anonymous<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb60-24"><a href="#cb60-24" aria-hidden="true" tabindex="-1"></a>        rospy.loginfo(<span class="st">"Collision avoidance controller has started"</span>)</span>
-<span id="cb60-25"><a href="#cb60-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-26"><a href="#cb60-26" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Do some cleanup on shutdown</span></span>
-<span id="cb60-27"><a href="#cb60-27" aria-hidden="true" tabindex="-1"></a>        rospy.on_shutdown(<span class="va">self</span>.clean_shutdown)</span>
-<span id="cb60-28"><a href="#cb60-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-29"><a href="#cb60-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Publisher to send velocity commands</span></span>
-<span id="cb60-30"><a href="#cb60-30" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cmd_vel_pub <span class="op">=</span> rospy.Publisher(<span class="st">'/cmd_vel'</span>, Twist, queue_size<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb60-31"><a href="#cb60-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-32"><a href="#cb60-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Subscriber to get LIDAR scans</span></span>
-<span id="cb60-33"><a href="#cb60-33" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.scan_sub <span class="op">=</span> rospy.Subscriber(<span class="st">'/scan'</span>, LaserScan, <span class="va">self</span>.scan_callback)</span>
-<span id="cb60-34"><a href="#cb60-34" aria-hidden="true" tabindex="-1"></a>                </span>
-<span id="cb60-35"><a href="#cb60-35" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Safety threshold in meters</span></span>
-<span id="cb60-36"><a href="#cb60-36" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.min_dist <span class="op">=</span> <span class="fl">0.5</span> <span class="co"># Minimum distance to consider an obstacle (in meters)</span></span>
-<span id="cb60-37"><a href="#cb60-37" aria-hidden="true" tabindex="-1"></a>        rospy.loginfo(<span class="st">"Collision avoidance controller initialized with min_dist = </span><span class="sc">%f</span><span class="st">"</span>, <span class="va">self</span>.min_dist)</span>
-<span id="cb60-38"><a href="#cb60-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-39"><a href="#cb60-39" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Initialize Twist message for movement commands    </span></span>
-<span id="cb60-40"><a href="#cb60-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># This message will be used to control the robot's linear and angular velocities</span></span>
-<span id="cb60-41"><a href="#cb60-41" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.twist <span class="op">=</span> Twist()</span>
-<span id="cb60-42"><a href="#cb60-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-43"><a href="#cb60-43" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Main loop rate</span></span>
-<span id="cb60-44"><a href="#cb60-44" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rate <span class="op">=</span> rospy.Rate(<span class="dv">10</span>)  <span class="co"># 10 Hz</span></span>
-<span id="cb60-45"><a href="#cb60-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-46"><a href="#cb60-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-47"><a href="#cb60-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-48"><a href="#cb60-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-49"><a href="#cb60-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Callback function to process LIDAR scan data</span></span>
-<span id="cb60-50"><a href="#cb60-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This function will be called whenever a new scan message is received</span></span>
-<span id="cb60-51"><a href="#cb60-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># It processes the scan data to determine if there are obstacles in the way</span></span>
-<span id="cb60-52"><a href="#cb60-52" aria-hidden="true" tabindex="-1"></a>    <span class="co"># and sets the appropriate movement commands for the robot</span></span>
-<span id="cb60-53"><a href="#cb60-53" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> scan_callback(<span class="va">self</span>, scan_data):</span>
-<span id="cb60-54"><a href="#cb60-54" aria-hidden="true" tabindex="-1"></a>        degrees <span class="op">=</span> []</span>
-<span id="cb60-55"><a href="#cb60-55" aria-hidden="true" tabindex="-1"></a>        ranges <span class="op">=</span> []</span>
-<span id="cb60-56"><a href="#cb60-56" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb60-57"><a href="#cb60-57" aria-hidden="true" tabindex="-1"></a>        front <span class="op">=</span> []</span>
-<span id="cb60-58"><a href="#cb60-58" aria-hidden="true" tabindex="-1"></a>        left <span class="op">=</span> []</span>
-<span id="cb60-59"><a href="#cb60-59" aria-hidden="true" tabindex="-1"></a>        right <span class="op">=</span> []</span>
-<span id="cb60-60"><a href="#cb60-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-61"><a href="#cb60-61" aria-hidden="true" tabindex="-1"></a>        <span class="co"># determine how many scans were taken during rotation</span></span>
-<span id="cb60-62"><a href="#cb60-62" aria-hidden="true" tabindex="-1"></a>        count <span class="op">=</span> <span class="bu">len</span>(scan_data.ranges)</span>
-<span id="cb60-63"><a href="#cb60-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-64"><a href="#cb60-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(count):</span>
-<span id="cb60-65"><a href="#cb60-65" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Using scan_data.angle_min and scan_data.angle_increment data to determine current angle, </span></span>
-<span id="cb60-66"><a href="#cb60-66" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Also convert radian to degrees (0 degree is ahead, 90 is left, 180 is behind and 270 is right)</span></span>
-<span id="cb60-67"><a href="#cb60-67" aria-hidden="true" tabindex="-1"></a>                degrees.append(<span class="bu">int</span>(RAD2DEG(scan_data.angle_min <span class="op">+</span> scan_data.angle_increment<span class="op">*</span>i)))</span>
-<span id="cb60-68"><a href="#cb60-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-69"><a href="#cb60-69" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Append the distance detected to the array of distances</span></span>
-<span id="cb60-70"><a href="#cb60-70" aria-hidden="true" tabindex="-1"></a>                rng <span class="op">=</span> scan_data.ranges[i]</span>
-<span id="cb60-71"><a href="#cb60-71" aria-hidden="true" tabindex="-1"></a>                </span>
-<span id="cb60-72"><a href="#cb60-72" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Ensure range values are valid; set to 0 if not</span></span>
-<span id="cb60-73"><a href="#cb60-73" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> rng <span class="op">&lt;</span> scan_data.range_min <span class="kw">or</span> rng <span class="op">&gt;</span> scan_data.range_max:</span>
-<span id="cb60-74"><a href="#cb60-74" aria-hidden="true" tabindex="-1"></a>                    ranges.append(<span class="fl">0.0</span>)</span>
-<span id="cb60-75"><a href="#cb60-75" aria-hidden="true" tabindex="-1"></a>                <span class="cf">else</span>:</span>
-<span id="cb60-76"><a href="#cb60-76" aria-hidden="true" tabindex="-1"></a>                    ranges.append(rng)</span>
-<span id="cb60-77"><a href="#cb60-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-78"><a href="#cb60-78" aria-hidden="true" tabindex="-1"></a>            <span class="co"># python way to iterate two lists at once!</span></span>
-<span id="cb60-79"><a href="#cb60-79" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> deg, rng <span class="kw">in</span> <span class="bu">zip</span>(degrees, ranges):</span>
-<span id="cb60-80"><a href="#cb60-80" aria-hidden="true" tabindex="-1"></a>                <span class="co">#rospy.loginfo("Processing zipped scan_data - degree: %d, range: %f", deg, rng)</span></span>
-<span id="cb60-81"><a href="#cb60-81" aria-hidden="true" tabindex="-1"></a>                <span class="co"># if the range is not 0, append to the appropriate list</span></span>
-<span id="cb60-82"><a href="#cb60-82" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> rng <span class="op">&gt;</span> <span class="dv">0</span>:</span>
-<span id="cb60-83"><a href="#cb60-83" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> (deg <span class="op">&gt;=</span> <span class="dv">340</span> <span class="kw">or</span> deg <span class="op">&lt;=</span> <span class="dv">20</span>): </span>
-<span id="cb60-84"><a href="#cb60-84" aria-hidden="true" tabindex="-1"></a>                        front.append(rng)</span>
-<span id="cb60-85"><a href="#cb60-85" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">elif</span> <span class="dv">30</span> <span class="op">&lt;=</span> deg <span class="op">&lt;=</span> <span class="dv">60</span>:</span>
-<span id="cb60-86"><a href="#cb60-86" aria-hidden="true" tabindex="-1"></a>                        left.append(rng)</span>
-<span id="cb60-87"><a href="#cb60-87" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">elif</span> <span class="dv">300</span> <span class="op">&lt;=</span> deg <span class="op">&lt;=</span> <span class="dv">330</span>:</span>
-<span id="cb60-88"><a href="#cb60-88" aria-hidden="true" tabindex="-1"></a>                        right.append(rng)</span>
-<span id="cb60-89"><a href="#cb60-89" aria-hidden="true" tabindex="-1"></a>                    </span>
-<span id="cb60-90"><a href="#cb60-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-91"><a href="#cb60-91" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Average distances</span></span>
-<span id="cb60-92"><a href="#cb60-92" aria-hidden="true" tabindex="-1"></a>        front_dist <span class="op">=</span> <span class="bu">min</span>(front) <span class="cf">if</span> front <span class="cf">else</span> <span class="bu">float</span>(<span class="st">'inf'</span>)</span>
-<span id="cb60-93"><a href="#cb60-93" aria-hidden="true" tabindex="-1"></a>        left_dist <span class="op">=</span> <span class="bu">min</span>(left) <span class="cf">if</span> left <span class="cf">else</span> <span class="bu">float</span>(<span class="st">'inf'</span>)</span>
-<span id="cb60-94"><a href="#cb60-94" aria-hidden="true" tabindex="-1"></a>        right_dist <span class="op">=</span> <span class="bu">min</span>(right) <span class="cf">if</span> right <span class="cf">else</span> <span class="bu">float</span>(<span class="st">'inf'</span>)</span>
-<span id="cb60-95"><a href="#cb60-95" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb60-96"><a href="#cb60-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-97"><a href="#cb60-97" aria-hidden="true" tabindex="-1"></a>        rospy.loginfo(<span class="st">"Front distance: </span><span class="sc">%f</span><span class="st">, Left distance: </span><span class="sc">%f</span><span class="st">, Right distance: </span><span class="sc">%f</span><span class="st">"</span>, front_dist, left_dist, right_dist)</span>
-<span id="cb60-98"><a href="#cb60-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-99"><a href="#cb60-99" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb60-100"><a href="#cb60-100" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Decision logic (set movement commands based on distances)</span></span>
-<span id="cb60-101"><a href="#cb60-101" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> front_dist <span class="op">&lt;</span> <span class="va">self</span>.min_dist:</span>
-<span id="cb60-102"><a href="#cb60-102" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Obstacle ahead, turn (right or left depending on side with more space)</span></span>
-<span id="cb60-103"><a href="#cb60-103" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.twist.linear.x <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb60-104"><a href="#cb60-104" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.twist.angular.z <span class="op">=</span> <span class="fl">0.5</span> <span class="cf">if</span> left_dist <span class="op">&gt;</span> right_dist <span class="cf">else</span> <span class="op">-</span><span class="fl">0.5</span></span>
-<span id="cb60-105"><a href="#cb60-105" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb60-106"><a href="#cb60-106" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Clear path, move forward</span></span>
-<span id="cb60-107"><a href="#cb60-107" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.twist.linear.x <span class="op">=</span> <span class="fl">0.1</span></span>
-<span id="cb60-108"><a href="#cb60-108" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.twist.angular.z <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb60-109"><a href="#cb60-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-110"><a href="#cb60-110" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cmd_vel_pub.publish(<span class="va">self</span>.twist)</span>
-<span id="cb60-111"><a href="#cb60-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-112"><a href="#cb60-112" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> run(<span class="va">self</span>):</span>
-<span id="cb60-113"><a href="#cb60-113" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb60-114"><a href="#cb60-114" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> <span class="kw">not</span> rospy.is_shutdown():</span>
-<span id="cb60-115"><a href="#cb60-115" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Spin to keep the node running and process callbacks</span></span>
-<span id="cb60-116"><a href="#cb60-116" aria-hidden="true" tabindex="-1"></a>            rospy.spin()</span>
-<span id="cb60-117"><a href="#cb60-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-118"><a href="#cb60-118" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> clean_shutdown(<span class="va">self</span>):</span>
-<span id="cb60-119"><a href="#cb60-119" aria-hidden="true" tabindex="-1"></a>        rospy.loginfo(<span class="st">"Collision avoidance controller is shutting down."</span>)</span>
-<span id="cb60-120"><a href="#cb60-120" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Stop the robot if the node is shut down</span></span>
-<span id="cb60-121"><a href="#cb60-121" aria-hidden="true" tabindex="-1"></a>        stopTwist <span class="op">=</span> Twist()</span>
-<span id="cb60-122"><a href="#cb60-122" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cmd_vel_pub.publish(stopTwist)</span>
-<span id="cb60-123"><a href="#cb60-123" aria-hidden="true" tabindex="-1"></a>        rospy.loginfo(<span class="st">"Robot stopped."</span>)</span>
-<span id="cb60-124"><a href="#cb60-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-125"><a href="#cb60-125" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">'__main__'</span>:</span>
-<span id="cb60-126"><a href="#cb60-126" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb60-127"><a href="#cb60-127" aria-hidden="true" tabindex="-1"></a>        controller <span class="op">=</span> CollisionAvoidance()</span>
-<span id="cb60-128"><a href="#cb60-128" aria-hidden="true" tabindex="-1"></a>        controller.run()</span>
-<span id="cb60-129"><a href="#cb60-129" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> rospy.ROSInterruptException:</span>
-<span id="cb60-130"><a href="#cb60-130" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<!-- 
+```python         
+##
+## CODE SOLUTION (Works with REAL robot & simulation - DO NOT GIVE TO STUDENTS)
+##
+
+#!/usr/bin/env python3
+import rospy
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import LaserScan
+import math
+
+
+## LIDAR INFORMATION 
+# Contrary to simulation, real robot does not receive exactly 360 measures every scan (more or less around 270). Therefore it is necessary to know where it started its scan, the angle between two measures (provided by the robot /scan topic). We can use this information to convert that to 0 - 360 information in order to facilitate processing. The lambda function below helps doing that. In the end, the user receives two arrays of same lengths. The first array contains the angles and the second array contains the distances. (0 degree is ahead, 90 is left, 180 is behind and 270 is right)
+# More information on how to process lidar data https://stanbaek.github.io/ece387/Module8_LIDAR/LIDAR.html
+
+
+# lambda function to convert rad to deg
+RAD2DEG = lambda x: ((x)*180./math.pi)
+
+
+class CollisionAvoidance:
+    def __init__(self):
+        rospy.init_node('collision_avoidance_controller', anonymous=True)
+        rospy.loginfo("Collision avoidance controller has started")
+
+        # Do some cleanup on shutdown
+        rospy.on_shutdown(self.clean_shutdown)
+
+        # Publisher to send velocity commands
+        self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+
+        # Subscriber to get LIDAR scans
+        self.scan_sub = rospy.Subscriber('/scan', LaserScan, self.scan_callback)
+                
+        # Safety threshold in meters
+        self.min_dist = 0.5 # Minimum distance to consider an obstacle (in meters)
+        rospy.loginfo("Collision avoidance controller initialized with min_dist = %f", self.min_dist)
+
+        # Initialize Twist message for movement commands    
+        # This message will be used to control the robot's linear and angular velocities
+        self.twist = Twist()
+
+        # Main loop rate
+        self.rate = rospy.Rate(10)  # 10 Hz
+
+
+
+
+    # Callback function to process LIDAR scan data
+    # This function will be called whenever a new scan message is received
+    # It processes the scan data to determine if there are obstacles in the way
+    # and sets the appropriate movement commands for the robot
+    def scan_callback(self, scan_data):
+        degrees = []
+        ranges = []
+        
+        front = []
+        left = []
+        right = []
+
+        # determine how many scans were taken during rotation
+        count = len(scan_data.ranges)
+
+        for i in range(count):
+                # Using scan_data.angle_min and scan_data.angle_increment data to determine current angle, 
+                # Also convert radian to degrees (0 degree is ahead, 90 is left, 180 is behind and 270 is right)
+                degrees.append(int(RAD2DEG(scan_data.angle_min + scan_data.angle_increment*i)))
+
+                # Append the distance detected to the array of distances
+                rng = scan_data.ranges[i]
+                
+                # Ensure range values are valid; set to 0 if not
+                if rng < scan_data.range_min or rng > scan_data.range_max:
+                    ranges.append(0.0)
+                else:
+                    ranges.append(rng)
+
+            # python way to iterate two lists at once!
+            for deg, rng in zip(degrees, ranges):
+                #rospy.loginfo("Processing zipped scan_data - degree: %d, range: %f", deg, rng)
+                # if the range is not 0, append to the appropriate list
+                if rng > 0:
+                    if (deg >= 340 or deg <= 20): 
+                        front.append(rng)
+                    elif 30 <= deg <= 60:
+                        left.append(rng)
+                    elif 300 <= deg <= 330:
+                        right.append(rng)
+                    
+
+        # Average distances
+        front_dist = min(front) if front else float('inf')
+        left_dist = min(left) if left else float('inf')
+        right_dist = min(right) if right else float('inf')
+        
+
+        rospy.loginfo("Front distance: %f, Left distance: %f, Right distance: %f", front_dist, left_dist, right_dist)
+
+    
+        # Decision logic (set movement commands based on distances)
+        if front_dist < self.min_dist:
+            # Obstacle ahead, turn (right or left depending on side with more space)
+            self.twist.linear.x = 0.0
+            self.twist.angular.z = 0.5 if left_dist > right_dist else -0.5
+        else:
+            # Clear path, move forward
+            self.twist.linear.x = 0.1
+            self.twist.angular.z = 0.0
+
+        self.cmd_vel_pub.publish(self.twist)
+
+    def run(self):
+            
+        while not rospy.is_shutdown():
+            # Spin to keep the node running and process callbacks
+            rospy.spin()
+
+    def clean_shutdown(self):
+        rospy.loginfo("Collision avoidance controller is shutting down.")
+        # Stop the robot if the node is shut down
+        stopTwist = Twist()
+        self.cmd_vel_pub.publish(stopTwist)
+        rospy.loginfo("Robot stopped.")
+
+if __name__ == '__main__':
+    try:
+        controller = CollisionAvoidance()
+        controller.run()
+    except rospy.ROSInterruptException:
+        pass
+
+```
+-->
 </section>
 </section>
 <section id="optional-task-5-modify-wifi-settings-of-turtlebot3" class="level3">
 <h3 class="anchored" data-anchor-id="optional-task-5-modify-wifi-settings-of-turtlebot3">[OPTIONAL] Task 5 – Modify WIFI settings of Turtlebot3</h3>
 <p>In order to modify the wifi settings of your Turtlebot3, you need to connect it directly to a monitor and a keyboard (Note: you can also do it in ssh IF you have remote access capabilities). Then you can modify the network configuration file to change the wifi settings of the robot. You need to modify the file <code>/etc/netplan/cloud-init.yaml</code>: change ProFab to your own wifi name (ssid) and 1700_UniFR.&amp; to your own password. Save the file and reboot the robot. The robot should now connect to your own wifi automatically. Unfortunately, it seems not possible to define multiple networks … the file must be adapted every network change.</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo nano /etc/netplan/cloud-init.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb62"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a># This file is generated from information provided by the datasource. Changes</span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a># to it will not persist across an instance reboot. To disable cloud-init's</span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a># network configuration capabilities, write a file</span>
-<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a># /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:</span>
-<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a># network: {config: disabled} </span>
-<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>network:</span>
-<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>  version: 2</span>
-<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>  renderer: networkd</span>
-<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>  ethernets:</span>
-<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>    eth0:</span>
-<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>      dhcp4: yes</span>
-<span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a>      dhcp6: yes</span>
-<span id="cb62-14"><a href="#cb62-14" aria-hidden="true" tabindex="-1"></a>      optional: true</span>
-<span id="cb62-15"><a href="#cb62-15" aria-hidden="true" tabindex="-1"></a>  wifis:</span>
-<span id="cb62-16"><a href="#cb62-16" aria-hidden="true" tabindex="-1"></a>    wlan0:</span>
-<span id="cb62-17"><a href="#cb62-17" aria-hidden="true" tabindex="-1"></a>      dhcp4: yes</span>
-<span id="cb62-18"><a href="#cb62-18" aria-hidden="true" tabindex="-1"></a>      dhcp6: yes</span>
-<span id="cb62-19"><a href="#cb62-19" aria-hidden="true" tabindex="-1"></a>      access-points:</span>
-<span id="cb62-20"><a href="#cb62-20" aria-hidden="true" tabindex="-1"></a>        ProFab:</span>
-<span id="cb62-21"><a href="#cb62-21" aria-hidden="true" tabindex="-1"></a>          password: 1700_UniFR.&amp;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo nano /etc/netplan/cloud-init.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a># This file is generated from information provided by the datasource. Changes</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a># to it will not persist across an instance reboot. To disable cloud-init's</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a># network configuration capabilities, write a file</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a># /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:</span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a># network: {config: disabled} </span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>network:</span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>  version: 2</span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>  renderer: networkd</span>
+<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>  ethernets:</span>
+<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>    eth0:</span>
+<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>      dhcp4: yes</span>
+<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>      dhcp6: yes</span>
+<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>      optional: true</span>
+<span id="cb61-15"><a href="#cb61-15" aria-hidden="true" tabindex="-1"></a>  wifis:</span>
+<span id="cb61-16"><a href="#cb61-16" aria-hidden="true" tabindex="-1"></a>    wlan0:</span>
+<span id="cb61-17"><a href="#cb61-17" aria-hidden="true" tabindex="-1"></a>      dhcp4: yes</span>
+<span id="cb61-18"><a href="#cb61-18" aria-hidden="true" tabindex="-1"></a>      dhcp6: yes</span>
+<span id="cb61-19"><a href="#cb61-19" aria-hidden="true" tabindex="-1"></a>      access-points:</span>
+<span id="cb61-20"><a href="#cb61-20" aria-hidden="true" tabindex="-1"></a>        ProFab:</span>
+<span id="cb61-21"><a href="#cb61-21" aria-hidden="true" tabindex="-1"></a>          password: 1700_UniFR.&amp;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="optional-task-6-connect-a-usb-webcam" class="level3">
 <h3 class="anchored" data-anchor-id="optional-task-6-connect-a-usb-webcam">[OPTIONAL] Task 6 – Connect a USB webcam</h3>
@@ -795,52 +800,52 @@ Note: Turtlebot3 OS - user: ubuntu, password: turtlebot. We will now refer to th
 <ol type="1">
 <li>Update your sources and install packages (may take a some time …)</li>
 </ol>
-<div class="sourceCode" id="cb63"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt update      </span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y libv4l-dev    </span>
-<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-image-transport  (to enable compressing images for transport over wifi)     </span>
-<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-camera-info-manager     </span>
-<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-usb-cam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt update      </span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y libv4l-dev    </span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-image-transport  (to enable compressing images for transport over wifi)     </span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-camera-info-manager     </span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-usb-cam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ol start="2" type="1">
 <li>Use the commands below to launch the camera node (you can nano the usb_cam-test.launch file to see its settings). When using image_view on your local pc, you should be able to see the image. If the procedure below works; this means that your camera is now functional.</li>
 </ol>
-<div class="sourceCode" id="cb64"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] roslaunch /opt/ros/noetic/share/usb_cam/launch/usb_cam-test.launch</span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-1] roscore</span>
-<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-2] rosrun image_view image_view image:=/usb_cam/image_raw</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] roslaunch /opt/ros/noetic/share/usb_cam/launch/usb_cam-test.launch</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-1] roscore</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-2] rosrun image_view image_view image:=/usb_cam/image_raw</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ol start="3" type="1">
 <li><p>To integrate it to the Turtlebot, you need to make it start automatically with the robot. You must first copy the launcher for the usbcam to your own workspace. Then copy the robot launcher file (<code>turtlebot3_robot.launch</code>) that you will then adapt to include your new usbcam.</p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] roscd turtlebot3_bringup</span>
-<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] cd launch    </span>
-<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] cp /opt/ros/noetic/share/usb_cam/launch/usb_cam-test.launch turtlebot3_usbcam.launch</span>
-<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] cp turtlebot3_robot.launch turtlebot3_robot_usbcam.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb64"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] roscd turtlebot3_bringup</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] cd launch    </span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] cp /opt/ros/noetic/share/usb_cam/launch/usb_cam-test.launch turtlebot3_usbcam.launch</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] cp turtlebot3_robot.launch turtlebot3_robot_usbcam.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Now edit your new launch file. Add the directive to also start your usbcam. An example of such launch file is provided below.</p>
-<div class="sourceCode" id="cb66"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] nano turtlebot3_robot_usbcam.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb67"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>&lt;launch&gt; </span>
-<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>    &lt;arg name="multi_robot_name" default=""/&gt; </span>
-<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>    &lt;arg name="set_lidar_frame_id" default="base_scan"/&gt; </span>
-<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>    &lt;arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/&gt;</span>
-<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>    &lt;include file="$(find turtlebot3_bringup)/launch/turtlebot3_core.launch"&gt;</span>
-<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>        &lt;arg name="multi_robot_name" value="$(arg multi_robot_name)"/&gt;</span>
-<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a>    &lt;/include&gt;</span>
-<span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a>    &lt;include file="$(find turtlebot3_bringup)/launch/turtlebot3_lidar.launch"&gt;</span>
-<span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>        &lt;arg name="set_frame_id" value="$(arg set_lidar_frame_id)"/&gt;</span>
-<span id="cb67-12"><a href="#cb67-12" aria-hidden="true" tabindex="-1"></a>    &lt;/include&gt;</span>
-<span id="cb67-13"><a href="#cb67-13" aria-hidden="true" tabindex="-1"></a>    &lt;include file="$(find turtlebot3_bringup)/launch/turtlebot3_usbcam.launch"/&gt;</span>
-<span id="cb67-14"><a href="#cb67-14" aria-hidden="true" tabindex="-1"></a>    &lt;node pkg="turtlebot3_bringup" type="turtlebot3_diagnostics" name="turtlebot3_diagnostics" output="screen"/&gt;</span>
-<span id="cb67-15"><a href="#cb67-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb67-16"><a href="#cb67-16" aria-hidden="true" tabindex="-1"></a>    &lt;group if = "$(eval model == 'waffle_pi')"&gt;</span>
-<span id="cb67-17"><a href="#cb67-17" aria-hidden="true" tabindex="-1"></a>        &lt;include file="$(find turtlebot3_bringup)/launch/turtlebot3_rpicamera.launch"/&gt;</span>
-<span id="cb67-18"><a href="#cb67-18" aria-hidden="true" tabindex="-1"></a>    &lt;/group&gt;</span>
-<span id="cb67-19"><a href="#cb67-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb67-20"><a href="#cb67-20" aria-hidden="true" tabindex="-1"></a>&lt;/launch&gt; </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb65"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] nano turtlebot3_robot_usbcam.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>&lt;launch&gt; </span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>    &lt;arg name="multi_robot_name" default=""/&gt; </span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>    &lt;arg name="set_lidar_frame_id" default="base_scan"/&gt; </span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>    &lt;arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/&gt;</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>    &lt;include file="$(find turtlebot3_bringup)/launch/turtlebot3_core.launch"&gt;</span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>        &lt;arg name="multi_robot_name" value="$(arg multi_robot_name)"/&gt;</span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>    &lt;/include&gt;</span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a>    &lt;include file="$(find turtlebot3_bringup)/launch/turtlebot3_lidar.launch"&gt;</span>
+<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a>        &lt;arg name="set_frame_id" value="$(arg set_lidar_frame_id)"/&gt;</span>
+<span id="cb66-12"><a href="#cb66-12" aria-hidden="true" tabindex="-1"></a>    &lt;/include&gt;</span>
+<span id="cb66-13"><a href="#cb66-13" aria-hidden="true" tabindex="-1"></a>    &lt;include file="$(find turtlebot3_bringup)/launch/turtlebot3_usbcam.launch"/&gt;</span>
+<span id="cb66-14"><a href="#cb66-14" aria-hidden="true" tabindex="-1"></a>    &lt;node pkg="turtlebot3_bringup" type="turtlebot3_diagnostics" name="turtlebot3_diagnostics" output="screen"/&gt;</span>
+<span id="cb66-15"><a href="#cb66-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-16"><a href="#cb66-16" aria-hidden="true" tabindex="-1"></a>    &lt;group if = "$(eval model == 'waffle_pi')"&gt;</span>
+<span id="cb66-17"><a href="#cb66-17" aria-hidden="true" tabindex="-1"></a>        &lt;include file="$(find turtlebot3_bringup)/launch/turtlebot3_rpicamera.launch"/&gt;</span>
+<span id="cb66-18"><a href="#cb66-18" aria-hidden="true" tabindex="-1"></a>    &lt;/group&gt;</span>
+<span id="cb66-19"><a href="#cb66-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-20"><a href="#cb66-20" aria-hidden="true" tabindex="-1"></a>&lt;/launch&gt; </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Compile your workspace. (You must be at the root of your workspace (<code>/home/ubuntu/catkin_ws/</code>)). This might not be needed but it is just to make sure all packages are well taken into account.</p>
-<div class="sourceCode" id="cb68"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] catkin_make</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb67"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] catkin_make</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>On your local computer, start roscore the navigation using the corresponding launch file. It will start roscore, rviz and a default map. (You might want to run roscore in a distinct terminal …)</p>
-<div class="sourceCode" id="cb69"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal1] roscore</span>
-<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal2] roslaunch turtlebot3_navigation turtlebot3_navigation.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb68"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal1] roscore</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal2] roslaunch turtlebot3_navigation turtlebot3_navigation.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Finally, on the robot, start the launcher that includes the usb camera</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] roslaunch turtlebot3_bringup turtlebot3_robot_usbcam.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb69"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] roslaunch turtlebot3_bringup turtlebot3_robot_usbcam.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>On your local computer, on the rviz navigation interface, enable Image and then select the <strong>right topic</strong> and the type to “compressed data” (red square on the image below). You should now be able to see the live stream provided by your camera on the bottom left part of the interface (thumbs up).</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -853,7 +858,7 @@ Note: Turtlebot3 OS - user: ubuntu, password: turtlebot. We will now refer to th
 </section>
 <section id="useful-commands" class="level2">
 <h2 class="anchored" data-anchor-id="useful-commands">Useful commands</h2>
-<div class="sourceCode" id="cb71"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] v4l2-ctl --list-devices</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] v4l2-ctl --list-devices</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="referenced-links" class="level2">
 <h2 class="anchored" data-anchor-id="referenced-links">Referenced links</h2>
@@ -872,28 +877,28 @@ Note: Turtlebot3 OS - user: ubuntu, password: turtlebot. We will now refer to th
 <h3 class="anchored" data-anchor-id="simulation">Simulation</h3>
 <ul>
 <li><p>Start gazebo simulator with the turtebot3 world</p>
-<div class="sourceCode" id="cb72"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roslaunch turtlebot3_gazebo turtlebot3_world.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb71"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roslaunch turtlebot3_gazebo turtlebot3_world.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Start teleop</p>
-<div class="sourceCode" id="cb73"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb72"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ul>
 </section>
 <section id="real-robots" class="level3">
 <h3 class="anchored" data-anchor-id="real-robots">Real robots</h3>
 <ul>
 <li><p>Start roscore</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roscore</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb73"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roscore</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Start teleop node</p>
-<div class="sourceCode" id="cb75"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb74"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Start Rviz visualizer (to visualize robot and its data)</p>
-<div class="sourceCode" id="cb76"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-2] roslaunch turtlebot3_bringup turtlebot3_model.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb75"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-2] roslaunch turtlebot3_bringup turtlebot3_model.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Start SLAM node</p>
-<div class="sourceCode" id="cb77"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roslaunch turtlebot3_slam turtlebot3_slam.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb76"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roslaunch turtlebot3_slam turtlebot3_slam.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Save a map (created using the SLAM algorithm)</p>
-<div class="sourceCode" id="cb78"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] rosrun map_server map_saver -f ~/A428_test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb77"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] rosrun map_server map_saver -f ~/A428_test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Edit SLAM parameters</p>
-<div class="sourceCode" id="cb79"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] sudo nano /opt/ros/noetic/share/turtlebot3_slam/config/gmapping_params.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb78"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] sudo nano /opt/ros/noetic/share/turtlebot3_slam/config/gmapping_params.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Start navigation (loading an existing map given in parameter)</p>
-<div class="sourceCode" id="cb80"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=/home/nomis/A428_test.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb79"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=/home/nomis/A428_test.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ul>
 </section>
 </section>
@@ -901,9 +906,9 @@ Note: Turtlebot3 OS - user: ubuntu, password: turtlebot. We will now refer to th
 <h2 class="anchored" data-anchor-id="on-the-real-robot-through-ssh">On the real robot (through ssh)</h2>
 <ul>
 <li><p>Start the robot</p>
-<div class="sourceCode" id="cb81"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal]  roslaunch turtlebot3_bringup turtlebot3_robot.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb80"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal]  roslaunch turtlebot3_bringup turtlebot3_robot.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Start the robot (with the USB cam, assuming you set it up)</p>
-<div class="sourceCode" id="cb82"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] roslaunch turtlebot3_bringup turtlebot3_robot_usbcam.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb81"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] roslaunch turtlebot3_bringup turtlebot3_robot_usbcam.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ul>
 </section>
 </section>
