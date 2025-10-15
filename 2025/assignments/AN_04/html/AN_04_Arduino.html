@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Simon Ruffieux">
+<meta name="dcterms.date" content="2025-10-09">
+<meta name="keywords" content="Human-IST, ProtoFab, LearningLab, UniFR">
+
+<title>Introduction to Arduino</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="AN_04_Arduino_files/libs/clipboard/clipboard.min.js"></script>
+<script src="AN_04_Arduino_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="AN_04_Arduino_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="AN_04_Arduino_files/libs/quarto-html/popper.min.js"></script>
+<script src="AN_04_Arduino_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="AN_04_Arduino_files/libs/quarto-html/anchor.min.js"></script>
+<link href="AN_04_Arduino_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="AN_04_Arduino_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="AN_04_Arduino_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="AN_04_Arduino_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="AN_04_Arduino_files/libs/bootstrap/bootstrap-e45286ae55112de182af3b94459e1a1c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#protofab-assignment-4-introduction-to-arduino---wiring-and-programming-arduino-poards" id="toc-protofab-assignment-4-introduction-to-arduino---wiring-and-programming-arduino-poards" class="nav-link active" data-scroll-target="#protofab-assignment-4-introduction-to-arduino---wiring-and-programming-arduino-poards">ProtoFab assignment 4: Introduction to Arduino - Wiring and Programming Arduino Poards</a>
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#pre-requisites" id="toc-pre-requisites" class="nav-link" data-scroll-target="#pre-requisites">Pre-requisites</a></li>
+  <li><a href="#hints" id="toc-hints" class="nav-link" data-scroll-target="#hints">Hints</a></li>
+  <li><a href="#tasks" id="toc-tasks" class="nav-link" data-scroll-target="#tasks">Tasks</a>
+  <ul class="collapse">
+  <li><a href="#task-1---first-experience-with-an-arduino-board-blink-example" id="toc-task-1---first-experience-with-an-arduino-board-blink-example" class="nav-link" data-scroll-target="#task-1---first-experience-with-an-arduino-board-blink-example">Task 1 - First experience with an Arduino Board – Blink example</a></li>
+  <li><a href="#task-2---a-lux-reader" id="toc-task-2---a-lux-reader" class="nav-link" data-scroll-target="#task-2---a-lux-reader">Task 2 - A LUX reader</a></li>
+  <li><a href="#task-3---webserver---remote-control-a-led-and-display-a-value" id="toc-task-3---webserver---remote-control-a-led-and-display-a-value" class="nav-link" data-scroll-target="#task-3---webserver---remote-control-a-led-and-display-a-value">Task 3 - Webserver - Remote control a LED and display a value</a></li>
+  <li><a href="#optional-task-4---connect-your-arduino-with-ros" id="toc-optional-task-4---connect-your-arduino-with-ros" class="nav-link" data-scroll-target="#optional-task-4---connect-your-arduino-with-ros">[OPTIONAL] Task 4 - Connect your Arduino with ROS</a></li>
+  </ul></li>
+  <li><a href="#extra-examples" id="toc-extra-examples" class="nav-link" data-scroll-target="#extra-examples">Extra Examples</a>
+  <ul class="collapse">
+  <li><a href="#extra-example-1---arduino-and-ledring" id="toc-extra-example-1---arduino-and-ledring" class="nav-link" data-scroll-target="#extra-example-1---arduino-and-ledring">[EXTRA] Example 1 - Arduino and LedRing</a></li>
+  <li><a href="#extra-example-2---arduino-and-servo-motor-control" id="toc-extra-example-2---arduino-and-servo-motor-control" class="nav-link" data-scroll-target="#extra-example-2---arduino-and-servo-motor-control">[EXTRA] Example 2 - Arduino and servo-motor control</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="..\..\..\AN_04_Arduino.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Introduction to Arduino</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Simon Ruffieux </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 9, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+<div>
+  <div class="keywords">
+    <div class="block-title">Keywords</div>
+    <p>Human-IST, ProtoFab, LearningLab, UniFR</p>
+  </div>
+</div>
+
+</header>
+
+
+<section id="protofab-assignment-4-introduction-to-arduino---wiring-and-programming-arduino-poards" class="level1">
+<h1>ProtoFab assignment 4: Introduction to Arduino - Wiring and Programming Arduino Poards</h1>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This practical work focuses on learning the basics concepts of Arduino</p>
+<p>In this practical work, you will perform the following tasks:</p>
+<ul>
+<li><p><strong>Task 1</strong> – First experience with an Arduino board – Blink example</p></li>
+<li><p><strong>Task 2</strong> – A first wiring for a LUX reader</p></li>
+<li><p><strong>Task 3</strong> – Remote control a LED and display sensor value <strong>(code on your own)</strong></p></li>
+<li><p><strong>Task 4 [OPTIONAL]</strong> – Connect your Arduino with ROS</p></li>
+<li><p><strong>[EXTRA] Example 1 [OPTIONAL]</strong> – Arduino and LedRing</p></li>
+<li><p><strong>[EXTRA] Example 2 [OPTIONAL]</strong> – Arduino and Servo-motor Control</p></li>
+</ul>
+<p><strong><u>Learning objectives:</u></strong></p>
+<p>At the end of the assignment, you should be able to</p>
+<ul>
+<li><p>Know the basics of Arduino IDE</p></li>
+<li><p>Know how to program an Arduino board (basics)</p></li>
+<li><p>Do a simple wiring and read data from a sensor</p></li>
+<li><p>Send commands remotely to control an actuator</p></li>
+<li><p>[OPTIONAL] Enable communication between your Arduino and a ROS ecosystem</p></li>
+</ul>
+</section>
+<section id="pre-requisites" class="level2">
+<h2 class="anchored" data-anchor-id="pre-requisites">Pre-requisites</h2>
+<ul>
+<li><p>IDE for Arduino installed on your machine</p></li>
+<li><p>Notions seen in the lecture LN04</p></li>
+<li><p>Basic notions of electronics (not given in this course)</p></li>
+</ul>
+</section>
+<section id="hints" class="level2">
+<h2 class="anchored" data-anchor-id="hints">Hints</h2>
+<ul>
+<li><p>The sample codes presented in this assignment are also available on the Github of the course.</p></li>
+<li><p>Before uploading your first sketch, ensure you have set the right settings in the IDE.</p></li>
+<li><p>Ensure you are using the right board on the Arduino IDE (“Adafruit Feather ESP32-S3…” must be correctly selected on the top left of the interface of the Arduino IDE).</p></li>
+<li><p>The IDE provides a Serial Monitor Console (to display it, you must click on a small icon on the top right of the interfcae of your IDE). Make sure you use this as it is the main way to debug. Any “serial.println()” command should be outputted in this terminal.</p></li>
+<li><p>When the Serial Monitor Console is reporting “Not Connected: Select …”, try to reselect your board/COM on the top left of the interface of Arduino IDE.</p></li>
+<li><p>After uploading a sketch, if the LED #13 on the ESP32 is blinking or pulsating, it probably indicate that the sketch did not uplod correctly and that it cannot start. Main reasons: wrong settings</p></li>
+<li><p>To be able to upload a sketch, you need to put the board in bootloader mode. You need to hold the “boot” button down and click once on the “reset” button. Otherwise, you’ll get a <em>timeout error</em> when uploading. It seems this is not necessary anymore with latest updates; uploading the sketch automatically puts the card in bootloader mode.</p></li>
+<li><p>If you are using Linux with WSL (Windows)</p>
+<ul>
+<li><p><strong>Install Arduino IDE on your Windows OS</strong> (WSL only provides limited access to USB ports)</p></li>
+<li><p>Do not forget to disable your firewall when trying to communicate with external devices (i.e.&nbsp;ROS).</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="tasks" class="level2">
+<h2 class="anchored" data-anchor-id="tasks">Tasks</h2>
+<section id="task-1---first-experience-with-an-arduino-board-blink-example" class="level3">
+<h3 class="anchored" data-anchor-id="task-1---first-experience-with-an-arduino-board-blink-example">Task 1 - First experience with an Arduino Board – Blink example</h3>
+<p>As a first task, we will ensure everything is working as expected by configuring your IDE to support the ESP32 card and then by uploading a first sketch to the ESP32-S3 board.</p>
+<p>You can find documentation and detailed instructions on how to use the ESP32-S3 Feather board from its <a href="https://docs.espressif.com/projects/arduino-esp32/en/latest/index.html">official_esp32_documentation</a>. The installation steps listed below are mostly a summary of these documentation. Please refer to the previous link if something is unclear.</p>
+<p>Let’s do the task step by step:</p>
+<ol type="1">
+<li><p>Ensure you have the latest <a href="https://www.arduino.cc/en/software">ArduinoIDE</a> installed on your machine (Note: we tested with the version 2.3.6).</p></li>
+<li><p>In the Arduino IDE, install the libraries for the ESP32</p>
+<ol type="a">
+<li><p>Start Arduino IDE and open the “Preferences” window</p></li>
+<li><p>Add the following <a href="https://espressif.github.io/arduino-esp32/package_esp32_index.json">IDE_esp32_link</a> to the field “additional boards manager URLs (see screenshot below)</p></li>
+<li><p>From your IDE main window, select “Board Manager” (second icon on the left pane) and search for “esp32”. Install the package named “esp32 by Expressif Systems”</p></li>
+<li><p>Restart your IDE</p></li>
+</ol></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image1.png" class="img-fluid figure-img" style="width:80.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol start="3" type="1">
+<li><p>In the Arduino IDE, set the ESP32 as your current development board</p>
+<ol type="a">
+<li>In the top menu, from Tools-&gt;Board, select the “Adafruit Feather ESP32-S3 2MB PSRAM as your development board”<br>
+<strong>Remark</strong>: Now you can access many specific examples for your board. You can have a quick look from “File”-&gt; “Examples” -&gt; “Examples for Adafruit Feather ESP32-S3”</li>
+</ol></li>
+<li><p>Connect your board to your computer using the provided USB cable</p>
+<ol type="a">
+<li><p>Make sure your system detects your board, set the right com port from “Tools” -&gt; “Port” -&gt; COM<em>x</em></p></li>
+<li><p>On the bottom right of the IDE, you should see that your card is connected<br>
+<strong>Remark</strong>: You may potentially need to set the card in <strong>bootloader mode</strong> to see it connected.</p></li>
+</ol></li>
+<li><p>From “File”-&gt; “Examples” -&gt; “01. Basics” (built-in examples), load the <em>Blink</em> example<br>
+<strong>Note</strong>: Have a look at the code. Note that it is the same as the one presented during the lecture.</p></li>
+<li><p>From “Tools”, ensure you have the right settings defined for your card (see image below)<br>
+<strong>Note</strong>: On Windows, it took me quite some time to find the right settings for the upload operation to work successfully …</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image2.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>Working settings for the ESP32 (tested on Windows only)</figcaption>
+</figure>
+</div>
+<ol start="7" type="1">
+<li><p>Upload the sketch onto the board</p>
+<ol type="a">
+<li>Compile your code (click on the “verify” button on the top left of the IDE)<br>
+<strong>WARNING</strong>: Before uploading a sketch, the card always needs to be set into <a href="https://docs.arduino.cc/retired/hacking/software/Bootloader/">bootloader</a> mode. It seems this is not necessary anymore with latest updates; uploading the sketch automatically puts the card in bootloader mode.</li>
+</ol>
+<blockquote class="blockquote">
+<p><strong>Hint</strong>: If you still want to put the card in bootloader mode: on the card, hold the “Boot” button and then press the “Reset” button, finally release the two buttons simultaneously. All LEDs on the card should be OFF while in bootloader mode.</p>
+</blockquote>
+<ol start="2" type="a">
+<li><p>Upload your sketch (click on the “upload” button on the top left of the IDE)<br>
+<strong>Note</strong>: this operation takes a bit of time. Wait for its completion. You can see the logs on the bottom of your IDE.</p></li>
+<li><p>On your card, press the “Reset” button to make the card restart and run your program</p></li>
+</ol></li>
+<li><p>You should now be able to see the small LED right next to the USB connector blink as defined in your code</p>
+<p><strong>Remark 1:</strong> If the code fails to upload, compiles but is not correct or some settings are misconfigured, your card could end up in a Boot loop. The RGB LED will be green (when connected to USB) or red (when connected to Power) and the LED_BUILTIN will be showing a pulsing red light. In Boot loop, the card is not visible anymore from the computer and you must put it back into bootloader mode to re-upload a sketch.<br>
+</p>
+<p><strong>Remark 2:</strong> Do not forget to open the Serial Monitor Console (click on the button an the top-right of your IDE) to be able to see information sent to the Serial Monitor, this can help debugging your programs.<br>
+</p></li>
+</ol>
+<p><strong>A few suggestions to go further:</strong></p>
+<ul>
+<li><p>What happens if you power off your card and power it back ON again?<br>
+<strong>Hint</strong>: just disconnect and reconnect your USB to test …</p></li>
+<li><p>Try to change delays and/or play with the blinking patterns in the code and upload your sketch to see the effect.</p></li>
+<li><p>Your ESP32 has an embedded RGB LED, can you make this RGB led blink and change colors?<br>
+<strong>Hint</strong>: Remember, Arduino is example based (Hint: ESP32-&gt;GPIO-&gt;?)</p></li>
+</ul>
+</section>
+<section id="task-2---a-lux-reader" class="level3">
+<h3 class="anchored" data-anchor-id="task-2---a-lux-reader">Task 2 - A LUX reader</h3>
+<p>As a second task, we will do some wiring on a breadboard to connect an additional sensor to the ESP32 and report the values through the serial connection. We will also use interrupts to report extreme high or low values.</p>
+<p>You can find additional documentation about the Adafruit VEML 7700 LUX sensor from its official_documentation, provided by Adafruit <a href="https://learn.adafruit.com/adafruit-veml7700">adafruit_veml7700</a><br>
+<strong>Remark</strong>: When you have a new sensor, you should always begin by reading/looking its official documentation.</p>
+<p>Let’s do the task step by step:</p>
+<ol type="1">
+<li><p>Get your breadboard and VEML 7700 LUX sensor ready</p></li>
+<li><p>Read the documentation about the VEML 7700.</p>
+<ol type="a">
+<li><p>Pay attention to the <a href="https://learn.adafruit.com/adafruit-veml7700/pinouts">veml7700_pinout</a> and <a href="https://learn.adafruit.com/adafruit-veml7700/arduino">veml7700_wiring</a> information which help you wire things correctly</p></li>
+<li><p>Pay attention to <a href="https://learn.adafruit.com/adafruit-veml7700/adjusting-for-different-light-levels">veml7700_information</a> related to the “gain” and “integration time”</p></li>
+</ol></li>
+<li><p>Install the VEML 7700 library from your IDE</p>
+<ol type="a">
+<li>From “Tools”-&gt;“Manage Libraries…”, search and install the “Adafruit VEML7700 Library”</li>
+</ol></li>
+<li><p>Wire the sensor on your board. The result should look somewhat similar to the wiring shown on picture below.</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image3.png" class="img-fluid figure-img" style="width:40.0%" data-margin="auto"></p>
+<figcaption>Picture of a possible wiring to connect the VEML7700 to the ESP32.</figcaption>
+</figure>
+</div>
+<ol start="5" type="1">
+<li><p>From the Arduino IDE, load the example sketch “VEML7700_test”</p>
+<ol type="a">
+<li>You can find it in “Examples”-&gt;“Adafruit VEML7700”</li>
+</ol></li>
+<li><p>Read and understand the sketch</p>
+<ol type="a">
+<li><p>How is the sensor initialised?</p></li>
+<li><p>How are the interrupts for Low and High thresholds defined?</p></li>
+<li><p>How are sensor values sent to the serial?</p></li>
+<li><p>What happens with the interrupts? How are they handled?</p></li>
+</ol></li>
+<li><p>Upload the sketch on the board</p></li>
+<li><p>Test and play with your system</p>
+<ol type="a">
+<li><p>Are the High and Low threshold triggered?</p></li>
+<li><p>How and when are the interrupts triggered?</p></li>
+</ol></li>
+<li><p>Find approximate values for the Low and High thresholds that allow the detection of two events</p>
+<ol type="a">
+<li><p>A smartphone with lamp ON starts hovering 20 cm above the sensor</p></li>
+<li><p>A hand starts covering the sensor</p></li>
+</ol>
+<p><strong>Hint:</strong> You may want to add the command below in your sketch for more consistent results. Look in the documentation and browse the web to understand its effect.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>veml.setPersistence(VEML7700_PERS_8); // wait 8 readings before firing</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+</section>
+<section id="task-3---webserver---remote-control-a-led-and-display-a-value" class="level3">
+<h3 class="anchored" data-anchor-id="task-3---webserver---remote-control-a-led-and-display-a-value">Task 3 - Webserver - Remote control a LED and display a value</h3>
+<p>As a third task, we will provide a way to remotely actuate a LED on our Arduino. We will connect the Arduino to the Wifi, make it act as a webserver and provide a simple interface to set a LED ON or OFF.</p>
+<p>This task has been inspired from this <a href="https://randomnerdtutorials.com/esp32-web-server-arduino-ide/">link</a>. Remember Arduino is example-based; you can download most of the sketch from “File”-&gt;“Examples”-&gt;“Examples for Adafruit Feather ESP32-S3”-&gt;“WiFi”-&gt;“SimpleWiFiServer”</p>
+<p>Let’s do the task step by step:</p>
+<ol type="1">
+<li><p>Get the SimpleWiFiServer sketch from the ESP32-S3 examples (or see below)</p></li>
+<li><p>Inspect and understand the initial code:</p>
+<ol type="a">
+<li><p>External LED connected to a PIN</p></li>
+<li><p>Wifi network search and connection</p></li>
+<li><p>The NetworkServer serving an HTML page to the client and handling GET commands</p></li>
+</ol></li>
+<li><p>Now do some modifications to the code</p>
+<ol type="a">
+<li><p>Set the right password and SSID to connect to the provided local WiFi of the Learning Lab (Note that if you are on a different WiFi, you need to change the information below)</p>
+<ol type="i">
+<li><p>ssid = “ProFab”</p></li>
+<li><p>password = “1700_UniFR.&amp;";</p></li>
+</ol></li>
+<li><p>Control the embedded LED (LED_BUILTIN) instead of an external LED (Pay attention, the variable must be modified in several places within the provided code)</p></li>
+</ol></li>
+<li><p>Upload the sketch onto the board</p></li>
+<li><p>Test your system by connecting to the webpage and remote controlling the LED<br>
+<strong>Remark</strong>: You should be able to see the IP address of your web server on the Serial Monitor of your IDE.</p></li>
+</ol>
+<p><strong>A few suggestions to go further:</strong></p>
+<ol type="1">
+<li><p><strong>[Recommended]</strong> Update your code to also display the LUX values (use inspiration from previous task)</p></li>
+<li><p>Make your HTML page more fancy. Do not hesitate to use GenAI to help you with that.</p>
+<ul>
+<li><p>You could use buttons instead of links</p></li>
+<li><p>You could control the RGB LED instead of the built-in LED</p></li>
+<li><p>You could try to develop a real-time version that relies on AJAX</p></li>
+</ul></li>
+<li><p>You could easily set your Arduino to act as an Access Point, thus removing the need of the additional router to make the system work (check this <a href="https://randomnerdtutorials.com/esp32-access-point-ap-web-server/">link</a> for more details)</p>
+<ul>
+<li>Reflect on the difference and potential advantages and disadvantages of Access Point vs Router for concrete applications in real-life</li>
+</ul></li>
+</ol>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">WiFi Web Server LED Blink</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"> </span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"> A simple web server that lets you blink an LED via the web.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"> //This sketch will print the IP address of your WiFi (once connected)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"> //to the Serial monitor. From there, you can open that address in a web browser</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"> //to turn on and off the LED on pin 5.</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"> </span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"> If the IP address of your shield is yourAddress:</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"> http://yourAddress/H turns the LED on</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"> http://yourAddress/L turns it off</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"> </span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"> This example is written for a network using WPA2 encryption. For insecure</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"> WEP or WPA, change the Wifi.begin() call and use Wifi.setMinSecurity() accordingly.</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"> </span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"> Circuit:</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"> * ESP32 Espressif with embedded wifi shield</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"> </span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"> created for arduino 25 Nov 2012</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"> by Tom Igoe</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"> </span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">ported for sparkfun esp32</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">31.01.2017 by Jan Hendrik Berlin</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"> </span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;WiFi.h&gt;</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>ssid <span class="op">=</span> <span class="st">"ssid"</span><span class="op">;</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>password <span class="op">=</span> <span class="st">"password"</span><span class="op">;</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>NetworkServer server<span class="op">(</span><span class="dv">80</span><span class="op">);</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  pinMode<span class="op">(</span><span class="dv">5</span><span class="op">,</span> OUTPUT<span class="op">);</span>  <span class="co">// set the LED pin mode</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  delay<span class="op">(</span><span class="dv">10</span><span class="op">);</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  <span class="co">// We start by connecting to a WiFi network</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">();</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">();</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"Connecting to "</span><span class="op">);</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span>ssid<span class="op">);</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  WiFi<span class="op">.</span>begin<span class="op">(</span>ssid<span class="op">,</span> password<span class="op">);</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="op">(</span>WiFi<span class="op">.</span>status<span class="op">()</span> <span class="op">!=</span> WL_CONNECTED<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    delay<span class="op">(</span><span class="dv">500</span><span class="op">);</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"."</span><span class="op">);</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span><span class="st">""</span><span class="op">);</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"WiFi connected."</span><span class="op">);</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"IP address: "</span><span class="op">);</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span>WiFi<span class="op">.</span>localIP<span class="op">());</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>  server<span class="op">.</span>begin<span class="op">();</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>  NetworkClient client <span class="op">=</span> server<span class="op">.</span>accept<span class="op">();</span>  <span class="co">// listen for incoming clients</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>client<span class="op">)</span> <span class="op">{</span>                     <span class="co">// if you get a client,</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"New Client."</span><span class="op">);</span>  <span class="co">// print a message out the serial port</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    String currentLine <span class="op">=</span> <span class="st">""</span><span class="op">;</span>        <span class="co">// make a String to hold incoming data from the client</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>client<span class="op">.</span>connected<span class="op">())</span> <span class="op">{</span>    <span class="co">// loop while the client's connected</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>client<span class="op">.</span>available<span class="op">())</span> <span class="op">{</span>     <span class="co">// if there's bytes to read from the client,</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        <span class="dt">char</span> c <span class="op">=</span> client<span class="op">.</span>read<span class="op">();</span>     <span class="co">// read a byte, then</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>        Serial<span class="op">.</span>write<span class="op">(</span>c<span class="op">);</span>            <span class="co">// print it out the serial monitor</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>c <span class="op">==</span> <span class="ch">'</span><span class="sc">\n</span><span class="ch">'</span><span class="op">)</span> <span class="op">{</span>            <span class="co">// if the byte is a newline character</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>          <span class="co">// if the current line is blank, you got two newline characters in a row.</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>          <span class="co">// that's the end of the client HTTP request, so send a response:</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> <span class="op">(</span>currentLine<span class="op">.</span>length<span class="op">()</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>            <span class="co">// HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>            <span class="co">// and a content-type so the client knows what's coming, then a blank line:</span></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>            client<span class="op">.</span>println<span class="op">(</span><span class="st">"HTTP/1.1 200 OK"</span><span class="op">);</span></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>            client<span class="op">.</span>println<span class="op">(</span><span class="st">"Content-type:text/html"</span><span class="op">);</span></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>            client<span class="op">.</span>println<span class="op">();</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>            <span class="co">// the content of the HTTP response follows the header:</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>            client<span class="op">.</span>print<span class="op">(</span><span class="st">"Click &lt;a href=</span><span class="sc">\"</span><span class="st">/H</span><span class="sc">\"</span><span class="st">&gt;here&lt;/a&gt; to turn the LED ON.&lt;br&gt;"</span><span class="op">);</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>            client<span class="op">.</span>print<span class="op">(</span><span class="st">"Click &lt;a href=</span><span class="sc">\"</span><span class="st">/L</span><span class="sc">\"</span><span class="st">&gt;here&lt;/a&gt; to turn the LED OFF.&lt;br&gt;"</span><span class="op">);</span></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>            <span class="co">// The HTTP response ends with another blank line:</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>            client<span class="op">.</span>println<span class="op">();</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>            <span class="co">// break out of the while loop:</span></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>          <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span>  <span class="co">// if you got a newline, then clear currentLine:</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>            currentLine <span class="op">=</span> <span class="st">""</span><span class="op">;</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>          <span class="op">}</span></span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>c <span class="op">!=</span> <span class="ch">'</span><span class="sc">\r</span><span class="ch">'</span><span class="op">)</span> <span class="op">{</span>  <span class="co">// if you got anything else but a carriage return character,</span></span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>          currentLine <span class="op">+=</span> c<span class="op">;</span>      <span class="co">// add it to the end of the currentLine</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Check to see if the client request was "GET /H" or "GET /L":</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>currentLine<span class="op">.</span>endsWith<span class="op">(</span><span class="st">"GET /H"</span><span class="op">))</span> <span class="op">{</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>          Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"--&gt; Turn the LED ON"</span><span class="op">);</span></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>          digitalWrite<span class="op">(</span>LED_BUILTIN<span class="op">,</span> HIGH<span class="op">);</span>  <span class="co">// GET /H turns the LED on</span></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>currentLine<span class="op">.</span>endsWith<span class="op">(</span><span class="st">"GET /L"</span><span class="op">))</span> <span class="op">{</span></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>          Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"--&gt; Turn the LED OFF"</span><span class="op">);</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>          digitalWrite<span class="op">(</span>LED_BUILTIN<span class="op">,</span> LOW<span class="op">);</span>  <span class="co">// GET /L turns the LED off</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>    <span class="co">// close the connection:</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>    client<span class="op">.</span>stop<span class="op">();</span></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"Client Disconnected."</span><span class="op">);</span></span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>&nbsp; </p>
+</section>
+<section id="optional-task-4---connect-your-arduino-with-ros" class="level3">
+<h3 class="anchored" data-anchor-id="optional-task-4---connect-your-arduino-with-ros">[OPTIONAL] Task 4 - Connect your Arduino with ROS</h3>
+<p>In this fourth task, we will turn our Arduino into a ROS Node to show how to enable a direct communication between an Arduino and ROS. As a first step, we will simply send a String over WiFi.</p>
+<p>We recommend to continue further the exercise and modify the code to send the LUX value (and not a string) to a ROS Node.</p>
+<p><strong>Remark</strong>: For Windows users, who have not set network mirroring, it will be slightly trickier as you will need to enable forwarding the packet received on Windows to WSL. But a few commands can do the trick!</p>
+<p>Let’s do this step by step.</p>
+<p>Let’s start with the <u>Arduino part</u>:</p>
+<ol type="1">
+<li><p>Install the “Rosserial Arduino Library” from your Arduino IDE</p></li>
+<li><p>Load the “TcpHelloWorld” example from “File”-&gt;“Examples”-&gt;“Rosserial Arduino Library”</p></li>
+<li><p>Modify the code to connect to the WiFi instead of Ethernet</p>
+<ol type="a">
+<li><p>Note: you can reuse some of the code from the previous task</p></li>
+<li><p>Pay attention to the IP address of the ROS master server (needs to be adapted later)</p></li>
+<li><p>Use your own name for the topic</p></li>
+</ol></li>
+<li><p>Your code should look something like the one provided below <strong>Remark</strong>: the ssid, password and IPAddress server should be adapted to your own particular case.</p></li>
+</ol>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define ROSSERIAL_ARDUINO_TCP   </span><span class="co">// Very important directive ! </span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"WiFi.h"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;ros.h&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;std_msgs/Int16.h&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;std_msgs/String.h&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>ssid <span class="op">=</span> <span class="st">"ssid"</span><span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>password <span class="op">=</span> <span class="st">"password"</span><span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>IPAddress server<span class="op">(</span><span class="dv">192</span><span class="op">,</span> <span class="dv">168</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">3</span><span class="op">);</span> <span class="co">// ip of your ROS machine (for Windows, if you use port forwarding, it is the IP of Windows and you need to have port forwarding to redirect packets to your WSL linux)</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>ros<span class="op">::</span>NodeHandle nh<span class="op">;</span> <span class="co">// the node</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>std_msgs<span class="op">::</span>String str_msg<span class="op">;</span> <span class="co">// the type of message that will be sent</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>ros<span class="op">::</span>Publisher pub<span class="op">(</span><span class="st">"chatter"</span><span class="op">,</span> <span class="op">&amp;</span>str_msg<span class="op">);</span> <span class="co">// the topic on which to publish the data (parameters: name, type of message)</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> </span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">();</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"Connecting to "</span><span class="op">);</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span>ssid<span class="op">);</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Connect to WiFi</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  WiFi<span class="op">.</span>begin<span class="op">(</span>ssid<span class="op">,</span> password<span class="op">);</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="op">(</span>WiFi<span class="op">.</span>status<span class="op">()</span> <span class="op">!=</span> WL_CONNECTED<span class="op">)</span> <span class="co">// -&gt; wifi delay -&gt; a must -&gt; other wise it will restart continuously </span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> delay<span class="op">(</span><span class="dv">500</span><span class="op">);</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"."</span><span class="op">);</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"WiFi connected - IP address:  "</span><span class="op">);</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span>WiFi<span class="op">.</span>localIP<span class="op">());</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Setup connection to ROS machine (server)</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>getHardware<span class="op">()-&gt;</span>setConnection<span class="op">(</span>server<span class="op">,</span><span class="dv">11411</span><span class="op">);</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>initNode<span class="op">();</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>advertise<span class="op">(</span>pub<span class="op">);</span> <span class="co">// the topic must be advertised to the master</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">(){</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="co">//Send a HelloWorld message every second</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>  std_msgs<span class="op">::</span>String str<span class="op">;</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>  str<span class="op">.</span>data <span class="op">=</span> <span class="st">"hello world"</span><span class="op">;</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"Sending message"</span><span class="op">);</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>  pub<span class="op">.</span>publish<span class="op">(</span> <span class="op">&amp;</span>str <span class="op">);</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>spinOnce<span class="op">();</span> <span class="co">// Required, otherwise topic not detected by ROS !</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>  delay<span class="op">(</span><span class="dv">1000</span><span class="op">);</span> </span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now let’s continue with the <u>ROS part on your computer</u></p>
+<ol start="5" type="1">
+<li><p>Start your Linux distribution</p></li>
+<li><p>From your Linux terminal, install the ros-noetic-rosserial package</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>$ sudo apt-get install ros-noetic-rosserial</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>For Windows users who have not enabled Network Mirroring:</strong> Enable port forwarding from Windows to WLS2 Linux</p>
+<ol type="a">
+<li><p>Open a Powershell from Windows (as admin)</p></li>
+<li><p>Type the following command: <strong>Note</strong>: you must replace the “<em>connectaddress</em>” IP with the IP address of your WSL2 Linux, use the command “hostname -I” from your Linux terminal to obtain it.</p></li>
+</ol>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=8080 connectaddress=172.17.152.3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>For all Windows users</strong> Disable your Firewall(s). Do not forget to re-enable it after the laboratory !</p></li>
+</ol>
+<p>Finally, let’s start everything</p>
+<ol start="9" type="1">
+<li><p>Start the different ROS processes in distinct terminals. You can see an example in the two figures below (Figure 1 and Figure 2)</p>
+<ol type="a">
+<li>Start roscore</li>
+</ol>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>$ roscore</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="2" type="a">
+<li>Start the node that will handle TCP connections (with the default port [11411]). You can change the port, if necessary, but then also modify the port in the sketch</li>
+</ol>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>$ rosrun rosserial_python serial_node.py tcp 11411</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="3" type="a">
+<li>Echo the received messages in the console (just for debugging, in practice you would create a node that consumes the content of the topic)</li>
+</ol>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>$ rostopic echo NameOfTheTopic</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Upload your sketch to the Arduino<br>
+<strong>Remark</strong>: you need to have the right IPAddress for your server in the code!</p></li>
+<li><p>Restart your Arduino<br>
+<strong>Note</strong>: The Arduino should start, connect to the WiFi, advertise its node and finally start sending data periodically. On your Linux, running ROS, the result should look similar to the content shown in Figure 2, with the data being displayed on the terminal every second.</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image4.png" class="img-fluid figure-img" style="width:90.0%" data-margin="auto"></p>
+<figcaption>Screenshot of the (three) Linux terminals before starting the distinct services.</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image5.png" class="img-fluid figure-img" style="width:90.0%" data-margin="auto"></p>
+<figcaption>Screenshot of the (three) Linux terminals after starting the distinct services. The socket connection on the lower left terminal is established once the Arduino is restarted and starts sending data. The received data (“hello world”) is shown on the terminal on the right.</figcaption>
+</figure>
+</div>
+<p><strong>A few suggestions to go further:</strong></p>
+<ol type="1">
+<li><p><strong>[Recommendend]</strong> Modify the code to send the Lux values from your VEML sensor (instead of a string)</p></li>
+<li><p>Use the tool “<em>rqt</em>” to visualize the values received on the topic</p></li>
+<li><p>Create a bi-directional communication between Arduino and ROS</p></li>
+</ol>
+<pre><code>- Arduino VEML LUX Sensor -&gt; ROS node on your computer -&gt; Arduino LED
+
+- For example, you could create a sketch that controls the LED on the Arduino based on values received on a specific topic. A node running on your computer could send data to this topic.
+
+- If you work with other groups, you could easily control LEDs on multiple Arduinos, all listening to the same topic ...</code></pre>
+<!--
+
+**[Not to be handed to students:]{.underline}**
+
+Below, the solution for the code that reads the data from the sensor and sends it to the "veml_lux" topic.
+```cpp
+#define ROSSERIAL_ARDUINO_TCP   // Very important! 
+#include "Adafruit_VEML7700.h"
+#include "WiFi.h"
+#include <ros.h>
+#include <std_msgs/Float32.h>
+ 
+const char *ssid = "ProFab";
+const char *password = "1700_UniFR.&";
+ 
+Adafruit_VEML7700 veml = Adafruit_VEML7700();
+IPAddress server(192, 168, 1, 3); // ip of your ROS machine (for Windows, the IP of Windows and you need to have port forwarding to redirect to your WSL2 linux)
+ 
+ros::NodeHandle nh; // the node handler
+std_msgs::Float32 output_val; // the type of message that will be sent
+ros::Publisher pub("veml_lux", &output_val); // The publisher method; the first parameter corresponds to the name of topic on which to publish and the second the type of data 
+ 
+void setup()
+{ 
+  Serial.begin(115200);
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  
+  // Connect to WiFi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) // -> wifi delay -> a must -> other wise it will restart continuously 
+  { delay(500);
+    Serial.print(".");
+  }
+  Serial.println("WiFi connected - IP address:  ");
+  Serial.println(WiFi.localIP());
+ 
+  // Setup VEML
+  if (!veml.begin()) {
+    Serial.println("VEML Sensor not found");
+    while (1);
+  }
+  Serial.println("VEML Sensor found");
+ 
+  // Setup connection to ROS machine (server)
+  nh.getHardware()->setConnection(server, 11411);
+  nh.initNode();
+  nh.advertise(pub); // the topic must be advertised to the master
+}
+ 
+void loop(){
+  //Send the value every second
+  
+  float veml_val = veml.readLux(); 
+  output_val.data = veml_val;
+  Serial.print("lux: "); Serial.println(veml_val); // for debug purposes
+  pub.publish(&output_val); // publish the value on the topic
+  nh.spinOnce(); // Required, otherwise topic not detected by ROS !
+  delay(1000); 
+}
+``` 
+
+
+```cpp
+# TASK 3 - Solution CODE
+# Actuation of buttons and display LUX value (needs to be updated with VEML stuff)
+# This version is also a bit more fancy version with CSS and refresh every 5 seconds
+
+#include <WiFi.h>
+
+const char* ssid = "yourSSID";
+const char* password = "yourPassword";
+
+WiFiServer server(80);
+
+const int ledPin = 2;
+const int sensorPin = A0;
+
+String header;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, LOW);
+
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConnected to WiFi.");
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+
+  server.begin();
+}
+
+void loop() {
+  WiFiClient client = server.available();
+  if (client) {
+    Serial.println("New Client");
+    String currentLine = "";
+    while (client.connected()) {
+      if (client.available()) {
+        char c = client.read();
+        header += c;
+
+        if (c == '\n') {
+          // LED Control
+          if (header.indexOf("GET /LED=ON") >= 0) {
+            digitalWrite(ledPin, HIGH);
+          } else if (header.indexOf("GET /LED=OFF") >= 0) {
+            digitalWrite(ledPin, LOW);
+          }
+
+          // Read sensor
+          int sensorValue = analogRead(sensorPin);
+          bool ledState = digitalRead(ledPin);
+
+          // Build HTTP response
+          client.println("HTTP/1.1 200 OK");
+          client.println("Content-type:text/html");
+          client.println("Connection: close");
+          client.println();
+          
+          client.println("<!DOCTYPE html><html>");
+          client.println("<head>");
+          client.println("<meta charset='UTF-8'>");
+          client.println("<meta name='viewport' content='width=device-width, initial-scale=1'>");
+          client.println("<meta http-equiv='refresh' content='5'>");  // Refresh every 5 seconds
+          client.println("<title>ESP32 Control Panel</title>");
+          client.println("<style>");
+          client.println("body { font-family: Arial; background: #f2f2f2; text-align: center; padding: 50px; }");
+          client.println(".card { background: white; padding: 30px; margin: auto; width: 300px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }");
+          client.println(".btn { display: inline-block; padding: 10px 20px; font-size: 16px; margin: 10px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }");
+          client.println(".on { background-color: #4CAF50; color: white; }");
+          client.println(".off { background-color: #f44336; color: white; }");
+          client.println(".status { margin: 20px 0; font-size: 18px; }");
+          client.println("</style>");
+          client.println("</head><body>");
+          
+          client.println("<div class='card'>");
+          client.println("<h2>ESP32 Web Server</h2>");
+
+          client.print("<div class='status'>Sensor Value: <strong>");
+          client.print(sensorValue);
+          client.println("</strong></div>");
+
+          client.print("<div class='status'>LED State: <strong>");
+          client.print(ledState ? "ON" : "OFF");
+          client.println("</strong></div>");
+
+          client.println("<a href=\"/LED=ON\" class='btn on'>Turn LED ON</a>");
+          client.println("<a href=\"/LED=OFF\" class='btn off'>Turn LED OFF</a>");
+
+          client.println("</div></body></html>");
+          break;
+        }
+      }
+    }
+
+    delay(1);
+    client.stop();
+    Serial.println("Client Disconnected");
+    header = "";
+  }
+}
+
+
+```
+
+ -->
+</section>
+</section>
+<section id="extra-examples" class="level2">
+<h2 class="anchored" data-anchor-id="extra-examples">Extra Examples</h2>
+<section id="extra-example-1---arduino-and-ledring" class="level3">
+<h3 class="anchored" data-anchor-id="extra-example-1---arduino-and-ledring">[EXTRA] Example 1 - Arduino and LedRing</h3>
+<p>This example is more a support to help you bootstrap your project by giving you an example of build and sketch to control a ring of leds. If you want to try it, do not hesistate to ask us for the necessary hardware to build this example.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Adafruit_NeoPixel.h&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LED_PIN </span><span class="dv">6</span><span class="pp"> </span><span class="co">// which PIN of the arduino board is used to send 'commands' to the ring</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LED_COUNT </span><span class="dv">24</span><span class="pp"> </span><span class="co">// the numbe rof led on the ring</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>Adafruit_NeoPixel ring<span class="op">(</span>LED_COUNT<span class="op">,</span> LED_PIN<span class="op">,</span> NEO_GRB <span class="op">+</span> NEO_KHZ800<span class="op">);</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  ring<span class="op">.</span>begin<span class="op">();</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  ring<span class="op">.</span>show<span class="op">();</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  ring<span class="op">.</span>setBrightness<span class="op">(</span><span class="dv">50</span><span class="op">);</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">* Example to make the led ring alterate Red, Green, Yellow colors and shift the position of these colors by 1  every 500 ms</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">* It gives the impression that the RGY colors move along the ring.</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">*/</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> LED_COUNT<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span><span class="op">((</span>i<span class="op">+</span>k<span class="op">)%</span><span class="dv">3</span> <span class="op">==</span> <span class="dv">0</span><span class="op">){</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>      ring<span class="op">.</span>setPixelColor<span class="op">(</span>i<span class="op">,</span> ring<span class="op">.</span>Color<span class="op">(</span><span class="dv">255</span><span class="op">,</span> <span class="dv">255</span><span class="op">,</span> <span class="dv">0</span><span class="op">));</span><span class="co">//Yellow</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span><span class="cf">else</span> <span class="cf">if</span><span class="op">((</span>i<span class="op">+</span>k<span class="op">)%</span><span class="dv">2</span><span class="op">==</span><span class="dv">0</span><span class="op">){</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>      ring<span class="op">.</span>setPixelColor<span class="op">(</span>i<span class="op">,</span> ring<span class="op">.</span>Color<span class="op">(</span><span class="dv">255</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">));</span> <span class="co">//Red</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span><span class="cf">else</span><span class="op">{</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>      ring<span class="op">.</span>setPixelColor<span class="op">(</span>i<span class="op">,</span> ring<span class="op">.</span>Color<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">255</span><span class="op">,</span> <span class="dv">0</span><span class="op">));</span> <span class="co">//Green</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    delay<span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  ring<span class="op">.</span>show<span class="op">()</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  delay<span class="op">(</span><span class="dv">500</span><span class="op">);</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>  k<span class="op">++;</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/Ledring_24_pic_fritz.png" class="img-fluid figure-img" style="width:90.0%" data-margin="auto"></p>
+<figcaption>An illustration of a rough wiring (left) and its corresponding Fritzing schematic (right).</figcaption>
+</figure>
+</div>
+</section>
+<section id="extra-example-2---arduino-and-servo-motor-control" class="level3">
+<h3 class="anchored" data-anchor-id="extra-example-2---arduino-and-servo-motor-control">[EXTRA] Example 2 - Arduino and servo-motor control</h3>
+<p>This example is more a support to help you bootstrap your project by giving you an example of build and sketch to control a servo-motor. In this example, we use a RovoR S009 Analog Servo-motor. You can find the exact model (here)[https://www.robbe.com/en/RC-Electronics/RC-Systems/Servos/Robbe-Modellsport-ROVOR-SERVO-S0009-9G/S0009]. If you want to try it, do not hesistate to ask us for the necessary hardware to build and test this example.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*********</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">  Rui Santos &amp; Sara Santos - Random Nerd Tutorials</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">  Simplified from Complete project details at https://RandomNerdTutorials.com/esp32-servo-motor-web-server-arduino-ide/</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">  Based on the ESP32Servo Sweep Example</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">*********/</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;ESP32Servo.h&gt;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">const</span> <span class="dt">int</span> servoPin <span class="op">=</span> <span class="dv">6</span><span class="op">;</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>Servo servo1<span class="op">;</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  servo1<span class="op">.</span>attach<span class="op">(</span>servoPin<span class="op">);</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> posDegrees <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> posDegrees <span class="op">&lt;=</span> <span class="dv">180</span><span class="op">;</span> posDegrees<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    servo1<span class="op">.</span>write<span class="op">(</span>posDegrees<span class="op">);</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>println<span class="op">(</span>posDegrees<span class="op">);</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    delay<span class="op">(</span><span class="dv">20</span><span class="op">);</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> posDegrees <span class="op">=</span> <span class="dv">180</span><span class="op">;</span> posDegrees <span class="op">&gt;=</span> <span class="dv">0</span><span class="op">;</span> posDegrees<span class="op">--)</span> <span class="op">{</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    servo1<span class="op">.</span>write<span class="op">(</span>posDegrees<span class="op">);</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>println<span class="op">(</span>posDegrees<span class="op">);</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    delay<span class="op">(</span><span class="dv">20</span><span class="op">);</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/servo_pic_fritz.png" class="img-fluid figure-img" style="width:90.0%" data-margin="auto"></p>
+<figcaption>An illustration of a rough wiring (left) and its corresponding Fritzing schematic (right).</figcaption>
+</figure>
+</div>
+</section>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references">References</h3>
+<ul>
+<li>[esp32_webserver_tutorial] https://randomnerdtutorials.com/esp32-web-server-arduino-ide/</li>
+<li>[official_esp32_documentation] https://docs.espressif.com/projects/arduino-esp32/en/latest/index.html</li>
+<li>[Arduino_IDE] https://www.arduino.cc/en/software</li>
+<li>[IDE_esp32_link] https://espressif.github.io/arduino-esp32/package_esp32_index.json</li>
+<li>[bootloader] https://docs.arduino.cc/retired/hacking/software/Bootloader/</li>
+<li>[adafruit_veml7700] https://learn.adafruit.com/adafruit-veml7700</li>
+<li>[veml7700_pinout] https://learn.adafruit.com/adafruit-veml7700/pinouts</li>
+<li>[veml7700_wiring] https://learn.adafruit.com/adafruit-veml7700/arduino</li>
+<li>[veml7700_information] https://learn.adafruit.com/adafruit-veml7700/adjusting-for-different-light-levels</li>
+<li>[esp32-ap-webserver] https://randomnerdtutorials.com/esp32-access-point-ap-web-server/</li>
+</ul>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
