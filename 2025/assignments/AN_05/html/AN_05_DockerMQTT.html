@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Julien Nembrini">
+<meta name="dcterms.date" content="2025-10-16">
+<meta name="keywords" content="Human-IST, ProtoFab, LearningLab, UniFR">
+
+<title>Raspberry Pi, containers &amp; MQTT</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="AN_05_DockerMQTT_files/libs/clipboard/clipboard.min.js"></script>
+<script src="AN_05_DockerMQTT_files/libs/quarto-html/quarto.js"></script>
+<script src="AN_05_DockerMQTT_files/libs/quarto-html/popper.min.js"></script>
+<script src="AN_05_DockerMQTT_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="AN_05_DockerMQTT_files/libs/quarto-html/anchor.min.js"></script>
+<link href="AN_05_DockerMQTT_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="AN_05_DockerMQTT_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="AN_05_DockerMQTT_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="AN_05_DockerMQTT_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="AN_05_DockerMQTT_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#protofab-assignment-5-raspberry-pi-containers-mqtt" id="toc-protofab-assignment-5-raspberry-pi-containers-mqtt" class="nav-link active" data-scroll-target="#protofab-assignment-5-raspberry-pi-containers-mqtt">ProtoFab assignment 5: Raspberry Pi, containers &amp; MQTT</a>
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#task-1-configure-your-raspberry-pi-zero-w-and-ssh-into-it" id="toc-task-1-configure-your-raspberry-pi-zero-w-and-ssh-into-it" class="nav-link" data-scroll-target="#task-1-configure-your-raspberry-pi-zero-w-and-ssh-into-it">Task 1 – Configure your raspberry Pi zero W and ssh into it</a>
+  <ul class="collapse">
+  <li><a href="#download-and-setup-the-image" id="toc-download-and-setup-the-image" class="nav-link" data-scroll-target="#download-and-setup-the-image">Download and setup the image</a></li>
+  <li><a href="#boot-the-raspi" id="toc-boot-the-raspi" class="nav-link" data-scroll-target="#boot-the-raspi">Boot the RasPi</a></li>
+  <li><a href="#log-onto-your-raspi" id="toc-log-onto-your-raspi" class="nav-link" data-scroll-target="#log-onto-your-raspi">Log onto your RasPi</a></li>
+  </ul></li>
+  <li><a href="#task-2-configure-an-mqtt-broker-container-and-test-it" id="toc-task-2-configure-an-mqtt-broker-container-and-test-it" class="nav-link" data-scroll-target="#task-2-configure-an-mqtt-broker-container-and-test-it">Task 2 – Configure an MQTT broker container and test it</a>
+  <ul class="collapse">
+  <li><a href="#configure-and-start-the-mqtt-broker" id="toc-configure-and-start-the-mqtt-broker" class="nav-link" data-scroll-target="#configure-and-start-the-mqtt-broker">Configure and start the MQTT broker</a></li>
+  <li><a href="#test-the-mqtt-broker" id="toc-test-the-mqtt-broker" class="nav-link" data-scroll-target="#test-the-mqtt-broker">Test the MQTT broker</a></li>
+  <li><a href="#optional-more-secure-mqtt-broker" id="toc-optional-more-secure-mqtt-broker" class="nav-link" data-scroll-target="#optional-more-secure-mqtt-broker">[optional] More secure MQTT broker</a></li>
+  <li><a href="#code-links" id="toc-code-links" class="nav-link" data-scroll-target="#code-links">Code links</a></li>
+  </ul></li>
+  <li><a href="#task-3-publish-sensor-values-from-arduino-to-mqtt" id="toc-task-3-publish-sensor-values-from-arduino-to-mqtt" class="nav-link" data-scroll-target="#task-3-publish-sensor-values-from-arduino-to-mqtt">Task 3 – Publish sensor values from arduino to MQTT</a>
+  <ul class="collapse">
+  <li><a href="#optional-further-work" id="toc-optional-further-work" class="nav-link" data-scroll-target="#optional-further-work">[optional] Further work</a></li>
+  <li><a href="#code-link" id="toc-code-link" class="nav-link" data-scroll-target="#code-link">Code link</a></li>
+  </ul></li>
+  <li><a href="#task-4-start-multiple-containers-to-store-and-serve-sensor-values" id="toc-task-4-start-multiple-containers-to-store-and-serve-sensor-values" class="nav-link" data-scroll-target="#task-4-start-multiple-containers-to-store-and-serve-sensor-values">Task 4 – Start multiple containers to store and serve sensor values</a>
+  <ul class="collapse">
+  <li><a href="#optional-further-work-1" id="toc-optional-further-work-1" class="nav-link" data-scroll-target="#optional-further-work-1">[optional] Further work</a></li>
+  <li><a href="#code-links-1" id="toc-code-links-1" class="nav-link" data-scroll-target="#code-links-1">Code links</a></li>
+  </ul></li>
+  <li><a href="#task-5-make-docker-compose-start-when-booting-the-raspberry-pi" id="toc-task-5-make-docker-compose-start-when-booting-the-raspberry-pi" class="nav-link" data-scroll-target="#task-5-make-docker-compose-start-when-booting-the-raspberry-pi">Task 5 – Make docker compose start when booting the raspberry Pi</a></li>
+  <li><a href="#task-6-optional-setup-your-raspberry-pi-zero-w-from-scratch" id="toc-task-6-optional-setup-your-raspberry-pi-zero-w-from-scratch" class="nav-link" data-scroll-target="#task-6-optional-setup-your-raspberry-pi-zero-w-from-scratch">Task 6 – [optional] Setup your Raspberry Pi zero W from scratch</a>
+  <ul class="collapse">
+  <li><a href="#contact-information" id="toc-contact-information" class="nav-link" data-scroll-target="#contact-information">Contact information</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="../../AN_05_DockerMQTT.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Raspberry Pi, containers &amp; MQTT</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Julien Nembrini </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 16, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+<div>
+  <div class="keywords">
+    <div class="block-title">Keywords</div>
+    <p>Human-IST, ProtoFab, LearningLab, UniFR</p>
+  </div>
+</div>
+
+</header>
+
+
+<section id="protofab-assignment-5-raspberry-pi-containers-mqtt" class="level1">
+<h1>ProtoFab assignment 5: Raspberry Pi, containers &amp; MQTT</h1>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This practical work focuses on learning to set up a raspberry Pi and run docker containers on it. Each task consists of applying some basic (terminal) commands to illustrate usage and then some actions or coding from your side. Note that Task 4 is the only task where you will have to develop on your own!</p>
+<p>In this practical work, you will perform the following tasks:</p>
+<ul>
+<li><strong>Task 1</strong> – Configure your raspberry Pi zero W and ssh into it</li>
+<li><strong>Task 2</strong> – Configure an MQTT broker container and test it</li>
+<li><strong>Task 3</strong> – Publish sensor values from arduino to MQTT</li>
+<li><strong>Task 4</strong> – Start multiple containers to store and serve sensor values</li>
+<li><strong>Task 5</strong> – Make docker compose start when booting the raspberry Pi</li>
+<li><strong>Task 6</strong> – [optional] Setup your Raspberry Pi zero W from scratch</li>
+</ul>
+<p><strong>Learning objectives:</strong></p>
+<p>At the end of the assignment, you should be able to</p>
+<ul>
+<li>Set up a raspberry Pi</li>
+<li>Work with docker-compose</li>
+<li>Test an MQTT broker with standard tools</li>
+<li>Set up a lightweight REST api with Flask</li>
+<li>Understand the linux startup processes and add to it</li>
+</ul>
+<p>The aim is to have a web service using MQTT up and running at startup, e.g.&nbsp;when you plug the rasberry Pi W.</p>
+</section>
+<section id="task-1-configure-your-raspberry-pi-zero-w-and-ssh-into-it" class="level2">
+<h2 class="anchored" data-anchor-id="task-1-configure-your-raspberry-pi-zero-w-and-ssh-into-it">Task 1 – Configure your raspberry Pi zero W and ssh into it</h2>
+<section id="download-and-setup-the-image" class="level3">
+<h3 class="anchored" data-anchor-id="download-and-setup-the-image">Download and setup the image</h3>
+<ol type="1">
+<li><p>Download the provided image with docker pre-installed</p>
+<p><a href="https://drive.switch.ch/index.php/s/85bWV33of7H0KR6">32 Gb download link</a> &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <a href="https://drive.switch.ch/index.php/s/Mu4YrNlGz8iFXPn">64 Gb download link</a></p>
+<p>These image have been created following step 6 below. As it takes some time, we provide them and you only need to modify a few settings (otherwise we will have 10 Pis with the same hostname on the network). Note that these images have been created with 32 and 64 Gb cards, and may not work on other cards.</p>
+<p><em>username/pwd</em>: protofab</p></li>
+<li><p>Flash the microSD card through the imager</p>
+<ul>
+<li>Open the imager</li>
+<li>Choose the RasPi zero W device</li>
+<li>select the custom image you downloaded as operating system</li>
+<li>choose the SD card as storage</li>
+<li>click next and no (for not applying the settings) to burn the image on the SD card (it takes time)</li>
+</ul></li>
+<li><p>Mount the image on your computer: unplug and replug the SD card</p></li>
+<li><p>Modify the hostname by editting the files [rootfs]/etc/hostname and [rootfs]/etc/hosts. Replace “raspi” with “profab<robot number=""><your initials="">” (no underscores) such that we can differentiate them easily on the network. Save the files and eject the SD card</your></robot></p></li>
+<li><p>Plug the SD card on your RasPi and boot. You will find your RasPi using its new hostname</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ping profab&lt;robot number&gt;&lt;your initials&gt;.local</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>[optional ] Connect to another wifi</p>
+<ul>
+<li>The wifi is configured to connect to the lab’s wifi. If you want to connect to another wifi (e.g.&nbsp;your mobile hotspot), ssh on the RasPi and scan the wifis available using nmcli (network manager CLI)</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo nmcli dev wifi</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>modify the name and priority of the profab wifi</li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo nmcli connection modify preconfigured connection.id ProFab connection.autoconnect-priority 4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>connect the RasPi to your mobile hotspot</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo nmcli connection add con-name hotspot type wifi ssid "yourhotspotssid" wifi-sec.key-mgmt wpa-psk wifi-sec.psk "yourhotspotpasswd" connection.autoconnect-priority 5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>check that the configuration indeed happened</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] ls -alF /etc/NetworkManager/system-connections/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>It will now remember the network and automatically connect to the one available. See this <a href="https://wimsworld.wordpress.com/2024/02/22/raspberry-pi-os-and-multiple-wifi-configurations/">link</a> for additional information.</li>
+</ul></li>
+</ol>
+</section>
+<section id="boot-the-raspi" class="level3">
+<h3 class="anchored" data-anchor-id="boot-the-raspi">Boot the RasPi</h3>
+<ol type="1">
+<li><p>Put the image on the RasPi and connect it to the power socket. Careful there are 2 mini-USB connectors: one for USB, one for power (PWR). The latter is the right one.</p></li>
+<li><p>Wait a long time…. 2-3 minutes</p></li>
+<li><p>log on your RasPi (see below). Check if your RasPi is on the network, using the hostname defined above (make sure your computer is on the ProFab wifi…).</p></li>
+</ol>
+</section>
+<section id="log-onto-your-raspi" class="level3">
+<h3 class="anchored" data-anchor-id="log-onto-your-raspi">Log onto your RasPi</h3>
+<ol type="1">
+<li><p>There are 2 options to ssh on your RasPi</p>
+<ol type="1">
+<li>use the “yourhostname”.local address</li>
+<li>find your RasPi ip (see below)</li>
+</ol>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ssh protofab@yourhostname.local</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ssh protofab@192.168.1.xxx</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>find your own ip</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ip addr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>find all devices on your network (change ip as needed)</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] fping -gaq -r 0 192.168.1.0/24</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><p>On the profab wifi, 192.168.1.1 is the access point.</p></li>
+<li><p>On windows the powershell is faster to find the RasPi by hostname.</p></li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ping -4 yourhostname.local</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><a href="https://www.raspberrypi.com/documentation/computers/remote-access.html#remote-access">more info</a></p></li>
+</ol>
+</section>
+</section>
+<section id="task-2-configure-an-mqtt-broker-container-and-test-it" class="level2">
+<h2 class="anchored" data-anchor-id="task-2-configure-an-mqtt-broker-container-and-test-it">Task 2 – Configure an MQTT broker container and test it</h2>
+<section id="configure-and-start-the-mqtt-broker" class="level3">
+<h3 class="anchored" data-anchor-id="configure-and-start-the-mqtt-broker">Configure and start the MQTT broker</h3>
+<ol type="1">
+<li><p>Create a folder for the task, cd into it, and edit the docker-compose.yml file</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] nano docker-compose.yml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here is the configuration you will use</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="st">'3.3'</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">services</span><span class="kw">:</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">mqttbroker</span><span class="kw">:</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">hostname</span><span class="kw">:</span><span class="at"> mosquitto</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> eclipse-mosquitto:latest</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">restart</span><span class="kw">:</span><span class="at"> always</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">volumes</span><span class="kw">:</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> ./mqtt_broker/mosquitto.conf:/mosquitto/config/mosquitto.conf</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> ./mqtt_broker/mosquitto.passwd:/mosquitto/config/mosquitto.passwd</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> ./mqtt_broker/log/mosquitto.log:/mosquitto/log/mosquitto.log</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> ./mqtt_broker/data:/mosquitto/data</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> 1883:1883</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">privileged</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>create a “mqtt_broker” folder, cd into it and edit the configuration file (note the commented-out options)</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] nano mosquitto.conf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#pid_file /var/run/mosquitto.pid</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="at">persistence false</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#persistence_location /mosquitto/data/</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#log_dest file /mosquitto/log/mosquitto.log</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="at">log_dest stdout</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">#password_file /mosquitto/config/mosquitto.passwd</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="at">allow_anonymous true</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="at">listener 1883</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>cd back to your task folder and start the docker container</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker compose up -d mqttbroker</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+</section>
+<section id="test-the-mqtt-broker" class="level3">
+<h3 class="anchored" data-anchor-id="test-the-mqtt-broker">Test the MQTT broker</h3>
+<ol type="1">
+<li><p>install the mosquitto clients on your machine</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] sudo apt install mosquitto-clients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>open a terminal and subscribe to a test topic</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] mosquitto_sub -h &lt;yourhostname&gt;.local -p 1883 -t "testtopic"</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>open a second terminal and publish to the same topic</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] mosquitto_pub -h &lt;yourhostname&gt;.local -p 1883 -t "testtopic" -m "test message"</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>you should see the message appear in the first terminal. This message has been sent to the RasPi MQTT broker which took the care to distribute it to the subscribers. Important: the broker is not secure!</p></li>
+</ol>
+</section>
+<section id="optional-more-secure-mqtt-broker" class="level3">
+<h3 class="anchored" data-anchor-id="optional-more-secure-mqtt-broker">[optional] More secure MQTT broker</h3>
+<p>Change the MQTT broker configuration to make the broker more secure</p>
+<ol type="1">
+<li><p>Configure username/password with the “mosquitto_passwd” command. This command is in the mosquitto package.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo apt install mosquitto</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>note that this will by default start a mosquitto server at boot. You will have to disable it using systemd to make sure that the port 1883 does not clash with the container. <a href="http://www.steves-internet-guide.com/mqtt-username-password-example/">more info</a> </p></li>
+<li><p>Use a dedicated self-signed certificate: this certificate will need to be locally available to all clients. <a href="https://medium.com/gravio-edge-iot-platform/how-to-set-up-a-mosquitto-mqtt-broker-securely-using-client-certificates-82b2aaaef9c8">more info</a> </p></li>
+</ol>
+</section>
+<section id="code-links" class="level3">
+<h3 class="anchored" data-anchor-id="code-links">Code links</h3>
+<ul>
+<li><p>docker compose definition <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/docker-compose.yml">docker-compose.yml</a></p></li>
+<li><p>MQTT broker <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/mqtt_broker/mosquitto.conf">mosquitto.conf</a></p></li>
+</ul>
+</section>
+</section>
+<section id="task-3-publish-sensor-values-from-arduino-to-mqtt" class="level2">
+<h2 class="anchored" data-anchor-id="task-3-publish-sensor-values-from-arduino-to-mqtt">Task 3 – Publish sensor values from arduino to MQTT</h2>
+<ol type="1">
+<li><p>Open the arduino IDE</p></li>
+<li><p>Install the PubSubClient arduino library</p></li>
+<li><p>Make your arduino MQTT-enabled using the PubSub library. The whole code is available on <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/wifi_veml7700_raspi_mqtt/wifi_veml7700_raspi_mqtt.ino">github</a> and at the end of this document</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#include &lt;PubSubClient.h&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="op">/*</span> Put your MQTT broker credentials <span class="op">*/</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>const char<span class="op">*</span> mqttServer <span class="op">=</span> <span class="st">"yourhostname.local"</span><span class="op">;</span> <span class="op">//</span> <span class="op">&lt;------</span> CHANGE HERE</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>const <span class="bu">int</span> mqttPort <span class="op">=</span> <span class="dv">1883</span><span class="op">;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>const char<span class="op">*</span> mqttTopic <span class="op">=</span> <span class="st">"esp32/lux"</span><span class="op">;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>WiFiClient wlanClient<span class="op">;</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>PubSubClient client(wlanClient)<span class="op">;</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="op">/*</span> MQTT setup <span class="op">*/</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>client.setServer(mqttServer, mqttPort)<span class="op">;</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> (<span class="op">!</span>client.connected()) {</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    Serial.println(<span class="st">"Connecting to MQTT..."</span>)<span class="op">;</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">//</span><span class="cf">if</span> (client.<span class="ex">connect</span>(<span class="st">"ESP32Client"</span>, mqttUser, mqttPassword )) {</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (client.<span class="ex">connect</span>(<span class="st">"ESP32Client"</span>)) {</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>        Serial.println(<span class="st">"connected"</span>)<span class="op">;</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>        Serial.<span class="bu">print</span>(<span class="st">"failed with state "</span>)<span class="op">;</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>        Serial.println(client.state())<span class="op">;</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>        delay(<span class="dv">2000</span>)<span class="op">;</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>}  </span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>char currentValue[<span class="dv">10</span>]<span class="op">;</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>void loop(void){</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (millis()<span class="op">%</span><span class="dv">2000</span> <span class="op">&lt;</span> <span class="dv">10</span>) {</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">float</span> luxValue <span class="op">=</span> veml.readLux(VEML_LUX_AUTO)<span class="op">;</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>        dtostrf(luxValue, <span class="dv">2</span>, <span class="dv">2</span>, currentValue)<span class="op">;</span></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>        Serial.<span class="bu">print</span>(<span class="st">"reading lux sensor: "</span>)<span class="op">;</span> Serial.println(currentValue)<span class="op">;</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>        client.publish(mqttTopic, currentValue)<span class="op">;</span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>        LEDstatus <span class="op">=</span> <span class="op">!</span>LEDstatus<span class="op">;</span></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>compile and flash your code on the arduino, reset it.</p></li>
+<li><p>Start a terminal on your computer and subscribe to the “esp32/lux” topic.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] mosquitto_sub -h yourhostname.local -p 1883 -t "esp32/lux"</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+<section id="optional-further-work" class="level3">
+<h3 class="anchored" data-anchor-id="optional-further-work">[optional] Further work</h3>
+<ol type="1">
+<li><p>Add username and password to your arduino publisher. <a href="http://www.steves-internet-guide.com/mqtt-username-password-example/">more info</a> </p></li>
+<li><p>Do some “edge computing” on your arduino by computing simple statistics of the sensor values, and publish them on different MQTT topics</p></li>
+</ol>
+</section>
+<section id="code-link" class="level3">
+<h3 class="anchored" data-anchor-id="code-link">Code link</h3>
+<ul>
+<li>ESP32 arduino <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/wifi_veml7700_raspi_mqtt/wifi_veml7700_raspi_mqtt.ino">code</a></li>
+</ul>
+</section>
+</section>
+<section id="task-4-start-multiple-containers-to-store-and-serve-sensor-values" class="level2">
+<h2 class="anchored" data-anchor-id="task-4-start-multiple-containers-to-store-and-serve-sensor-values">Task 4 – Start multiple containers to store and serve sensor values</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/container_arch.png" class="img-fluid figure-img" style="width:80.0%" data-margin="auto"></p>
+<figcaption>Container system architecture</figcaption>
+</figure>
+</div>
+<ol type="1">
+<li><p><strong>Copy the files</strong>: Get the files from <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/AN_05_code.zip">github</a>, unzip it on your machine, and copy them from your local folder to your pi using scp (address name example)</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] scp -r ./data* docker* mqtt* protofab@&lt;yourhostname&gt;.local:/home/protofab/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] scp -r ./data* docker* mqtt* protofab@192.168.1.xxx:/home/protofab/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Here is the file structure of the whole project after it has run once (creating the mosquitto logs).</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/tree.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>Example containerization file structure</figcaption>
+</figure>
+</div></li>
+<li><p><strong>Data recorder</strong>: Open the file <a href="https://github.com/nembrinj/protofablab/blob/main/2024/assignments/AN_05/data_recorder/data_recorder.py">data_recorder.py</a> and change the MQTT borker ip address to point to your pi. Use only the ip version as localhost raises a CORS error in the browser.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] nano data_recorder/data_recorder.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>mqttServer <span class="op">=</span> <span class="st">"192.168.1.xxx"</span>  <span class="co"># &lt;------ CHANGE HERE</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>mqttPort <span class="op">=</span> <span class="dv">1883</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">#mqttUser = "mqttuser";</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co">#mqttPassword = "password";</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>mqttTopic <span class="op">=</span> <span class="st">"esp32/lux"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>study the function on_messsage(): it mainly stores incoming data into a .csv file</li>
+</ul>
+<div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> on_message(client, userdata, msg):</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    lux <span class="op">=</span> <span class="bu">str</span>(msg.payload.decode(<span class="st">"utf-8"</span>))</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    timestr <span class="op">=</span> time.strftime(<span class="st">"%Y_%m_</span><span class="sc">%d</span><span class="st">-%H_%M_%S"</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    columns <span class="op">=</span> [<span class="st">"datetime"</span>, <span class="st">"lux"</span>]</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># store values</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    FILE_PATH <span class="op">=</span> Path(<span class="st">'data/illuminance.csv'</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> FILE_PATH.exists():</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> <span class="bu">open</span>(FILE_PATH, <span class="st">'w'</span>, newline<span class="op">=</span><span class="st">''</span>) <span class="im">as</span> csv_file:</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>            csv_file_writer <span class="op">=</span> csv.writer(csv_file)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>            csv_file_writer.writerow(columns)</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(FILE_PATH, <span class="st">'a'</span>, newline<span class="op">=</span><span class="st">''</span>) <span class="im">as</span> csv_file:</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>        csv_file_append <span class="op">=</span> csv.writer(csv_file)</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>        csv_file_append.writerow([timestr,lux])</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># save current value</span></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    FILE_PATH <span class="op">=</span> Path(<span class="st">'data/current'</span>)</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(FILE_PATH, <span class="st">'w'</span>, newline<span class="op">=</span><span class="st">''</span>) <span class="im">as</span> current:</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>            current.write(lux)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>This python file uses the paho-mqtt library. The library needs to be installed when building the docker image (data_recorder/Dockerfile):</li>
+</ul>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#FROM python:3</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> arm32v6/python:3.9.14-alpine3.15</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="ex">WORKDIR</span> /usr/src/app</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> mkdir data</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> pip install <span class="at">--no-cache-dir</span> paho-mqtt </span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> . .</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="ex">CMD</span> [ <span class="st">"python"</span>, <span class="st">"./data_recorder.py"</span> ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Note in the docker file the working and data directories that match with the docker-compose.yml file</li>
+</ul>
+<div class="sourceCode" id="cb28"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">data_recorder</span><span class="kw">:</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">build</span><span class="kw">:</span><span class="at"> data_recorder</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> profab_recorder:latest</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">environment</span><span class="kw">:</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> TZ=Europe/Berlin</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">restart</span><span class="kw">:</span><span class="at"> always</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">network_mode</span><span class="kw">:</span><span class="at"> host</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">volumes</span><span class="kw">:</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> data_volume:/usr/src/app/data  </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>Simple flask server</strong> Open the file <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/data_server/data_server.py">data_server.py</a>.</p>
+<ul>
+<li>It defines 3 routes: index, analysis and current. The first two return a template, while the third is used in the index.html to provide the current data value.</li>
+</ul>
+<div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">'/analysis'</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> analysis_page():</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Analysis page."""</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    m,s,mi,ma <span class="op">=</span> analyze_lux_data()</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">'analysis.html'</span>, values <span class="op">=</span> [m,s,mi,ma])</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">'/'</span>)</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> index():</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""current lux reading page"""</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">'index.html'</span>)</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">'/current'</span>)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> current():</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    current <span class="op">=</span> <span class="st">'none'</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(<span class="st">'data/current'</span>) <span class="im">as</span> f:</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>        current <span class="op">=</span> f.readline()</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> make_response(current, <span class="dv">200</span>)</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>    response.mimetype <span class="op">=</span> <span class="st">"text/plain"</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>    response.headers.add(<span class="st">'Access-Control-Allow-Origin'</span>, <span class="st">'*'</span>)</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> response</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">'/lastreading'</span>)</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lastreading():</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> time.ctime(os.path.getmtime(<span class="st">'data/illuminance.csv'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>The function analyze_lux_data() is a simple computation example. The use of pandas on the RasPi Zero requires a non-trivial installation process.</li>
+</ul>
+<div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> analyze_lux_data() :</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">"""simple data analysis without pandas"""</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>_min <span class="op">=</span> <span class="fl">1000000.0</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>_max <span class="op">=</span> <span class="op">-</span><span class="fl">1.0</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'data/illuminance.csv'</span>) <span class="im">as</span> csv_file:</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    csv_reader <span class="op">=</span> csv.reader(csv_file, delimiter<span class="op">=</span><span class="st">','</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    tmp <span class="op">=</span> []</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> row <span class="kw">in</span> csv_reader:</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> row[<span class="dv">1</span>]<span class="op">==</span><span class="st">'lux'</span>:</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>        tmp.append(<span class="bu">float</span>(row[<span class="dv">1</span>]))</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>_mean <span class="op">=</span> <span class="bu">sum</span>(tmp) <span class="op">/</span> <span class="bu">len</span>(tmp)   <span class="co"># mean</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>var  <span class="op">=</span> <span class="bu">sum</span>(<span class="bu">pow</span>(x<span class="op">-</span>_mean,<span class="dv">2</span>) <span class="cf">for</span> x <span class="kw">in</span> tmp) <span class="op">/</span> <span class="bu">len</span>(tmp)  <span class="co"># variance</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>_std  <span class="op">=</span> math.sqrt(var)  <span class="co"># standard deviation</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>_max <span class="op">=</span> <span class="bu">max</span>(tmp)</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>_min <span class="op">=</span> <span class="bu">min</span>(tmp)</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> _mean,_std,_min,_max</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Again the library (here flask) needs to be installed and a port exposed (5000) (data_server/Dockerfile):</li>
+</ul>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#FROM python:3</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> arm32v6/python:3.9.14-alpine3.15</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="ex">WORKDIR</span> /usr/src/app</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> mkdir data</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> pip install <span class="at">--no-cache-dir</span> Flask</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> . .</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="ex">EXPOSE</span> 5000</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="ex">CMD</span> [ <span class="st">"python"</span>, <span class="st">"data_server.py"</span> ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Note in the docker file the same working and data directories than for the data recorder. This path is shared in the docker-compose file for the exchange of data</li>
+</ul>
+<div class="sourceCode" id="cb32"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">data_server</span><span class="kw">:</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">build</span><span class="kw">:</span><span class="at"> data_server</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> profab_server:latest</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">environment</span><span class="kw">:</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> TZ=Europe/Berlin</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">restart</span><span class="kw">:</span><span class="at"> always</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">network_mode</span><span class="kw">:</span><span class="at"> host</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"5000:5000"</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">volumes</span><span class="kw">:</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> data_volume:/usr/src/app/data   </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>The <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/data_server/templates/index.html">index.html</a> template uses the “current” route to retrieve the last value published. Change the ip as needed. (data_server/templates/index.html)</li>
+</ul>
+<div class="sourceCode" id="cb33"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span> <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"luxValue"</span><span class="dt">&gt;</span>0<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span> [lux]<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span> <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"timestamp"</span><span class="dt">&gt;</span>xx<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span> <span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">script</span><span class="dt">&gt;</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="pp">setInterval</span>(<span class="kw">function</span>() {</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Call a function repeatedly with 2 seconds interval</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">getData</span>(<span class="st">'current'</span><span class="op">,</span><span class="st">'luxValue'</span>)<span class="op">;</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">getData</span>(<span class="st">'lastreading'</span><span class="op">,</span><span class="st">'timestamp'</span>)<span class="op">;</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>}<span class="op">,</span> <span class="dv">2000</span>)<span class="op">;</span> <span class="co">//2000mSeconds update rate</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">getData</span>(route<span class="op">,</span>id) {</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">var</span> xhttp <span class="op">=</span> <span class="kw">new</span> <span class="bu">XMLHttpRequest</span>()<span class="op">;</span></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>  xhttp<span class="op">.</span><span class="at">onreadystatechange</span> <span class="op">=</span> <span class="kw">function</span>() {</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="kw">this</span><span class="op">.</span><span class="at">readyState</span> <span class="op">==</span> <span class="dv">4</span> <span class="op">&amp;&amp;</span> <span class="kw">this</span><span class="op">.</span><span class="at">status</span> <span class="op">==</span> <span class="dv">200</span>) {</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>      <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(id)<span class="op">.</span><span class="at">innerHTML</span> <span class="op">=</span></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>      <span class="kw">this</span><span class="op">.</span><span class="at">responseText</span><span class="op">;</span></span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>  }<span class="op">;</span></span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>  xhttp<span class="op">.</span><span class="fu">open</span>(<span class="st">"GET"</span><span class="op">,</span> <span class="st">"http://192.168.1.xxx:5000/"</span><span class="op">+</span>route<span class="op">,</span> <span class="kw">true</span>)<span class="op">;</span>  <span class="op">&lt;!------</span> CHANGE HERE <span class="op">--&gt;</span></span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>  xhttp<span class="op">.</span><span class="fu">send</span>()<span class="op">;</span></span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>The <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/data_server/templates/analysis.html">analysis.html</a> template uses jinja templating to display the analysis values</li>
+</ul>
+<div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>m,s,mi,ma <span class="op">=</span> analyze_lux_data()</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> render_template(<span class="st">'analysis.html'</span>, values <span class="op">=</span> [m,s,mi,ma])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h3</span><span class="dt">&gt;</span>ESP32-S3 VEML7700 lux sensor statistics<span class="dt">&lt;/</span><span class="kw">h3</span><span class="dt">&gt;&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Illuminance<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Mean<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span> {{ values[0] }} [lux]<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>STD<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span> {{ values[1] }} [lux]<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Min<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span> {{ values[2] }} [lux]<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Max<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span> {{ values[3] }} [lux]<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">br</span><span class="dt">/&gt;</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>Run the whole system</strong>: Start the whole infrastructure - except the arduino, building the images if needed (the build takes ~9’ on the RasPi zero W)</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> docker compose up <span class="at">--build</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><p>When the MQTT server is up and running, reset your esp32 to make sure it is connected to the MQTT broker</p></li>
+<li><p>With a browser on your computer, connect to <a href="http://yourhostname.local:5000">http://yourhostname.local:5000</a> or <a href="http://yourhostname.local:5000/analysis">http://yourhostname.local:5000/analysis</a>, or <a href="http://192.168.1.xxx:5000">http://192.168.1.xxx:5000</a> or <a href="http://192.168.1.xxx:5000/analysis">http://192.168.1.xxx:5000/analysis</a> to get a response from the server (running in a container)</p></li>
+<li><p>Stop all containers and remove shared volumes (this removes previously recorded data)</p></li>
+</ul>
+<div class="sourceCode" id="cb37"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> docker compose down <span class="at">-v</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>If you only want to run the data_recorder container (e.g.&nbsp;for debug)</li>
+</ul>
+<div class="sourceCode" id="cb38"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> docker compose up <span class="at">--build</span> data_recorder</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>If you experience an error when running the docker-compose, typically saying “port 1883 already in use”, this is due to the previous MQTT container of Task 2 using the port. You can check this with the command</li>
+</ul>
+<div class="sourceCode" id="cb39"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo ss <span class="at">-lptn</span> <span class="st">'sport = :1883'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>In this case you just need to stop the container (be careful to be in the right folder to use the right docker-compose.yml).</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> docker compose down <span class="at">-v</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If you installed docker on the pi, this error might also be due to the system docker deamon being started. In this case you need to use systemctl to stop it.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo systemctl stop docker.service</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Once everything works fine you may use the command below to start the whole infrastructure in one go.</li>
+</ul>
+<div class="sourceCode" id="cb42"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> docker compose up <span class="at">-d</span> <span class="at">--build</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+<section id="optional-further-work-1" class="level3">
+<h3 class="anchored" data-anchor-id="optional-further-work-1">[optional] Further work</h3>
+<ol type="1">
+<li><p>Move the simple statistics of data_server.py to the arduino (on a limited time window), publish them on new topics, and include this information on the index.html template.</p></li>
+<li><p>Include a shared network and hostnames in the docker-compose.yml file to avoid the need to change the ip addresses</p></li>
+</ol>
+</section>
+<section id="code-links-1" class="level3">
+<h3 class="anchored" data-anchor-id="code-links-1">Code links</h3>
+<ul>
+<li><p>python flask server: <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/data_server/data_server.py">data_server.py</a></p></li>
+<li><p>python flask server: <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/data_server/Dockerfile">Dockerfile</a></p></li>
+<li><p>python flask server: <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/data_server/templates/index.html">templates/index.html</a></p></li>
+<li><p>python flask server: <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/data_server/templates/analysis.html">templates/index.html</a></p></li>
+<li><p>python data recorder: <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/data_recorder/data_recorder.py">data_recorder.py</a></p></li>
+<li><p>python data recorder: <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/data_recorder/Dockerfile">Dockerfile</a></p></li>
+</ul>
+</section>
+</section>
+<section id="task-5-make-docker-compose-start-when-booting-the-raspberry-pi" class="level2">
+<h2 class="anchored" data-anchor-id="task-5-make-docker-compose-start-when-booting-the-raspberry-pi">Task 5 – Make docker compose start when booting the raspberry Pi</h2>
+<ol type="1">
+<li><p>in your working directory of Task 4, modify the line of the <a href="https://github.com/nembrinj/protofablab/blob/main/2025/assignments/AN_05/docker_compose_app.service">systemd service file</a> to point to your docker-compose.yml directory</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/systemd/system/docker_compose_app.service</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[Unit]</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="va">Description</span><span class="op">=</span>Docker <span class="ex">Compose</span> Application Service</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="va">Requires</span><span class="op">=</span>docker.service</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="va">After</span><span class="op">=</span>docker.service</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[Service]</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a><span class="va">Type</span><span class="op">=</span>oneshot</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="va">RemainAfterExit</span><span class="op">=</span>yes</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="va">WorkingDirectory</span><span class="op">=</span>/home/protofab/                </span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStart</span><span class="op">=</span>/usr/local/bin/docker <span class="ex">compose</span> up <span class="at">-d</span> <span class="at">--build</span></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStop</span><span class="op">=</span>/usr/local/bin/docker <span class="ex">compose</span> down <span class="at">-v</span></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a><span class="va">TimeoutStartSec</span><span class="op">=</span>0</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[Install]</span></span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a><span class="va">WantedBy</span><span class="op">=</span>multi-user.target</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>copy the systemd service file to the systemd folder</li>
+</ul>
+<div class="sourceCode" id="cb44"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo cp ./docker_compose_app.service /etc/systemd/system/docker_compose_app.service</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>enable the service</li>
+</ul>
+<div class="sourceCode" id="cb45"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo systemctl daemon-reload</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo systemctl enable docker_compose_app</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>you may want to disable it at some point</li>
+</ul>
+<div class="sourceCode" id="cb46"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo systemctl disable docker_compose_app</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>check if the service is running properly</li>
+</ul>
+<div class="sourceCode" id="cb47"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> systemctl status docker_compose_app.service</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo systemctl list-unit-files <span class="kw">|</span> <span class="fu">grep</span> docker_compose_app</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo systemctl restart docker_compose_app.service</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>reboot your RasPi (wait….), and with a browser on your computer connect to <a href="http://yourhostname.local:5000">http://yourhostname.local:5000</a> or <a href="http://yourhostname.local:5000/analysis">http://yourhostname.local:5000/analysis</a>, or <a href="http://192.168.1.xxx:5000">http://192.168.1.xxx:5000</a> or <a href="http://192.168.1.xxx:5000/analysis">http://192.168.1.xxx:5000/analysis</a> to get a response from the server.</li>
+</ul></li>
+</ol>
+<p>You should have now a complete system running at startup an MQTT server with several services to check data publishing and recording.</p>
+</section>
+<section id="task-6-optional-setup-your-raspberry-pi-zero-w-from-scratch" class="level2">
+<h2 class="anchored" data-anchor-id="task-6-optional-setup-your-raspberry-pi-zero-w-from-scratch">Task 6 – [optional] Setup your Raspberry Pi zero W from scratch</h2>
+<ol type="1">
+<li><p><strong>Flash the microSD card</strong>: Raspberry Pi provides Raspberry Pi OS (former raspbian) - a tailor-made linux distribution for each kind of raspberry pi</p>
+<ul>
+<li><p>Start by downloading the raspberry Pi imager and install it on your computer</p></li>
+<li><p>Open the imager:</p>
+<ul>
+<li>choose the RasPi type: “raspberry pi zero W”</li>
+<li><strong>important</strong> select the right OS version: raspberry Pi OS (other) <span class="math inline">\rightarrow</span> raspberry Pi OS lite (legacy,32-bit). We use the previous version (buster) since docker is no longer supported on RasPis zero W.</li>
+<li>introduce the microSD or the microSD adpater on your computer, choose the corresponding storage (make sure it is really the SD card, since everything will be overwritten)</li>
+</ul></li>
+<li><p>You should obtain the following image</p></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/raspi_OSconfig_imager.png" class="img-fluid figure-img" style="width:40.0%" data-margin="auto"></p>
+<figcaption>Raspberry Pi imager settings</figcaption>
+</figure>
+</div>
+<ul>
+<li>Press “NEXT” and “EDIT SETTINGS” to configure the OS: set up (a unique) hostname, locale, ssh username &amp; password, and wifi (ssid:“ProFab”, password:“1700_UniFR.&amp;”). Change the wifi credentials if you are not in the LearningLab</li>
+</ul>
+<p><img src="img/raspi_OSconfig_settings.png" class="img-fluid" style="width:32.0%" data-margin="auto" alt="Raspberry Pi imager settings"> <img src="img/raspi_OSconfig_ssh.png" class="img-fluid" style="width:32.0%" data-margin="auto" alt="Raspberry Pi imager settings"> <img src="img/raspi_OSconfig_save.png" class="img-fluid" style="width:32.0%" data-margin="auto" alt="Raspberry Pi imager settings"></p>
+<ul>
+<li>Save the settings, and choose “Yes” to apply them. Then flash the image on the SD card (this will overwrite any data on it)</li>
+</ul></li>
+<li><p>Boot the RasPi and log on</p>
+<ul>
+<li><p>Put the image on the RasPi and connect it to the power socket. Careful there are 2 mini-USB connectors: one for USB, one for power (PWR). The latter is the right one.</p></li>
+<li><p>Wait a long time…. 2-3 minutes</p></li>
+<li><p>Check if your RasPi is on the network (see Task 1), using the hostname or fping (make sure your computer is on the ProFab wifi…).</p></li>
+<li><p>Log onto your raspi with ssh using the username &amp; password provided during configuration</p></li>
+<li><p>you have now an up-and-running RasPi with linux!</p></li>
+<li><p>update your software when you have something else to do as this may take some time (20-30 minutes depending on how many security updates there has been since the image release). The RasPI Zero is a <em>low performance</em> computer…</p></li>
+</ul>
+<div class="sourceCode" id="cb48"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo apt update </span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo apt upgrade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Install docker</p>
+<ul>
+<li>ssh into your pi and install docker by getting the install script and running it</li>
+</ul>
+<div class="sourceCode" id="cb49"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo curl -sL https://get.docker.com | bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>add the current user to the docker group, and check if it is set</li>
+</ul>
+<div class="sourceCode" id="cb50"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo usermod -aG docker ${USER}</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>[pi-terminal] groups ${USER}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>reboot and check docker</li>
+</ul>
+<div class="sourceCode" id="cb51"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker version</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker info</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker run --rm hello-world</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>docker-compose is installed with docker. test it with</li>
+</ul>
+<div class="sourceCode" id="cb52"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker compose version</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<!--\scriptsize Source (not 100% accurate): [install docker-compose on raspi](https://dev.to/elalemanyo/how-to-install-docker-and-docker-compose-on-raspberry-pi-1mo)
+
+\normalsize--></li>
+<li><p>make an image of your RasPi</p>
+<ul>
+<li><p>Power down the pi, remove the SD card and plug it in back to your computer</p></li>
+<li><p>If you are on linux (or mac), identify the SD card using</p></li>
+</ul>
+<div class="sourceCode" id="cb53"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[localpc-terminal]</span> lsblk</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[localpc-terminal]</span> df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The card should have the form /media/user/sda or sdb</p>
+<ul>
+<li>Backup your pi system using (in this case your SD card is sda)</li>
+</ul>
+<div class="sourceCode" id="cb55"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dd if=/dev/sda status=progress conv=fsync bs=4M <span class="kw">|</span> <span class="fu">gzip</span> <span class="op">&gt;</span> /home/<span class="op">&lt;</span>user<span class="op">&gt;</span>/protofab_pi_backup.gz </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Compressing is needed to avoid huge files, also the system is fresh and should not take much space on the card. If you are on another platform see this <a href="https://thelinuxcode.com/back-up-raspberry-pi-sd-card/">link</a>.</p>
+<p>You can the use the imager to burn a clone of your system on another SD card with the “Use custom” option.</p></li>
+</ol>
+<section id="contact-information" class="level3">
+<h3 class="anchored" data-anchor-id="contact-information">Contact information</h3>
+<ul>
+<li>Dr.&nbsp;Simon Ruffieux, <a href="mailto:simon.ruffieux@unifr.ch">simon.ruffieux@unifr.ch</a></li>
+<li>Dr.&nbsp;Julien Nembrini, <a href="mailto:julien.nembrini@unifr.ch">julien.nembrini@unifr.ch</a></li>
+</ul>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
