@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Simon Ruffieux">
+<meta name="dcterms.date" content="2025-10-23">
+<meta name="keywords" content="Human-IST, ProtoFab, LearningLab, UniFR">
+
+<title>Introduction to Node-RED</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="AN_06_NodeRED_files/libs/clipboard/clipboard.min.js"></script>
+<script src="AN_06_NodeRED_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="AN_06_NodeRED_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="AN_06_NodeRED_files/libs/quarto-html/popper.min.js"></script>
+<script src="AN_06_NodeRED_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="AN_06_NodeRED_files/libs/quarto-html/anchor.min.js"></script>
+<link href="AN_06_NodeRED_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="AN_06_NodeRED_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="AN_06_NodeRED_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="AN_06_NodeRED_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="AN_06_NodeRED_files/libs/bootstrap/bootstrap-e45286ae55112de182af3b94459e1a1c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="..\..\..\AN_06_NodeRED.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Introduction to Node-RED</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Simon Ruffieux </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 23, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+<div>
+  <div class="keywords">
+    <div class="block-title">Keywords</div>
+    <p>Human-IST, ProtoFab, LearningLab, UniFR</p>
+  </div>
+</div>
+
+</header>
+
+
+<section id="protofab-assignment-6-introduction-to-node-red" class="level1">
+<h1>ProtoFab assignment 6: Introduction to Node-RED</h1>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This practical work focuses on learning the basics concepts of Node-RED</p>
+<p>In this practical work, you will perform the following tasks:</p>
+<ul>
+<li><p><strong>Task 1</strong> – Install Node-RED</p></li>
+<li><p><strong>Task 2</strong> – A first Node-RED dashboard</p></li>
+<li><p><strong>Task 3</strong> – A dashboard to control ROS your Turtlebot3 (simulation and real robot)</p></li>
+<li><p><strong>Task 4</strong> – [OPTIONAL] A dashboard to monitor your Arduino luxmeter (remote)</p></li>
+</ul>
+<p><strong><u>Learning objectives:</u></strong></p>
+<p>At the end of the assignment, you should be able to</p>
+<ul>
+<li><p>Know the basics of Node-RED IDE</p></li>
+<li><p>Know how to program and deploy a dashboard</p></li>
+<li><p>Know how to communicate with local ROS nodes</p></li>
+</ul>
+</section>
+<section id="pre-requisites" class="level2">
+<h2 class="anchored" data-anchor-id="pre-requisites">Pre-requisites</h2>
+<ul>
+<li><p>IDE for Arduino installed on your machine</p></li>
+<li><p>Node-RED installed on your machine (Linux). See Task 1 for instructions.</p>
+<ul>
+<li>Windows - Please install it on your Linux WSL machine (where ROS is also installed)</li>
+</ul></li>
+<li><p>[For the optional task] Notions seen in the assignment AN04</p>
+<ul>
+<li>The ESP32 circuit with the luxmeter (see AN_04)</li>
+</ul></li>
+<li><p>Notions seen in the lecture LN06</p></li>
+</ul>
+</section>
+<section id="hints" class="level2">
+<h2 class="anchored" data-anchor-id="hints">Hints</h2>
+<ul>
+<li><p>When starting Node-RED, all flows are also started. This might create some problems when your flows are connecting to unavailable nodes; typically, when connecting to <em>rosbridge</em> or <em>external servers</em>. You can use the command below to start Node-RED without deploying flows.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>$ node-red --safe</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
+</section>
+<section id="tasks" class="level2">
+<h2 class="anchored" data-anchor-id="tasks">Tasks</h2>
+<section id="task-1-install-node-red" class="level3">
+<h3 class="anchored" data-anchor-id="task-1-install-node-red">Task 1 – Install Node-RED</h3>
+<section id="section" class="level4">
+<h4 class="anchored" data-anchor-id="section"></h4>
+<ol type="1">
+<li><p>Follow these instructions to install node-js on your system</p>
+<ol type="a">
+<li><p><strong>For Windows (WSL Linux)</strong> Follow these instructions to install nvm, node.js, and npm on WSL2 Linux<br>
+<strong>Remark</strong>: You may install only the LTS version of node-js, to save some space on your system <a href="https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl" class="uri">https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl</a></p></li>
+<li><p><strong>For Native Linux (Ubuntu)</strong> Follow these instructions to install nvm, node.js, and npm on Ubuntu<br>
+<strong>Remark</strong>: You may install only the LTS version of node-js, to save some space on your system <a href="https://www.freecodecamp.org/news/how-to-install-node-js-on-ubuntu/" class="uri">https://www.freecodecamp.org/news/how-to-install-node-js-on-ubuntu/</a></p></li>
+</ol></li>
+<li><p>Then continue by installing Node-RED on your Ubuntu system. In a terminal, type the command below<br>
+<strong>Remark</strong>: You may potentially need to use ‘sudo’ before the command to install it as admin (was not needed in my case)</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>$ npm install -g --unsafe-perm node-red</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>You may want to add Node-RED to your path permanently (to ensure you can run it from anywhere, even after a restart)</p>
+<ol type="a">
+<li><p>In a terminal, type the command below to get the {node-red_installation_path}</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>$ npm get prefix</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Edit your “.bashrc” file and add the line below at the end of your file. Note that you need to use your own {node-red_installation_path}<br>
+<strong>Remark</strong>: Pay attention, there is an extra “/bin” after the path!</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>export PATH="{node-red_installation_path}/bin:$PATH"</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol></li>
+<li><p>Start Node-RED by typing “node-red” in your terminal</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>$ node-red</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Open the Node-Red user interface on your browser using the following url: http://127.0.0.1:1880/</p></li>
+<li><p>Note that to open the Dashboard(s) you created, you can use the url http://127.0.0.1:1880/dashboard</p></li>
+</ol>
+</section>
+<section id="for-linux-ubuntu" class="level4">
+<h4 class="anchored" data-anchor-id="for-linux-ubuntu">For Linux (Ubuntu)</h4>
+<ol type="1">
+<li><p>Follow these instructions to install node-js on Ubuntu<br>
+<strong>Remark</strong>: You can install only the LTS version of node-js, to save some space on your system</p></li>
+<li><p>Then install Node-RED on Ubuntu. In a terminal, type the command below<br>
+<strong>Remark</strong>: You may potentially need to use ‘sudo’ before the command to install it as admin</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>$ npm install -g --unsafe-perm node-red</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>You may potentially need to add Node-RED to your path (to ensure you can run it from anywhere and in new Terminals)</p>
+<ol type="a">
+<li><p>In a terminal, type the command below to get the {node-red_installation_path}</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>$ npm get prefix</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol></li>
+</ol>
+<ol start="2" type="a">
+<li><p>Edit your “.bashrc file” and add the line below at the end of your file. You need to use your own {node-red_installation_path}<br>
+<strong>Remark</strong>: Pay attention, there is an extra “/bin” after the path!</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>export PATH="{node-red_installation_path}/bin:$PATH"</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+<ol start="4" type="1">
+<li><p>Start Node-RED by typing “node-red” in a terminal</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>$ node-red</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Now open the Node-Red UI on your browser using the following url: http://127.0.0.1:1880/</p></li>
+<li><p>You should be able to see the Node-RED UI and interact with it. Note that you will be able to open the dashboards created using the following url: http://127.0.0.1:1880/dashboard</p></li>
+<li><p>Install the node-red ROS package</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>$ npm install node-red-contrib-ros</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Finally, install the ROS bridge server on your machine. This bridgle allows to connect Node-RED and ROS together. We will need it for the Task 2 of this assignment (Task 2)</p>
+<ol type="a">
+<li><p>To install rosbridge, in a terminal type</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>$ sudo apt install ros-noetic-rosbridge-server</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>You should now be able to start it using this command in a terminal</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol></li>
+</ol>
+</section>
+</section>
+<section id="task-2-a-first-node-red-dashboard" class="level3">
+<h3 class="anchored" data-anchor-id="task-2-a-first-node-red-dashboard">Task 2: A first Node-RED dashboard</h3>
+<p>As a first task, we will ensure everything is working as expected by starting node-red and creating a dummy dashboard. This dashboard will just consist in a button, an output text field and a small function to generate a random number. When clicking on the button, a new random number is generated and displayed on the text field.</p>
+<p>Let’s do the task step by step:</p>
+<ol type="1">
+<li><p>Ensure Node-RED was successfully installed. Start Node-RED and open its UI in your browser<br>
+<strong>Remark</strong>: We recommend using specific flow files for each project (below we specify a flow file name).</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>$ node-red dashboard_flows.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Install dashboard 2.0 palette</p>
+<ol type="a">
+<li><p>From the web interface, click on the menu button (the 3 horizontal lines on the top-right corner)</p></li>
+<li><p>Select “<em>manage palette</em>”.</p></li>
+<li><p>Select the “<em>install</em>” tab and search for flowfuse (see image below). Install it.</p></li>
+</ol></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image1.png" class="img-fluid figure-img" style="width:90.0%" data-margin="auto"></p>
+<figcaption>Screenshot of the Node-RED GUI when adding a new palette.</figcaption>
+</figure>
+</div>
+<ol start="3" type="1">
+<li><p>Create a new flow tab and rename it (i.e.&nbsp;“Dummy Dashboard”)<br>
+<strong>Hint</strong>: to rename it, you can double-click on its name on the top of the user interface.</p></li>
+<li><p>Add a “button” node to your new flow</p>
+<ol type="a">
+<li><p>Drag and drop a “button” node from the “dashboard 2” palette (left of user interface)</p></li>
+<li><p>Configure the button and the UI (double-click on the newly created button node)</p>
+<ol type="i">
+<li><p>You need add and configure the different parts of your UI (see figure below)<br>
+To enter the configuration of a sub-layout, click on the edit button of the current layout (see red rectangles on the figure below)<br>
+<strong>Remark</strong>: The <em>button</em> is embedded in a <em>group-ui,</em> which is embedded in a <em>page-ui</em>, which is embedded in the <em>base-ui</em> (as illustrated in the figure below).</p></li>
+<li><p>For now, you can just set a name for the different parts of your UI and keep the default values for other parameters. I still advise to have a look at the different layout options to get a sense of what can be done.</p></li>
+</ol></li>
+</ol></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image2.png" class="img-fluid figure-img" style="width:90.0%" data-margin="auto"></p>
+<figcaption>This schema illustrates how layouts are embedded. The button is contained in a group, which is contained in a page, which is contained in the base ui.</figcaption>
+</figure>
+</div>
+<ol start="5" type="1">
+<li><p>Add a “text” node to your flow to display the value</p>
+<ol type="a">
+<li><p>Drag and drop the “text” node to your flow from the dashboard 2 palette</p></li>
+<li><p>Configure the “text node (UI) (double-click on the text node)</p>
+<ol type="i">
+<li><p>Set the name to your “text” component and set its Label content.</p></li>
+<li><p>Add it to the same group, page and base UI as the previous “button” node</p></li>
+</ol></li>
+</ol></li>
+<li><p>Add a “function” node to your flow</p>
+<ol type="a">
+<li><p>Drag and drop the “function” node to your flow from the <strong>function palette</strong></p></li>
+<li><p>Edit the node to generate a random number between 0-100 (double-click on the node)</p></li>
+<li><p>You can see the javascript code below</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>msg<span class="op">.</span><span class="at">payload</span> <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">random</span>()<span class="op">*</span><span class="dv">100</span>)<span class="op">;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> msg<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol></li>
+<li><p>Connect the output of the “button” node to the input of the “function” node and connect the output of the “function” node to the input of the “text” node<br>
+<strong>Remark</strong>: You can see the final expected flow on the picture below (Note: an extra “debug” node has been added).</p></li>
+<li><p>Deploy your flow (using the button on the top-right of the UI) and open the dashboard in your browser using the address: <a href="http://127.0.0.1:1880/dashboard/" class="uri">http://127.0.0.1:1880/dashboard/</a></p>
+<ol type="a">
+<li>In your brwoser, on the left of your dashboard webpage, you can see the different pages available. Open your newly created page and test your UI.</li>
+</ol></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image3.png" class="img-fluid figure-img" style="width:90.0%" data-margin="auto"></p>
+<figcaption>Your final flow should look similar to the one displayed on the screenshot (Note that we have added an extra debug node).</figcaption>
+</figure>
+</div>
+<p><strong>A few suggestions to go further:</strong></p>
+<ul>
+<li><p>Play with the different settings and layouts for the UI nodes</p></li>
+<li><p>Also display the value using a gauge node</p></li>
+<li><p>Display the last 20 values received on a chart</p></li>
+</ul>
+</section>
+<section id="task-3---a-dashboard-to-control-your-turtlebot3-simulation" class="level3">
+<h3 class="anchored" data-anchor-id="task-3---a-dashboard-to-control-your-turtlebot3-simulation">Task 3 - A dashboard to control your Turtlebot3 (simulation)</h3>
+<p>As a second task, we will connect to a ROS topic and send commands to control the simulation of the turtlebot3 robot. The controller user interface (developed with Node-RED) will send commands to the right ROS topic. We will first develop a basic flow to test the features and then you will develop the graphical interface to send commands to the turtlebot3. It should be able to move forward (up), backward (down), rotate right (right), rotate left (left) and halt (stop).</p>
+<p>Let’s do the task step by step.</p>
+<p>Let’s start with a basic flow:</p>
+<ol type="1">
+<li><p>Start node-red with a new flow-file, specific for ROS<br>
+<strong>Remark</strong>: If you have all your flows in the same file, you might have problems when starting node-red: nodes connecting to ros bridge (i.e.&nbsp;pub and sub nodes) will yield problems when not being able to reach/connect to ROS server. In such case, just start roscore and rosbridge to let node-red start correctly.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>$ node-red ros_flows.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Create a new flow and rename it.</p></li>
+<li><p>Now add an inject node, a function node and a ros pub node; connect them sequentially (see image below).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/basic_turtlebot3_control_flow.png" class="img-fluid figure-img" style="width:80.0%" data-margin="auto"></p>
+<figcaption>Overview of a basic flow that sends Twist data to the robot</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li><p>For the “Send data” inject node, you can keep its default settings. When you click on the little grey square on its left, it will trigger the function connected to its right.</p></li>
+<li><p>For the “Twist message” function node, modify its “On Message” function looks like the code below. It creates a Twist message with a linar and angular values of 0. The payload of a JSON formatted message.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>var sent_lin_x = 0</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>var sent_ang_z = 0</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>msg.payload = {</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    linear: {</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        x: sent_lin_x,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        y: 0,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>        z: 0</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    angular: {</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        x: 0,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>        y: 0,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>        z: sent_ang_z</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>};</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>return msg;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>For the “/cmd_vel” ROS pub node, set the <em>Datatype package</em> to “geometry_msgs” and the <em>Datatype</em> to “Twist” (you must have ROS installed on your machine to be able to select those). Normally, the other the settings can be kept to default (ROS server: ws://0.0.0.0:9090 and ROS topic: /cmd_vel).</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image4.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>Configuring the IP of your ROS server within Node-RED.</figcaption>
+</figure>
+</div>
+<ol start="4" type="a">
+<li>Deploy your flow.</li>
+</ol></li>
+<li><p>We will now test the flow</p>
+<ol type="a">
+<li><p>On a terminal, start roscore and rosbridge. (Remember: roslauch automatically starts roscore if not already running).</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>On another terminal, start the gazebo simulation for your robot:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch turtlebot3_gazebo turtlebot3_world.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Now go back to your Node-RED flow UI, modify the linear (ie. 0.1) or angular (ie. 0.3) values of your Twist function, redeploy and finally click on the small grey rectangle on the left of your inject node to issue the command. You should now see the robot move in the simulation window.</p></li>
+</ol></li>
+<li><p>Close the simulation (Note: you may want to keep roscore and rosbridge running …)</p></li>
+</ol>
+<p>Now let’s develop a basic user interface to control the simulated robot.</p>
+<ol type="1">
+<li>In our proposed flow, we use “flow variables” (similar to the concept of global variable, accessible within your flow) to modify the linear and angular speed. The chosen approach will simplify the transition to the real robot for the end of the task. However, numerous other approaches could be developed. You can see the complete proposed flow on the image below (with some optional gauge visualisations …).</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image5.png" class="img-fluid figure-img" style="width:80.0%" data-margin="auto"></p>
+<figcaption>Overview of the final interface to control the Turle bot.</figcaption>
+</figure>
+</div>
+<ol start="2" type="1">
+<li><p>Create 5 buttons for your user interface (forward, left, stop, right, backward)</p>
+<ol type="a">
+<li><p>For each button, open its settings and modify its name, label and add it to the same group-ui. For the first button, you may need to create this group-ui as well as the page-ui the page; give them a name.</p></li>
+<li><p>You will need to play with the layouts to have your buttons displayed correctly, do not spend too much time on aesthetics for now. You can do that later.</p></li>
+<li><p>If desired, you can already deploy your flow to have a look at your interface (clikc on the Deploy button on the top-right of your interface and open this url http://127.0.0.1:1880/dashboard).</p></li>
+</ol></li>
+<li><p>Create a function to initialize and clean your flow variables</p>
+<ol type="a">
+<li><p>On the “On Start” and “On Stop” panels of your function, write the code provided below to initialise your variable to 0.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>flow.set("lin_x", 0)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>flow.set("ang_z", 0)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol></li>
+<li><p>Create functions for each of your buttons. Here we created 5 functions, but you could as well create a single function and do a specific operation according to the button pressed.</p>
+<ol type="a">
+<li><p>In each function, in its “On Message” panel, adapt the value of your flow variables (increase or decrease). Below is an example for the “Twist Message fwd” function. It gets the value of the flow variable</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>var linx = flow.get("lin_x") </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>flow.set("lin_x", linx + 0.05);</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>return msg;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol></li>
+<li><p>Connect the output of these functions to the “Twist Message” function.</p></li>
+<li><p>Modify the “Twist message” function</p>
+<ol type="a">
+<li>Modify the “On Message” code so that it reads the value of the flow variables before creating the Twist JSON object.</li>
+</ol></li>
+<li><p>Connect your Twist message to a “/cmd_vel” ROS pub node (you may reuse the one your used for the initial test).</p></li>
+<li><p>Start roscore and rosbridge (if not already running)</p>
+<ol type="a">
+<li><p>(if not already running) On a terminal, start roscore and rosbridge. (Remember: roslauch automatically starts roscore if not already running).</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol></li>
+<li><p>On Node-red, start the interface page. The interface should look somewhat similar to the one shown on the figure below. Note that on the interface shown below, we worked on the design to display the buttons nicely and also on two gauges to display current linear and angular speeds. You can optionnally work on that too.</p>
+<ol type="a">
+<li><p>Deploy your flow</p></li>
+<li><p>Open your dashboard (http://127.0.0.1:1880/dashboard)</p></li>
+</ol></li>
+<li><p>Test your developed controller to control the simulated Turtlebot3. You should be able to see the controller and the</p>
+<ol type="a">
+<li><p>On a terminal, start the gazebo simulation for your robot:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch turtlebot3_gazebo turtlebot3_world.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Press the button and see your simulated robot move.</p></li>
+<li><p>Once finished, close the simulation.</p></li>
+</ol></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/tbot3_interface.png" class="img-fluid figure-img" style="width:90.0%" data-margin="auto"></p>
+<figcaption>Overview of the final interface to control the Turle bot.</figcaption>
+</figure>
+</div>
+<p>Let’s modify the code to control the real robot.</p>
+<p>In simulation mode, the robot moves upon reception of a single command. The real robot requires to repeatedly receive commands to keep moving. You can test that using the current flow; the real robot will only move briefly upon every button press.</p>
+<ol type="1">
+<li><p>Add an inject node to your flow.</p>
+<ol type="a">
+<li>Configure it to send a message every 0.1 second.</li>
+</ol></li>
+<li><p>Connect this inject node to the input of your “Twist message” function.</p></li>
+<li><p>Deploy your flow. Test in simulation (it should still work as before).</p></li>
+<li><p>Modify .bashrc to use the real robot</p>
+<ol type="a">
+<li><p>Comment the two lines that export the values for the simulation</p></li>
+<li><p>Uncomment the two lines that export the values for the real robot</p></li>
+<li><p>Restart (or start) roscore and rosbridge</p></li>
+</ol></li>
+<li><p>Prepare the Real Robot</p>
+<ol type="a">
+<li><p>Make sure the real robot is in a safe spot</p></li>
+<li><p>Connect to the robot using ssh, update its bashrc, source it and then connect the robot to your roscore using the command below.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch turtlebot3_bringup turtlebot3_robot.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol></li>
+<li><p>Test your user interface to make the real robot move.</p></li>
+</ol>
+<p><strong>A few suggestions to go further:</strong></p>
+<ul>
+<li><p>Improve the interface so that it looks more pretty</p></li>
+<li><p>Collect some data from the robot (subscribing to its topics) and display them on your interface (ie. the battery)</p></li>
+</ul>
+</section>
+<section id="optional-task-4---a-dashboard-to-monitor-your-arduino-luxmeter-remote" class="level3">
+<h3 class="anchored" data-anchor-id="optional-task-4---a-dashboard-to-monitor-your-arduino-luxmeter-remote">[OPTIONAL] Task 4 - A dashboard to monitor your Arduino luxmeter (remote)</h3>
+<p>In this third task, we will connect Arduino, ROS and Node-RED. The Arduino will transmit its LUX data over WiFi using a ROS node (see optional Task 4 of Assignment 4). On your computer, the messages will be received by “ROS” and made available on the topic “veml_lux” (according to code provided below). Node-Red will read the data received on this topic and display it on a dashboard using a gauge and a chart.</p>
+<p>Let’s start step by step.</p>
+<p>Let’s begin with the Arduino part.</p>
+<ol type="1">
+<li><p>Upload the sketch provided (see code below) to send LUX data over WiFi with your ESP32.</p>
+<ol type="a">
+<li><p>Be sure to update ssid and password information if you are not using LearningLab’s network.</p></li>
+<li><p>Check that the server IPAddress is correct (See assignment 4, Task 4 for the details).</p></li>
+<li><p>In the sketch, have a quick look on how the lux value is sent (how the variable is handled).</p></li>
+</ol></li>
+<li><p>Ensure the Arduino starts correctly</p></li>
+</ol>
+<p>Let’s continue with the Node-Red part</p>
+<ol start="3" type="1">
+<li><p>Create a new flow</p></li>
+<li><p>Add a <em>ros_sub</em> node and configure it to listen on your topic (“veml_lux”)</p></li>
+<li><p>Add a gauge node from the “Dashboard 2” Palette and configure it</p></li>
+<li><p>Connect the output of your <em>ros_sub</em> node to the input of your <em>gauge</em> node</p></li>
+<li><p>Add a <em>chart</em> node from the “Dashboard 2” Palette and configure it</p></li>
+<li><p>Connect the output of your <em>ros_sub</em> node to the input of your <em>chart</em> node</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image7.png" class="img-fluid figure-img" style="width:90.0%" data-margin="auto"></p>
+<figcaption>Flow that reads data from the Arduino Lux sensor topic and displays it on a gauge and a chart. Note that we added a function node to round the value and a debug node to output values.</figcaption>
+</figure>
+</div>
+<p>Let’s continue with the ROS part</p>
+<ol start="9" type="1">
+<li><p>We now need to start the ROS bridge server and serial connections to make the link Node-RED &lt;-&gt; ROS &lt;-&gt; Arduino</p>
+<ol type="a">
+<li><p>Start ROS bridge to enable the connection between Node-RED and ROS</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Install ROS serial if you did not do it previously</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>$ sudo apt-get install ros-noetic-rosserial</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Start ROS serial to enable the connection between your Arduino and ROS</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>$ rosrun rosserial_python serial_node.py tcp 11411</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+<p><strong>Windows</strong>: Ensure you have firewall disabled.</p></li>
+</ol>
+<p>Now let’s start everything together</p>
+<ol start="10" type="1">
+<li><p>Start the Arduino with the right sketch (ensure ssid, password and server ip are correct)</p></li>
+<li><p>Deploy your flow and open your dashboard. Your dashboard should look similar to the figure below.</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image8.png" class="img-fluid figure-img" style="width:80.0%" data-margin="auto"></p>
+<figcaption>Screenshot of the expected dashboard for the LUX meter.</figcaption>
+</figure>
+</div>
+<p><strong>A few suggestions to go further:</strong></p>
+<ul>
+<li><p>Play with the different settings and layouts for the UI nodes</p></li>
+<li><p>Trigger some action on the LEDS of the Arduino using Node-RED and ROS</p></li>
+<li><p>Use the Lux value to control the robot (speed or direction)</p></li>
+</ul>
+<p><strong>Arduino code</strong>:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define ROSSERIAL_ARDUINO_TCP   </span><span class="co">// Very important! </span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"Adafruit_VEML7700.h"</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"WiFi.h"</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;ros.h&gt;</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;std_msgs/Float32.h&gt;</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">char</span> <span class="op">*</span>ssid <span class="op">=</span> <span class="st">"ProFab"</span><span class="op">;</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">char</span> <span class="op">*</span>password <span class="op">=</span> <span class="st">"1700_UniFR.&amp;"</span><span class="op">;</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>Adafruit_VEML7700 veml <span class="op">=</span> Adafruit_VEML7700<span class="op">();</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>IPAddress server<span class="op">(</span><span class="dv">192</span><span class="op">,</span> <span class="dv">168</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">);</span> <span class="co">// ip of your ROS machine (For Windows without Mirorring enabled, the IP of Windows and you need to have port forwarding to redirect to your WSL2 linux. If you have WSL Network Mirroring enabled, it is not necessary to set up port forwarding. See Assignment 4, Task 4 for more details)</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>ros<span class="op">::</span>NodeHandle nh<span class="op">;</span> <span class="co">// the node handler</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>std_msgs<span class="op">::</span>Float32 output_val<span class="op">;</span> <span class="co">// the type of message that will be sent</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>ros<span class="op">::</span>Publisher pub<span class="op">(</span><span class="st">"veml_lux"</span><span class="op">,</span> <span class="op">&amp;</span>output_val<span class="op">);</span> <span class="co">// The publisher method; the first parameter corresponds to the name of topic on which to publish and the second the type of data </span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> </span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">();</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"Connecting to "</span><span class="op">);</span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span>ssid<span class="op">);</span></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Connect to WiFi</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>  WiFi<span class="op">.</span>begin<span class="op">(</span>ssid<span class="op">,</span> password<span class="op">);</span></span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="op">(</span>WiFi<span class="op">.</span>status<span class="op">()</span> <span class="op">!=</span> WL_CONNECTED<span class="op">)</span> <span class="co">// -&gt; wifi delay -&gt; a must -&gt; other wise it will restart continuously </span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> delay<span class="op">(</span><span class="dv">500</span><span class="op">);</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"."</span><span class="op">);</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"WiFi connected - IP address:  "</span><span class="op">);</span></span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span>WiFi<span class="op">.</span>localIP<span class="op">());</span></span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Setup VEML</span></span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>veml<span class="op">.</span>begin<span class="op">())</span> <span class="op">{</span></span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"VEML Sensor not found"</span><span class="op">);</span></span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"VEML Sensor found"</span><span class="op">);</span></span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Setup connection to ROS machine (server)</span></span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>getHardware<span class="op">()-&gt;</span>setConnection<span class="op">(</span>server<span class="op">,</span> <span class="dv">11411</span><span class="op">);</span></span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>initNode<span class="op">();</span></span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>advertise<span class="op">(</span>pub<span class="op">);</span> <span class="co">// the topic must be advertised to the master</span></span>
+<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">(){</span></span>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>  <span class="co">//Send the value every second</span></span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> veml_val <span class="op">=</span> veml<span class="op">.</span>readLux<span class="op">();</span> </span>
+<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>  output_val<span class="op">.</span>data <span class="op">=</span> veml_val<span class="op">;</span></span>
+<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"lux: "</span><span class="op">);</span> Serial<span class="op">.</span>println<span class="op">(</span>veml_val<span class="op">);</span> <span class="co">// for debug purposes</span></span>
+<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a>  pub<span class="op">.</span>publish<span class="op">(&amp;</span>output_val<span class="op">);</span> <span class="co">// publish the value on the topic</span></span>
+<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>spinOnce<span class="op">();</span> <span class="co">// Required, otherwise topic not detected by ROS !</span></span>
+<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>  delay<span class="op">(</span><span class="dv">1000</span><span class="op">);</span> </span>
+<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="ressources" class="level3">
+<h3 class="anchored" data-anchor-id="ressources">Ressources</h3>
+<ul>
+<li><p>Node-RED Documentation - <a href="https://nodered.org/docs/" class="uri">https://nodered.org/docs/</a></p></li>
+<li><p>Node-RED Cookbook&nbsp;- <a href="https://cookbook.nodered.org/" class="uri">https://cookbook.nodered.org/</a></p></li>
+<li><p>Dashboard 2.0 Documentation - <a href="https://dashboard.flowfuse.com/getting-started.html" class="uri">https://dashboard.flowfuse.com/getting-started.html</a></p></li>
+<li><p>Dashboard 2.0 Overview (Youtube) - <a href="https://www.youtube.com/watch?v=0Hhns_DcyKQ" class="uri">https://www.youtube.com/watch?v=0Hhns_DcyKQ</a></p></li>
+</ul>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
