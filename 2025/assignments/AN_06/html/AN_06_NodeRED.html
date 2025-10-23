@@ -193,8 +193,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Note that to open the Dashboard(s) you created, you can use the url http://127.0.0.1:1880/dashboard</p></li>
 </ol>
 </section>
-<section id="for-linux-ubuntu-not-tested" class="level4">
-<h4 class="anchored" data-anchor-id="for-linux-ubuntu-not-tested">For Linux (Ubuntu) – [Not tested]</h4>
+<section id="for-linux-ubuntu" class="level4">
+<h4 class="anchored" data-anchor-id="for-linux-ubuntu">For Linux (Ubuntu)</h4>
 <ol type="1">
 <li><p>Follow these instructions to install node-js on Ubuntu<br>
 <strong>Remark</strong>: You can install only the LTS version of node-js, to save some space on your system</p></li>
@@ -216,13 +216,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Start Node-RED by typing “node-red” in a terminal</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>$ node-red</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Now open the Node-Red UI on your browser using the following url: http://127.0.0.1:1880/</p></li>
-<li><p>You should be able to see the Node-RED Ui and interact with it. Note that you will be able to open the dashboards created using the following url: http://127.0.0.1:1880/dashboard</p></li>
+<li><p>You should be able to see the Node-RED UI and interact with it. Note that you will be able to open the dashboards created using the following url: http://127.0.0.1:1880/dashboard</p></li>
+<li><p>Install the node-red ROS package</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>$ npm install node-red-contrib-ros</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Finally, install the ROS bridge server on your machine. This bridgle allows to connect Node-RED and ROS together. We will need it for the Task 2 of this assignment (Task 2)</p>
 <ol type="a">
 <li><p>To install rosbridge, in a terminal type</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>$ sudo apt install ros-noetic-rosbridge-server</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>$ sudo apt install ros-noetic-rosbridge-server</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>You should now be able to start it using this command in a terminal</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol></li>
 </ol>
 </section>
@@ -234,7 +236,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li><p>Ensure Node-RED was successfully installed. Start Node-RED and open its UI in your browser<br>
 <strong>Remark</strong>: We recommend using specific flow files for each project (below we specify a flow file name).</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>$ node-red dashboard_flows.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>$ node-red dashboard_flows.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Install dashboard 2.0 palette</p>
 <ol type="a">
 <li><p>From the web interface, click on the menu button (the 3 horizontal lines on the top-right corner)</p></li>
@@ -284,8 +286,8 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <li><p>Drag and drop the “function” node to your flow from the <strong>function palette</strong></p></li>
 <li><p>Edit the node to generate a random number between 0-100 (double-click on the node)</p></li>
 <li><p>You can see the javascript code below</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>msg<span class="op">.</span><span class="at">payload</span> <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">random</span>()<span class="op">*</span><span class="dv">100</span>)<span class="op">;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> msg<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb14"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>msg<span class="op">.</span><span class="at">payload</span> <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">random</span>()<span class="op">*</span><span class="dv">100</span>)<span class="op">;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> msg<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol></li>
 <li><p>Connect the output of the “button” node to the input of the “function” node and connect the output of the “function” node to the input of the “text” node<br>
 <strong>Remark</strong>: You can see the final expected flow on the picture below (Note: an extra “debug” node has been added).</p></li>
@@ -309,13 +311,13 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 </section>
 <section id="task-3---a-dashboard-to-control-your-turtlebot3-simulation" class="level3">
 <h3 class="anchored" data-anchor-id="task-3---a-dashboard-to-control-your-turtlebot3-simulation">Task 3 - A dashboard to control your Turtlebot3 (simulation)</h3>
-<p>As a second task, we will connect to a ROS topic and send commands to control the simulation of the turtlebot3 robot. The controller user interface (developed with Node-RED) will send commands to the right ROS topic. We will first develop a basic flow to test the features and then you will develop the graphical interfcae to send commands to the turtlebot3. IT should be able to move forward (up), backward (down), rotate right (right), rotate left (left) and halt (stop).</p>
+<p>As a second task, we will connect to a ROS topic and send commands to control the simulation of the turtlebot3 robot. The controller user interface (developed with Node-RED) will send commands to the right ROS topic. We will first develop a basic flow to test the features and then you will develop the graphical interface to send commands to the turtlebot3. It should be able to move forward (up), backward (down), rotate right (right), rotate left (left) and halt (stop).</p>
 <p>Let’s do the task step by step.</p>
 <p>Let’s start with a basic flow:</p>
 <ol type="1">
 <li><p>Start node-red with a new flow-file, specific for ROS<br>
 <strong>Remark</strong>: If you have all your flows in the same file, you might have problems when starting node-red: nodes connecting to ros bridge (i.e.&nbsp;pub and sub nodes) will yield problems when not being able to reach/connect to ROS server. In such case, just start roscore and rosbridge to let node-red start correctly.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>$ node-red ros_flows.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb15"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>$ node-red ros_flows.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Create a new flow and rename it.</p></li>
 <li><p>Now add an inject node, a function node and a ros pub node; connect them sequentially (see image below).</p>
 <div class="quarto-figure quarto-figure-center">
@@ -327,22 +329,22 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <ol type="a">
 <li><p>For the “Send data” inject node, you can keep its default settings. When you click on the little grey square on its left, it will trigger the function connected to its right.</p></li>
 <li><p>For the “Twist message” function node, modify its “On Message” function looks like the code below. It creates a Twist message with a linar and angular values of 0. The payload of a JSON formatted message.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>var sent_lin_x = 0</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>var sent_ang_z = 0</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>msg.payload = {</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    linear: {</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        x: sent_lin_x,</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>        y: 0,</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>        z: 0</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    angular: {</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>        x: 0,</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        y: 0,</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        z: sent_ang_z</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>};</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>return msg;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb16"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>var sent_lin_x = 0</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>var sent_ang_z = 0</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>msg.payload = {</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    linear: {</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        x: sent_lin_x,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        y: 0,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>        z: 0</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    angular: {</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        x: 0,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>        y: 0,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>        z: sent_ang_z</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>};</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>return msg;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>For the “/cmd_vel” ROS pub node, set the <em>Datatype package</em> to “geometry_msgs” and the <em>Datatype</em> to “Twist” (you must have ROS installed on your machine to be able to select those). Normally, the other the settings can be kept to default (ROS server: ws://0.0.0.0:9090 and ROS topic: /cmd_vel).</p></li>
 </ol>
 <div class="quarto-figure quarto-figure-center">
@@ -357,9 +359,9 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <li><p>We will now test the flow</p>
 <ol type="a">
 <li><p>On a terminal, start roscore and rosbridge. (Remember: roslauch automatically starts roscore if not already running).</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb17"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>On another terminal, start the gazebo simulation for your robot:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch turtlebot3_gazebo turtlebot3_world.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb18"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch turtlebot3_gazebo turtlebot3_world.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Now go back to your Node-RED flow UI, modify the linear (ie. 0.1) or angular (ie. 0.3) values of your Twist function, redeploy and finally click on the small grey rectangle on the left of your inject node to issue the command. You should now see the robot move in the simulation window.</p></li>
 </ol></li>
 <li><p>Close the simulation (Note: you may want to keep roscore and rosbridge running …)</p></li>
@@ -384,15 +386,15 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <li><p>Create a function to initialize and clean your flow variables</p>
 <ol type="a">
 <li><p>On the “On Start” and “On Stop” panels of your function, write the code provided below to initialise your variable to 0.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>flow.set("lin_x", 0)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>flow.set("ang_z", 0)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb19"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>flow.set("lin_x", 0)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>flow.set("ang_z", 0)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol></li>
 <li><p>Create functions for each of your buttons. Here we created 5 functions, but you could as well create a single function and do a specific operation according to the button pressed.</p>
 <ol type="a">
 <li><p>In each function, in its “On Message” panel, adapt the value of your flow variables (increase or decrease). Below is an example for the “Twist Message fwd” function. It gets the value of the flow variable</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>var linx = flow.get("lin_x") </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>flow.set("lin_x", linx + 0.05);</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>return msg;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb20"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>var linx = flow.get("lin_x") </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>flow.set("lin_x", linx + 0.05);</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>return msg;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol></li>
 <li><p>Connect the output of these functions to the “Twist Message” function.</p></li>
 <li><p>Modify the “Twist message” function</p>
@@ -403,7 +405,7 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <li><p>Start roscore and rosbridge (if not already running)</p>
 <ol type="a">
 <li><p>(if not already running) On a terminal, start roscore and rosbridge. (Remember: roslauch automatically starts roscore if not already running).</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb21"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol></li>
 <li><p>On Node-red, start the interface page. The interface should look somewhat similar to the one shown on the figure below. Note that on the interface shown below, we worked on the design to display the buttons nicely and also on two gauges to display current linear and angular speeds. You can optionnally work on that too.</p>
 <ol type="a">
@@ -413,7 +415,7 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <li><p>Test your developed controller to control the simulated Turtlebot3. You should be able to see the controller and the</p>
 <ol type="a">
 <li><p>On a terminal, start the gazebo simulation for your robot:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch turtlebot3_gazebo turtlebot3_world.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb22"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch turtlebot3_gazebo turtlebot3_world.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Press the button and see your simulated robot move.</p></li>
 <li><p>Once finished, close the simulation.</p></li>
 </ol></li>
@@ -443,7 +445,7 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <ol type="a">
 <li><p>Make sure the real robot is in a safe spot</p></li>
 <li><p>Connect to the robot using ssh, update its bashrc, source it and then connect the robot to your roscore using the command below.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch turtlebot3_bringup turtlebot3_robot.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb23"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch turtlebot3_bringup turtlebot3_robot.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol></li>
 <li><p>Test your user interface to make the real robot move.</p></li>
 </ol>
@@ -487,11 +489,11 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <li><p>We now need to start the ROS bridge server and serial connections to make the link Node-RED &lt;-&gt; ROS &lt;-&gt; Arduino</p>
 <ol type="a">
 <li><p>Start ROS bridge to enable the connection between Node-RED and ROS</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb24"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Install ROS serial if you did not do it previously</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>$ sudo apt-get install ros-noetic-rosserial</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb25"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>$ sudo apt-get install ros-noetic-rosserial</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Start ROS serial to enable the connection between your Arduino and ROS</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>$ rosrun rosserial_python serial_node.py tcp 11411</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb26"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>$ rosrun rosserial_python serial_node.py tcp 11411</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol>
 <p><strong>Windows</strong>: Ensure you have firewall disabled.</p></li>
 </ol>
@@ -513,60 +515,60 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <li><p>Use the Lux value to control the robot (speed or direction)</p></li>
 </ul>
 <p><strong>Arduino code</strong>:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define ROSSERIAL_ARDUINO_TCP   </span><span class="co">// Very important! </span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"Adafruit_VEML7700.h"</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"WiFi.h"</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;ros.h&gt;</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;std_msgs/Float32.h&gt;</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">char</span> <span class="op">*</span>ssid <span class="op">=</span> <span class="st">"ProFab"</span><span class="op">;</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">char</span> <span class="op">*</span>password <span class="op">=</span> <span class="st">"1700_UniFR.&amp;"</span><span class="op">;</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>Adafruit_VEML7700 veml <span class="op">=</span> Adafruit_VEML7700<span class="op">();</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>IPAddress server<span class="op">(</span><span class="dv">192</span><span class="op">,</span> <span class="dv">168</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">);</span> <span class="co">// ip of your ROS machine (For Windows without Mirorring enabled, the IP of Windows and you need to have port forwarding to redirect to your WSL2 linux. If you have WSL Network Mirroring enabled, it is not necessary to set up port forwarding. See Assignment 4, Task 4 for more details)</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>ros<span class="op">::</span>NodeHandle nh<span class="op">;</span> <span class="co">// the node handler</span></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>std_msgs<span class="op">::</span>Float32 output_val<span class="op">;</span> <span class="co">// the type of message that will be sent</span></span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>ros<span class="op">::</span>Publisher pub<span class="op">(</span><span class="st">"veml_lux"</span><span class="op">,</span> <span class="op">&amp;</span>output_val<span class="op">);</span> <span class="co">// The publisher method; the first parameter corresponds to the name of topic on which to publish and the second the type of data </span></span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span></span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> </span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">();</span></span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"Connecting to "</span><span class="op">);</span></span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span>ssid<span class="op">);</span></span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Connect to WiFi</span></span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>  WiFi<span class="op">.</span>begin<span class="op">(</span>ssid<span class="op">,</span> password<span class="op">);</span></span>
-<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="op">(</span>WiFi<span class="op">.</span>status<span class="op">()</span> <span class="op">!=</span> WL_CONNECTED<span class="op">)</span> <span class="co">// -&gt; wifi delay -&gt; a must -&gt; other wise it will restart continuously </span></span>
-<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> delay<span class="op">(</span><span class="dv">500</span><span class="op">);</span></span>
-<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"."</span><span class="op">);</span></span>
-<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"WiFi connected - IP address:  "</span><span class="op">);</span></span>
-<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span>WiFi<span class="op">.</span>localIP<span class="op">());</span></span>
-<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Setup VEML</span></span>
-<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>veml<span class="op">.</span>begin<span class="op">())</span> <span class="op">{</span></span>
-<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"VEML Sensor not found"</span><span class="op">);</span></span>
-<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
-<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"VEML Sensor found"</span><span class="op">);</span></span>
-<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Setup connection to ROS machine (server)</span></span>
-<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>getHardware<span class="op">()-&gt;</span>setConnection<span class="op">(</span>server<span class="op">,</span> <span class="dv">11411</span><span class="op">);</span></span>
-<span id="cb26-42"><a href="#cb26-42" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>initNode<span class="op">();</span></span>
-<span id="cb26-43"><a href="#cb26-43" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>advertise<span class="op">(</span>pub<span class="op">);</span> <span class="co">// the topic must be advertised to the master</span></span>
-<span id="cb26-44"><a href="#cb26-44" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb26-45"><a href="#cb26-45" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb26-46"><a href="#cb26-46" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">(){</span></span>
-<span id="cb26-47"><a href="#cb26-47" aria-hidden="true" tabindex="-1"></a>  <span class="co">//Send the value every second</span></span>
-<span id="cb26-48"><a href="#cb26-48" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> veml_val <span class="op">=</span> veml<span class="op">.</span>readLux<span class="op">();</span> </span>
-<span id="cb26-49"><a href="#cb26-49" aria-hidden="true" tabindex="-1"></a>  output_val<span class="op">.</span>data <span class="op">=</span> veml_val<span class="op">;</span></span>
-<span id="cb26-50"><a href="#cb26-50" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"lux: "</span><span class="op">);</span> Serial<span class="op">.</span>println<span class="op">(</span>veml_val<span class="op">);</span> <span class="co">// for debug purposes</span></span>
-<span id="cb26-51"><a href="#cb26-51" aria-hidden="true" tabindex="-1"></a>  pub<span class="op">.</span>publish<span class="op">(&amp;</span>output_val<span class="op">);</span> <span class="co">// publish the value on the topic</span></span>
-<span id="cb26-52"><a href="#cb26-52" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>spinOnce<span class="op">();</span> <span class="co">// Required, otherwise topic not detected by ROS !</span></span>
-<span id="cb26-53"><a href="#cb26-53" aria-hidden="true" tabindex="-1"></a>  delay<span class="op">(</span><span class="dv">1000</span><span class="op">);</span> </span>
-<span id="cb26-54"><a href="#cb26-54" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define ROSSERIAL_ARDUINO_TCP   </span><span class="co">// Very important! </span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"Adafruit_VEML7700.h"</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"WiFi.h"</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;ros.h&gt;</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;std_msgs/Float32.h&gt;</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">char</span> <span class="op">*</span>ssid <span class="op">=</span> <span class="st">"ProFab"</span><span class="op">;</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">char</span> <span class="op">*</span>password <span class="op">=</span> <span class="st">"1700_UniFR.&amp;"</span><span class="op">;</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>Adafruit_VEML7700 veml <span class="op">=</span> Adafruit_VEML7700<span class="op">();</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>IPAddress server<span class="op">(</span><span class="dv">192</span><span class="op">,</span> <span class="dv">168</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">);</span> <span class="co">// ip of your ROS machine (For Windows without Mirorring enabled, the IP of Windows and you need to have port forwarding to redirect to your WSL2 linux. If you have WSL Network Mirroring enabled, it is not necessary to set up port forwarding. See Assignment 4, Task 4 for more details)</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>ros<span class="op">::</span>NodeHandle nh<span class="op">;</span> <span class="co">// the node handler</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>std_msgs<span class="op">::</span>Float32 output_val<span class="op">;</span> <span class="co">// the type of message that will be sent</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>ros<span class="op">::</span>Publisher pub<span class="op">(</span><span class="st">"veml_lux"</span><span class="op">,</span> <span class="op">&amp;</span>output_val<span class="op">);</span> <span class="co">// The publisher method; the first parameter corresponds to the name of topic on which to publish and the second the type of data </span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> </span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">();</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"Connecting to "</span><span class="op">);</span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span>ssid<span class="op">);</span></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Connect to WiFi</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>  WiFi<span class="op">.</span>begin<span class="op">(</span>ssid<span class="op">,</span> password<span class="op">);</span></span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="op">(</span>WiFi<span class="op">.</span>status<span class="op">()</span> <span class="op">!=</span> WL_CONNECTED<span class="op">)</span> <span class="co">// -&gt; wifi delay -&gt; a must -&gt; other wise it will restart continuously </span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> delay<span class="op">(</span><span class="dv">500</span><span class="op">);</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"."</span><span class="op">);</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"WiFi connected - IP address:  "</span><span class="op">);</span></span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span>WiFi<span class="op">.</span>localIP<span class="op">());</span></span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Setup VEML</span></span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>veml<span class="op">.</span>begin<span class="op">())</span> <span class="op">{</span></span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"VEML Sensor not found"</span><span class="op">);</span></span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"VEML Sensor found"</span><span class="op">);</span></span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Setup connection to ROS machine (server)</span></span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>getHardware<span class="op">()-&gt;</span>setConnection<span class="op">(</span>server<span class="op">,</span> <span class="dv">11411</span><span class="op">);</span></span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>initNode<span class="op">();</span></span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>advertise<span class="op">(</span>pub<span class="op">);</span> <span class="co">// the topic must be advertised to the master</span></span>
+<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">(){</span></span>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>  <span class="co">//Send the value every second</span></span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> veml_val <span class="op">=</span> veml<span class="op">.</span>readLux<span class="op">();</span> </span>
+<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>  output_val<span class="op">.</span>data <span class="op">=</span> veml_val<span class="op">;</span></span>
+<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>print<span class="op">(</span><span class="st">"lux: "</span><span class="op">);</span> Serial<span class="op">.</span>println<span class="op">(</span>veml_val<span class="op">);</span> <span class="co">// for debug purposes</span></span>
+<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a>  pub<span class="op">.</span>publish<span class="op">(&amp;</span>output_val<span class="op">);</span> <span class="co">// publish the value on the topic</span></span>
+<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>  nh<span class="op">.</span>spinOnce<span class="op">();</span> <span class="co">// Required, otherwise topic not detected by ROS !</span></span>
+<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>  delay<span class="op">(</span><span class="dv">1000</span><span class="op">);</span> </span>
+<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="ressources" class="level3">
 <h3 class="anchored" data-anchor-id="ressources">Ressources</h3>
