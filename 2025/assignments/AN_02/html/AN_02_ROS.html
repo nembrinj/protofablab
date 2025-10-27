@@ -800,11 +800,12 @@ if __name__ == '__main__':
 <ol type="1">
 <li>Update your sources and install packages (may take a some time …)</li>
 </ol>
-<div class="sourceCode" id="cb62"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt update      </span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y libv4l-dev    </span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-image-transport  (to enable compressing images for transport over wifi)     </span>
-<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-camera-info-manager     </span>
-<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-usb-cam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt update </span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt upgrade -y </span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y libv4l-dev    </span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-image-transport  (to enable compressing images for transport over wifi)     </span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-camera-info-manager     </span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-noetic-usb-cam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ol start="2" type="1">
 <li>Use the commands below to launch the camera node (you can nano the usb_cam-test.launch file to see its settings). When using image_view on your local pc, you should be able to see the image. If the procedure below works; this means that your camera is now functional.</li>
 </ol>
