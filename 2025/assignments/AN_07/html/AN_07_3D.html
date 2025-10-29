@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Julien Nembrini">
+<meta name="dcterms.date" content="2025-10-29">
+<meta name="keywords" content="Human-IST, ProtoFab, LearningLab, UniFR">
+
+<title>3D modeling and fabrication</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="AN_07_3D_files/libs/clipboard/clipboard.min.js"></script>
+<script src="AN_07_3D_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="AN_07_3D_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="AN_07_3D_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="AN_07_3D_files/libs/quarto-html/popper.min.js"></script>
+<script src="AN_07_3D_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="AN_07_3D_files/libs/quarto-html/anchor.min.js"></script>
+<link href="AN_07_3D_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="AN_07_3D_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="AN_07_3D_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="AN_07_3D_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="AN_07_3D_files/libs/bootstrap/bootstrap-b5ea2d3fb43de5a4f84a72c5b59b7927.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#protofab-assignment-7-3d-modeling-and-fabrication" id="toc-protofab-assignment-7-3d-modeling-and-fabrication" class="nav-link active" data-scroll-target="#protofab-assignment-7-3d-modeling-and-fabrication">ProtoFab assignment 7: 3D modeling and fabrication</a>
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#task-1-setup-the-3d-modeling--3d-printing-pipeline" id="toc-task-1-setup-the-3d-modeling--3d-printing-pipeline" class="nav-link" data-scroll-target="#task-1-setup-the-3d-modeling--3d-printing-pipeline">Task 1 – Setup the 3D modeling- 3D printing pipeline</a>
+  <ul class="collapse">
+  <li><a href="#download-and-install-fusion-360-on-your-computer" id="toc-download-and-install-fusion-360-on-your-computer" class="nav-link" data-scroll-target="#download-and-install-fusion-360-on-your-computer">Download and install Fusion 360 on your computer</a></li>
+  <li><a href="#install-the-prusa-slicer" id="toc-install-the-prusa-slicer" class="nav-link" data-scroll-target="#install-the-prusa-slicer">Install the Prusa slicer</a></li>
+  <li><a href="#slice-the-3d-model" id="toc-slice-the-3d-model" class="nav-link" data-scroll-target="#slice-the-3d-model">Slice the 3D model</a></li>
+  </ul></li>
+  <li><a href="#task-2-understand-the-basic-modeling-capabilities-of-fusion-360" id="toc-task-2-understand-the-basic-modeling-capabilities-of-fusion-360" class="nav-link" data-scroll-target="#task-2-understand-the-basic-modeling-capabilities-of-fusion-360">Task 2 – Understand the basic modeling capabilities of Fusion 360</a>
+  <ul class="collapse">
+  <li><a href="#optional-further-work" id="toc-optional-further-work" class="nav-link" data-scroll-target="#optional-further-work">[optional] Further work</a></li>
+  </ul></li>
+  <li><a href="#task-3-build-a-3d-shape-with-different-modeling-paths" id="toc-task-3-build-a-3d-shape-with-different-modeling-paths" class="nav-link" data-scroll-target="#task-3-build-a-3d-shape-with-different-modeling-paths">Task 3 – Build a 3D shape with different modeling paths</a></li>
+  <li><a href="#task-4-model-and-export-a-support-for-the-lux-sensor" id="toc-task-4-model-and-export-a-support-for-the-lux-sensor" class="nav-link" data-scroll-target="#task-4-model-and-export-a-support-for-the-lux-sensor">Task 4 – Model and export a support for the lux sensor</a>
+  <ul class="collapse">
+  <li><a href="#optional-further-work-1" id="toc-optional-further-work-1" class="nav-link" data-scroll-target="#optional-further-work-1">[optional] Further work</a></li>
+  </ul></li>
+  <li><a href="#task-5-3d-print-the-support-on-the-prusa-printer" id="toc-task-5-3d-print-the-support-on-the-prusa-printer" class="nav-link" data-scroll-target="#task-5-3d-print-the-support-on-the-prusa-printer">Task 5 – 3D Print the support on the Prusa printer</a>
+  <ul class="collapse">
+  <li><a href="#contact-information" id="toc-contact-information" class="nav-link" data-scroll-target="#contact-information">Contact information</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="../../AN_07_3D.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">3D modeling and fabrication</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Julien Nembrini </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 29, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+<div>
+  <div class="keywords">
+    <div class="block-title">Keywords</div>
+    <p>Human-IST, ProtoFab, LearningLab, UniFR</p>
+  </div>
+</div>
+
+</header>
+
+
+<section id="protofab-assignment-7-3d-modeling-and-fabrication" class="level1">
+<h1>ProtoFab assignment 7: 3D modeling and fabrication</h1>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This practical work focuses on experimenting with 3D modeling and printing. You will have to model a prescribed shape while learning to set up a 3D design in Fusion 360, export it and prepare it for printing. You will be then able to define your own model and print it.</p>
+<p>In this practical work, you will perform the following tasks:</p>
+<ul>
+<li><strong>Task 1</strong> – Install Fusion 360 and get access to the ProFab workspace</li>
+<li><strong>Task 2</strong> – Understand the basic modeling capabilities of Fusion 360</li>
+<li><strong>Task 3</strong> – Build a 3D shape with different modeling paths</li>
+<li><strong>Task 4</strong> – Model and export a support for the lux sensor</li>
+<li><strong>Task 5</strong> – 3D Print the support on the Prusa printer</li>
+</ul>
+<p><strong>Learning objectives:</strong></p>
+<p>At the end of the assignment, you should be able to</p>
+<ul>
+<li>Understand basic 3D modeling techniques</li>
+<li>Prepare a model for 3D printing</li>
+<li>Experiment with parametric modeling</li>
+<li>Have a small 3D model printed</li>
+<li>Use the printer autonomously</li>
+</ul>
+</section>
+<section id="task-1-setup-the-3d-modeling--3d-printing-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="task-1-setup-the-3d-modeling--3d-printing-pipeline">Task 1 – Setup the 3D modeling- 3D printing pipeline</h2>
+<p>You will open a model, export it to STL format, and finally slice it for 3D printing.</p>
+<section id="download-and-install-fusion-360-on-your-computer" class="level3">
+<h3 class="anchored" data-anchor-id="download-and-install-fusion-360-on-your-computer">Download and install Fusion 360 on your computer</h3>
+<ol type="1">
+<li><p>Accept the invitation you should have received per email. Log into autodesk.com</p></li>
+<li><p>On your account drop-down, select “products and services”. You should then see Fusion 360. Click the button underneath to download the installer.</p></li>
+</ol>
+<p><img src="img/autodesk_products.png" class="img-fluid" style="width:38.0%" data-margin="auto" alt="&nbsp;"> <img src="img/autodesk_download.png" class="img-fluid" style="width:50.0%" data-margin="auto" alt="&nbsp;"></p>
+<ol start="3" type="1">
+<li><p>Run the installer</p></li>
+<li><p>While the software gets installed, access your hub by clicking “Fusion team”. You should have access to the “profab” hub from your settings and then to the “profab” project.</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/autodesk_team.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol start="5" type="1">
+<li>Once the software is installed, open the “sphere” model. Export it as “.f3d” and import it again in your own hub to be able to modify it as you wish.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/autodesk_sphere.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol start="6" type="1">
+<li>Export the model to STL by saving as .stl on your computer, using either “save as…”, or right-click on the component and “save as mesh…”.</li>
+</ol>
+</section>
+<section id="install-the-prusa-slicer" class="level3">
+<h3 class="anchored" data-anchor-id="install-the-prusa-slicer">Install the Prusa slicer</h3>
+<ol type="1">
+<li><p>Start by downloading the <a href="https://github.com/prusa3d/PrusaSlicer/releases">Prusaslicer</a> software and install it on your computer (again no need to be on linux/WSL).</p></li>
+<li><p>Open the prusaslicer and select the printer model Prusa MK3S+ in the wizard.</p></li>
+<li><p>Modify the main settings (on the right) as follows:</p>
+<ul>
+<li>Layer thickness 0.10 mm</li>
+<li>Filament Generic PLA</li>
+<li>Printer Prusa MK3S+</li>
+<li>Supports “Everywhere”</li>
+<li>Infill 15%</li>
+<li>“Expert mode” for the next steps</li>
+</ul></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/slicer_settings1.png" class="img-fluid figure-img" style="width:33.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol start="4" type="1">
+<li>Modify the infill settings by selecting the “Cubic” fill pattern</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/slicer_settings2.png" class="img-fluid figure-img" style="width:65.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol start="5" type="1">
+<li>Modify the support settings by selecting the “Snug” style and “Rectilinear grid” pattern</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/slicer_settings3.png" class="img-fluid figure-img" style="width:65.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+</section>
+<section id="slice-the-3d-model" class="level3">
+<h3 class="anchored" data-anchor-id="slice-the-3d-model">Slice the 3D model</h3>
+<ol type="1">
+<li><p>Import your sphere STL file (File-&gt;Import-&gt;STL or ctrl-I or cube with a ‘+’ sign)</p></li>
+<li><p>Select supports “Everywhere” on the main settings.</p></li>
+<li><p>Slice the model by pressing the “slice now” button on the bottom right.</p></li>
+<li><p>Observe the model and its supports. Use the vertical orange ‘+’ handle to unveil the infill pattern within the sphere. Note the histogram on the left.</p></li>
+<li><p>Export the G-code by pressing the “Export G-code” button on the bottom right and save the file.</p></li>
+<li><p>Open the G-code file, note the G1 X… Y… E… linear move instructions. XY stand for the plane and E for the “Extrude” axis.</p></li>
+</ol>
+<p>You have now set up the 3D modeling - 3D printing pipeline.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/slicer_sphere.png" class="img-fluid figure-img" style="width:48.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="task-2-understand-the-basic-modeling-capabilities-of-fusion-360" class="level2">
+<h2 class="anchored" data-anchor-id="task-2-understand-the-basic-modeling-capabilities-of-fusion-360">Task 2 – Understand the basic modeling capabilities of Fusion 360</h2>
+<p>This task will involve following the videos provided on the autodesk website</p>
+<ol type="1">
+<li><p>Go to the Fusion self-learning <a href="https://www.autodesk.com/learn/ondemand/collection/self-paced-learning-for-fusion">website</a> (Note: you have to be logged in to access the videos)</p></li>
+<li><p>Select the ” Get started with modeling” collection and watch the following videos:</p>
+<ul>
+<li>Video “Compoments and bodies”: make sure you understand the need to create components to organize your modeling, and how to activate one compenent to work on it.</li>
+<li>Video “About sketching in Fusion”: make sure you understand how to edit a sketch and its constraints.<br>
+</li>
+<li>Video “Fusion sketch constraints”: make sure you understand the need to constraint your sketches (disclaimer: you do not need to use so many constraints).</li>
+<li>Video “Extrude solid bodies”: make sure you understand the settings of the extrude function.</li>
+</ul></li>
+<li><p>You may additionally watch the 2 remaining videos</p></li>
+</ol>
+<section id="optional-further-work" class="level3">
+<h3 class="anchored" data-anchor-id="optional-further-work">[optional] Further work</h3>
+<ul>
+<li>Have a look at the scripting capabilities of Fusion:
+<ul>
+<li><a href="https://help.autodesk.com/view/fusion360/ENU/?guid=GUID-C1545D80-D804-4CF3-886D-9B5C54B2D7A2">Fusion API</a></li>
+<li><a href="https://www.makerluis.com/the-power-of-python-and-fusion-360-for-3d-printing/">blog post</a></li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="task-3-build-a-3d-shape-with-different-modeling-paths" class="level2">
+<h2 class="anchored" data-anchor-id="task-3-build-a-3d-shape-with-different-modeling-paths">Task 3 – Build a 3D shape with different modeling paths</h2>
+<p>Model the following 3D shape</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/extrude_csg.png" class="img-fluid figure-img" style="width:40.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol type="1">
+<li><p>Model the 3D shape above using 3 different sketches.</p>
+<ol type="1">
+<li>Draw the first triangle on a first sketch (on the horizontal plane) and then extrude it.</li>
+<li>Draw the second triangle on a second sketch (on one of the vertical planes) and then extrude it (use “join” operation).</li>
+<li>Draw the third triangle on a third sketch (on the other vertical planes) and then extrude it (use “join” operation).</li>
+<li>You should otbain the 3D shape above, not that the faces not visible in the image are flat (ie. two triangles have an extrusion length of 10 and one an extrusion length of 20).</li>
+</ol></li>
+<li><p>Now, model the 3D shape again, this time using a single sketch and extrude:</p>
+<ol type="1">
+<li>Create a new design</li>
+<li>Create a component, activate it</li>
+<li>Sketch a triangle, extrude it as in previous step (use an extrusion length of 10)</li>
+<li>Copy the component 4x (using “Move/Copy” to clone it). In the move/copy window, select “Create copy”.</li>
+<li>Now move/rotate the 4 components such that they represent the model. Hint: always activate the component before moving it.</li>
+<li>Modify the extent of the extrusion in 2. The model should adapt parametrically without collisions. Hint: the orientation of the 4 components is important …</li>
+</ol>
+<p>Note the different structure of the model compared to step 1 (see below right)</p></li>
+<li><p>Export the shape to STL and import it into the slicer. Rotate the model to minimizes the support time (shown in the histogram). You may need to use the “Place on face” tool.</p></li>
+</ol>
+<p><img src="img/shape1.png" class="img-fluid" style="width:50.0%" data-margin="auto" alt="&nbsp;"> <img src="img/shape2.png" class="img-fluid" style="width:45.0%" data-margin="auto" alt="&nbsp;"></p>
+</section>
+<section id="task-4-model-and-export-a-support-for-the-lux-sensor" class="level2">
+<h2 class="anchored" data-anchor-id="task-4-model-and-export-a-support-for-the-lux-sensor">Task 4 – Model and export a support for the lux sensor</h2>
+<p>In this task you will model a support for the VEML 7700 lux sensor that adpats to the robot support plate.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/support3D_fillet.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol type="1">
+<li><p>Create a new design,</p></li>
+<li><p>Import the Turtlebot support plate from the “Assets” folder as a sketching guide (this is a STEP file). Center it on the XY plane and place it such that the XY plane is just above the plate.</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/plate.png" class="img-fluid figure-img" style="width:40.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol start="3" type="1">
+<li>Create a new component and activate it. Draw the sketch below, making sure the circles are constrained concentrically to the holes on the plate. Placing the sketch as shown relative to the axis helps modeling.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/support_sketch.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol start="4" type="1">
+<li>Extrude the different parts following the plan on the left, to obtain the model on the right (except the slice on the vertical part)</li>
+</ol>
+<p><img src="img/plan2.png" class="img-fluid" style="width:45.0%" data-margin="auto" alt="&nbsp;"> <img src="img/support3D_noslice.png" class="img-fluid" style="width:45.0%" data-margin="auto" alt="&nbsp;"></p>
+<ol start="5" type="1">
+<li>Sketch a rectangle on the YZ plane</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/support_sketch_slice.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol start="6" type="1">
+<li>Cut the hole for the sensor using an extrusion</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/support3D.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol start="7" type="1">
+<li>Add 0.5 mm fillet to smooth the edges for the printer (we will print it on the side)</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/support3D_fillet.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol start="8" type="1">
+<li>Finally, export your model to STL</li>
+</ol>
+<section id="optional-further-work-1" class="level3">
+<h3 class="anchored" data-anchor-id="optional-further-work-1">[optional] Further work</h3>
+<ul>
+<li><p>Using the timeline at the bottom of the workspace, modify the different extrusion depths to see how the model adapts. Define user parameters to have the size of the holes automatically adapt to the thickness of the support</p></li>
+<li><p>Add extrusions below the holes as guides to fit exactly the robot plate. Think about supports when printing.</p></li>
+</ul>
+</section>
+</section>
+<section id="task-5-3d-print-the-support-on-the-prusa-printer" class="level2">
+<h2 class="anchored" data-anchor-id="task-5-3d-print-the-support-on-the-prusa-printer">Task 5 – 3D Print the support on the Prusa printer</h2>
+<ol type="1">
+<li><p>Import the model from Task 4 into the Prusa slicer</p></li>
+<li><p>Place it sideways on the plate to minimize supports and increase material stiffness.</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/support_slicer.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>&nbsp;</figcaption>
+</figure>
+</div>
+<ol start="3" type="1">
+<li><p>Prepare the Prusa 4S+ printer by adding glue to the printing bed where your model is going to be printed or use the side of the printing bed</p></li>
+<li><p>Print your model. You may want to print multiple models in parallel to speed up the process.</p></li>
+</ol>
+<section id="contact-information" class="level3">
+<h3 class="anchored" data-anchor-id="contact-information">Contact information</h3>
+<ul>
+<li>Dr.&nbsp;Simon Ruffieux, <a href="mailto:simon.ruffieux@unifr.ch">simon.ruffieux@unifr.ch</a></li>
+<li>Dr.&nbsp;Julien Nembrini, <a href="mailto:julien.nembrini@unifr.ch">julien.nembrini@unifr.ch</a></li>
+</ul>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
