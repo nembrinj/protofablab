@@ -175,12 +175,12 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="install-the-prusa-slicer">Install the Prusa slicer</h3>
 <ol type="1">
 <li><p>Start by downloading the <a href="https://github.com/prusa3d/PrusaSlicer/releases">Prusaslicer</a> software and install it on your computer (again no need to be on linux/WSL).</p></li>
-<li><p>Open the prusaslicer and select the printer model Prusa MK3S+ in the wizard.</p></li>
+<li><p>Open the prusaslicer and select the printer model Prusa MK4S+ in the wizard.</p></li>
 <li><p>Modify the main settings (on the right) as follows:</p>
 <ul>
 <li>Layer thickness 0.10 mm</li>
 <li>Filament Generic PLA</li>
-<li>Printer Prusa MK3S+</li>
+<li>Printer Prusa MK4S+ HF0.4 nozzle</li>
 <li>Supports “Everywhere”</li>
 <li>Infill 15%</li>
 <li>“Expert mode” for the next steps</li>
@@ -193,7 +193,7 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 <ol start="4" type="1">
-<li>Modify the infill settings by selecting the “Cubic” fill pattern</li>
+<li>Modify the “Print Settings” → “Infill” values by selecting the “Cubic” fill pattern</li>
 </ol>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -202,7 +202,7 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 <ol start="5" type="1">
-<li>Modify the support settings by selecting the “Snug” style and “Rectilinear grid” pattern</li>
+<li>Modify the “Print Settings” → Support Material settings by selecting to generate aupport material</li>
 </ol>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
