@@ -1,0 +1,16 @@
+[Unit]
+Description=Camera Fix Service for LED blob detection
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c '\
+sleep 20 && \
+v4l2-ctl -d /dev/video0 --set-ctrl=exposure_auto=1 && \
+v4l2-ctl -d /dev/video0 --set-ctrl=exposure_absolute=650 && \
+v4l2-ctl -d /dev/video0 --set-ctrl=white_balance_temperature_auto=0 && \
+v4l2-ctl -d /dev/video0 --set-ctrl=white_balance_temperature=4000'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
