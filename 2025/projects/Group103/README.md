@@ -136,9 +136,57 @@ This performed well enough. So, after implementing this algorithm and testing it
 **Color Calibration Issue:**
 We had already begun developing the blob detection when we corrected the camera's auto-exposure and white balance. So, in the demonstration, what occured was that some light sources were detected although they weren't close to our green. This was actually, because our initial example pictures had more of a cyanish green color and we missed out to consider this change after fixing up the camera settings.
 
-### Python Movememnt Script
+### Python Movement Script
 
-...
+To control to whole movement and operation of our Turtlebot3 we use a python script, similar to the `ca_controller.py` or `goal_controller.py` from the exercise [AN_02] and [AN_03], respectively.
+
+There we collect the inputs:
+
+- LIDAR scans
+- Images, rather the blobs
+
+The images are directly checked for blobs, so we don't directly handle images in this, script. This is taken over by the led_detection script.
+
+As outputs, we return the movement of the robot and whether to turn on the dc-motors or not via the arduino. So, we have to topics we subscribe to and two that we publish on.
+
+---
+To recap, we us e the camera to capture led balls and also move towards them, where our goal is to centered the led and then move straight to it.
+
+This divides operations into two phases. One, where no led is detect and one where we have one and need to capture it.
+
+**Scanning Phase:**
+In the scanning phase, we want to move our robot around as much as possible, to find any leds. This means, we need collision avoidance, to avoid letting our robot meet a wall. Here, we didn't want to overcomplicate things and simply build up on the `ca_controller.py` we could build ourselves in the respective exercise. However, in the collision avoidance controller we made there ourselves, the robot always moves straight and only turns if force to in order to avoid collision. So, we wanted to add some turning to it.
+
+Thus, we made the robot scan in two interchanges mode: straight and in a circle.
+The circle turning direction is deduced from which direction, offers the least chance of obstacles. or in other words, we check where the distance to an obstacle is the furthest, front left or front right.
+
+To switch between those two patterns, we simply use a timer for how long the robot executes each mode. For the demo video, we wanted the robot to turn around after having thrown a ball to quickly repeat its process. Thus, we set the circle duration to 16s and the straight scanning to 4s.
+
+**Centering and Collection**:
+Given that we have detected a led ball, our approach is to center it, then approach it and lastly, move straight, such that the robot kind of moves through the ball to feed it into the spinning wheels. This means that at some point of moving through the camera might loose sight of the ball.
+
+_Centering_:
+What we want is to position the led ball centered to the ramp. But not any led ball, we need to pick one, as there could be many. Here, we choose the one that is the closest to our centering line. As we said, this presumes the camera being approximately positioned at the center. In our case, our usb camera is located just a bit to the left. Thus, we consider a vertical x-line that is offset by a bit from the center, to which we try to get the led ball on the image as close as possible do. We further, consider an allowed error, since the funnel allows for small inaccuracies. Thus, in the centering phase, we turn the robot while very slowly moving forward, such that the led ball is within this allow error centered on the certical x-line.
+
+_Approaching_:
+We can then, fairly assume that since the led ball is in clear view, their ain't any obstacles between us and the led ball in front. This is based also on assuming the typical squared theatre space. However, since there could be smth behind the ball, we still check for distance to obstacles in front. And, if too close we cancel our approaching phase since collection is no longer feasible, as moving through the ball is not possible, with obstacles behind. Otherwise, in the approaching phase, the robot, simply moves straight while correcting slightly its direction to keep the led ball centered.
+
+_Collection_:
+As soon as the led is approximately close, we switching into collecting. This we detect by checking when the led-ball moves beyond a certain horizontal y-axis on the camera. This presumes the camera is angled to point slightly downwards, otherwise, this wouldn't work.
+Initially, at the start of the collecting phase, we turned on the dc-motors, but in some case this was too late, so this was given done when starting the approaching phase. Then, to allow for the ball to roll through the funnel, we decelerate it and for a fixed duration of 10s tell it to move straight, to move through, unless an obstacle blocks its path. This should allow for the ball to be caught by the funnels. And then, we move back to collecting. After exiting the collecting phase through either successfull collection or early exit, we trun of the dc motors.
+
+Why not merge the two centering and approaching:
+
+- It gives a nice, comical/cartoonish effect:
+- Having direct and clear vision of the ball helps as to not have to do any further collision avoidance in some parkoury fashion. also it makes clear which ball is selected.
+
+Difficulties in centering:
+
+During centering it can very much occur, that the blob detection for one or another frame can fail to detect the led. Thus, we implemented a kind of a cooldown buffer, which counts the successive frames in whihc no blob was detected. If this exceeds a limit of 15 frames, then we can savely assume, that the led has been lost. Otherwise, we stop the robot from turning, and hope the blob detection mechanism can get detect it again.
+
+The following UML-State diagram summarizes the interactions:
+
+<html picture size sesnibel src="./Schemas/movement_algo.png">
 
 ### Start up software
 
