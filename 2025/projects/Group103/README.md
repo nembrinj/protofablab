@@ -208,9 +208,80 @@ The following UML-State diagram summarizes the interactions:
 
 <html picture size sesnibel src="./Schemas/movement_algo.png">
 
-### Start up software
+### Start Up Software
 
-...
+We have three devices that run code:
+
+| Device      | Usage                                     | Short             |
+| ----------- | ----------------------------------------- | ----------------- |
+| Our own PC  | Runs the ROS master and the Python script | [PC]              |
+| The Raspi   | Controls the TurtleBot3                   | [turtlebot_raspi] |
+| The Arduino | Controls the DC-Motors                    | [Arduino]         |
+
+To start the whole interconnected system, the code should be run in the following order, with the target device denoted in square brackets. Use a new terminal for each command. For this to work, we assume that:
+
+- All devices have been set up on the same Wi-Fi network
+- The connection to the ROS master has been correctly configured
+- The following components have been correctly set up:
+  - **USB-camera**: Plugged into the Raspi on the TurtleBot3, with setup steps from exercise [AN_02, task 6, method 1] completed
+  - **Python script**: Located correctly on your PC, with the CMake file properly modified and built
+  - **Arduino**: The correct firmware has been loaded onto it
+
+#### Startup Sequence
+
+First, launch the ROS master:
+
+```bash
+roscore # [PC]
+```
+
+Next, set up rosserial Python for the Arduino to connect to ROS via TCP:
+
+```bash
+rosrun rosserial_python serial_node.py tcp 11411 # [PC]
+```
+
+The Arduino will connect automatically when powered by the battery.
+
+Now, set up the USB camera on the TurtleBot3. Turn the TurtleBot3 on and SSH into it from your PC:
+
+```bash
+ssh ubuntu@ubuntu.local # [PC] (This works if you have the avahi-daemon installed to provide mDNS)
+
+# Then, enter the password
+
+roslaunch turtlebot3_bringup turtlebot3_robot_usbcam.launch # [turtlebot_raspi]
+```
+
+Finally, run the Python script that contains all the control logic:
+
+```bash
+rosrun turtlebot3_profab blob_centeration.py # [PC]
+```
+
+#### Testing
+
+Here are some tests you can run to ensure the required components are operational:
+
+**Test Arduino connection:**
+Check if the Arduino is listening to the `/dc_motor_cmd` topic:
+
+```bash
+rostopic pub /dc_motor_cmd std_msgs/String "data: 'on'" # [PC]
+```
+
+or
+
+```bash
+rostopic pub /dc_motor_cmd std_msgs/String "data: 'off'" # [PC]
+```
+
+**Test USB camera:**
+Check if the USB camera is sending images by opening RViz and inspecting the Image section:
+
+```bash
+roslaunch turtlebot3_navigation turtlebot3_navigation.launch # [PC]
+```
 
 ## Result
 
