@@ -2,17 +2,26 @@
 
 ## Abstract
 
+- Leave for the end to simply summarize the whole thing into a few sentences
+
 ## Introduction
 
-In [Le Train](https://www.opus89-collectif.com/en-creation.html) by Joséphine de Weck, hope appears only briefly—fragile, fleeting, and easily lost. Ball-E was created as a robotic stage companion that supports this atmosphere through light and repetition rather than narration or action. Positioned in the background, the robot continuously collects and launches illuminated balls, releasing short arcs of light that recall fireflies or shooting stars: momentary glimmers of hope in an otherwise dark space.
+In [Le Train](https://www.opus89-collectif.com/en-creation.html) by Joséphine de Weck, hope appears only briefly; fragile, fleeting, and easily lost. Ball-E was created as a robotic stage companion that supports this atmosphere through light and repetition rather than narration or action. Positioned in the background, the robot continuously collects and launches illuminated balls, releasing short arcs of light that recall fireflies or shooting stars: momentary glimmers of hope in an otherwise dark space.
 
-At the same time, the endless cycle of collecting and throwing evokes the myth of Sisyphus. The robot’s task never resolves; meaning emerges through repetition and persistence rather than progress. Imperfect motion, visible effort, and mechanical delay are not errors but expressive qualities that align the system with the emotional undercurrent of the play.
+At the same time, the endless cycle of collecting and throwing evokes the myth of Sisyphus. The robot's task never resolves; meaning emerges through repetition and persistence rather than progress. Imperfect motion, visible effort, and mechanical delay are not errors but expressive qualities that align the system with the emotional undercurrent of the play.
 
-Technically, Ball-E combines mechanical design, embedded electronics, and computer vision to autonomously detect illuminated objects, move toward them, and launch them back into the environment. This repository documents the design and development of the prototype, exploring how simple autonomous systems can contribute to mood, symbolism, and dramaturgy in theatrical contexts.
+Technically, Ball-E combines mechanical design, embedded electronics, and computer vision to autonomously detect illuminated objects, move toward them, and launch them back into the environment.
+
+- Add contributions
+
+This repository documents the design and development of the prototype, exploring how simple autonomous systems can contribute to mood, symbolism, and dramaturgy in theatrical contexts.
+
+- List the content with links to the titles ( leave for the end)
 
 ## System Overview
 
-Ball-E is an autonomous robotic sytem designed to repeatedly collect and project illumintaed balls in a theatrical dark environment. The system integrates mechanical, electronic and software components oto create a continuous loop of perception, movement and collection and propulsion.
+Ball-E is an autonomous robotic sytem designed to repeatedly collect and shoot illumintaed balls in a theatrical dark environment. The system integrates mechanical, electronic and software components to create a continuous loop of perception, movement, and collection and propulsion.
+
 So conceptually, the robot performs two core actions:
 
 - Detect and move to illuminated balls
@@ -20,7 +29,7 @@ So conceptually, the robot performs two core actions:
 
 ### System Architecture
 
-Which leads us to the following system architecture, composed of three tightly coupled subsytems:
+This leads us to the following system architecture, composed of three tightly coupled subsytems:
 
 1. **Perception**: Lead by..
    - A full-HD Usb camera mounted on the robot used for "seeing" the balls and send to the maincomputing station
@@ -32,8 +41,8 @@ Which leads us to the following system architecture, composed of three tightly c
    - A Breadboard connecting 2x 5V DC-motors for the propulsion, connected to
    - A [ramp](./Media/base_ramp_2.jpeg) which is connected to the robot and
    - An extension of the ramp which gives the optimal angle for the propulsion in regards to the chosen motors
-   - A [funnel](./Media/funnel_2.jpeg) leading the balls to the DC-motors
-4. **Connecting everything**: By a P script which automates
+   - A [funnel](./Media/funnel_2.jpeg) guiding the balls to the DC-motors
+4. **Connecting everything**: By a Python  script which automates
    - the movement
    - the detection
    - the threshold for activating the propulsion motors
@@ -42,36 +51,63 @@ Which leads us to the following system architecture, composed of three tightly c
 
 TODO: reference pictures!
 
-| Amount | Parts                                                                 | Descriptions |
-|--------|-----------------------------------------------------------------------|--------------|
-| 1x     | [TurtleBot Preassembled](./Media/turtle_bot_frontview.jpeg)           |              |
-| 1x     | [3D-printend base_ramp](./Media/base_ramp_2.jpeg)                     |              |
-| 1x     | [3D-printend ramp_extension](./Media/ramp_extension.jpeg)             |              |
-| 1x     | [3D-printend ramp clamps](./Media/ramp_clamps.jpeg)                   |              |
-| 2x     | [3D-printend motor holders](./Media/ramp_clamps.jpeg)                 |              |
-| 2x     | [3D-printend gears without teeth](./Media/gear.jpeg)                  |              |
-| 1x     | [foam for coating the gears](./Media/foam.jpeg)                       |              |
-| 2x     | [5V DC-Motors](./Media/dc-motors.jpeg)                                |              |
-| 1x     | [Motor Relay](./Media/relay.jpeg)                                     |              |
-| 2x     | [Powerbanks](./Media/powerbanks.jpeg)                                 |              |
-| 2x     | [Usb power connectors](./Media/usb_power_connectors.jpeg)             |              |
-| 2x     | [Usb power connectors](./Media/usb_power_connectors.jpeg)             |              |
-| 1x     | [Bread Board](./Media/bread_board.jpeg)                               |              |
-| xx     | [Some male-male and male-female electric cables](./Media/cables.jpeg) |              |
-| 1x     | [Microcontroller](./Media/microcontroller.jpeg)                       |              |
-| 1x     | [Funnel](./Media/funnel_2.jpeg)                                       |              |
+| Amount | Parts                                                                        | Descriptions |
+|--------|------------------------------------------------------------------------------|--------------|
+| 1x     | [TurtleBot Preassembled](./Media/Images/turtle_bot_frontview.jpeg)           |              |
+| 1x     | [3D-printend base_ramp](./Media/Images/base_ramp_2.jpeg)                     |              |
+| 1x     | [3D-printend ramp_extension](./Media/Images/ramp_extension.jpeg)             |              |
+| 1x     | [3D-printend ramp clamps](./Media/Images/ramp_clamps.jpeg)                   |              |
+| 2x     | [3D-printend motor holders](./Media/Images/ramp_clamps.jpeg)                 |              |
+| 2x     | [3D-printend gears without teeth](./Media/Images/gear.jpeg)                  |              |
+| 1x     | [foam for coating the gears](./Media/Images/foam.jpeg)                       |              |
+| 2x     | [5V DC-Motors](./Media/Images/dc-motors.jpeg)                                |              |
+| 1x     | [Motor Relay](./Media/Images/relay.jpeg)                                     |              |
+| 2x     | [Powerbanks](./Media/Images/powerbanks.jpeg)                                 |              |
+| 2x     | [Usb power connectors](./Media/Images/usb_power_connectors.jpeg)             |              |
+| 2x     | [Usb power connectors](./Media/Images/usb_power_connectors.jpeg)             |              |
+| 1x     | [Bread Board](./Media/Images/bread_board.jpeg)                               |              |
+| xx     | [Some male-male and male-female electric cables](./Media/Images/cables.jpeg) |              |
+| 1x     | [Microcontroller](./Media/Images/microcontroller.jpeg)                       |              |
+| 1x     | [Funnel](./Media/Images/funnel_2.jpeg)                                       |              |
 
 ### System Schemas
 
 This is how the finished hardware architecture looks like:
 
+<!-- <img src="path" style="max-width:600px; width:100%; height:auto;"> -->
+
 This is how the motors are connected on the breadboard with the microcontroller, the relay and the powerbanks:
 
-This is how the finished software architecture looks like:
+<img src="./Schemas/circuit.svg" style="max-width:600px; width:100%; height:auto;">
+
+This is how the finished software architecture looks like: (todo: is this really software architecture??)
+
+<img src="./Schemas/component_diagramm.png" style="max-width:600px; width:100%; height:auto;">
 
 ## Design and Fabrication of Hard- and Software
 
-- Present propulsion mechanism by going through the devlopment stage part by part:
+### Initial Prototype
+
+For designing our propulsion mechanism, we did some research like anybody does by watching some YouTube videos. There we found a video where one was using two DC-Motors to which some type of wheels wrapped with some sort of rubber-band where attached, which thus where spun. Then, a ping pong ball was fed into the wheels and the spinning wheels managed to transfer some of their momentum to the ball to fling it away.
+
+So, we tried to recreate this in our first iteration, using wood, from which we lasercutted two circles and put a hole inside of each to attach them to a DC-Motor each. We connected the DC-Motors to a battery each with a button in between to control whether they spin or not and thus, created the following 1. prototype showcased in this video:
+
+<video src="./Media/Videos/propulsion_prototype_1.mp4" controls style="max-height:600px; height:100%; width:auto;"></video>
+
+This works well, but our protoype wasn't very precise, the ball isn't thrown well consistently. And, although on camera the ball which we created by rolling paper into the shaped of a ball and taping it, looks like it flies quite a bit, in reality it doesn't fly that far, which was a bit of a concern for us. The ball in which we'll place the LED, we knew, would likely be heavier, since alone the coin battery for the LED is heavier. Thus, we need to also make some efficiency adaptations.
+
+### Continous Iteration
+
+Since our first prototype showed promise, we started with designing and testing key components. However, we also made some key decisions that motivated the following components. After discussion with our professors which gave their helpful tips and ideas, we adjusted our approach to:
+
+- combine collection and propulsion into one. Basically, to directly feed the ball into the DC-Motors which instantly propulse it into the air. So, no storage of LED-Balls
+- and decided t make the ball for the led 3d printed, with holes to let the leds light shine through
+
+As a result the DC-motors should basically be placed at ground level. At least to implement this in the simplest way possible. So, we thought similar to our protoype we could then, use a ramp to guide the ball upwards.
+
+So, we needed a 3D-printed ball, some type of ramp -> also 3d print and then, somewhat attach the dc-motors to this ramp. We'll now look at each of those components and how, we iterated them in development and highlight special considerations.
+
+- Present propulsion mechanism by going through the devlopment stage part by part:  
 
   - First two tests (videos?)
   - LED-Ball
@@ -206,7 +242,7 @@ During centering it can very much occur, that the blob detection for one or anot
 
 The following UML-State diagram summarizes the interactions:
 
-<html picture size sesnibel src="./Schemas/movement_algo.png">
+<img src="./Schemas/movement_algo.png" style="max-width:600px; width:100%; height:auto;">
 
 ### Start Up Software
 
