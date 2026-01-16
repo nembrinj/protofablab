@@ -6,7 +6,7 @@
 
 ## Introduction
 
-In [Le Train](https://www.opus89-collectif.com/en-creation.html) by Joséphine de Weck, hope appears only briefly; fragile, fleeting, and easily lost. Ball-E was created as a robotic stage companion that supports this atmosphere through light and repetition rather than narration or action. Positioned in the background, the robot continuously collects and launches illuminated balls, releasing short arcs of light that recall fireflies or shooting stars: momentary glimmers of hope in an otherwise dark space.
+In [Le Train](https://www.opus89-collectif.com/en-creation.html) by Joséphine de Weck, hope appears only briefly; fragile, fleeting, and easily lost. Ball-E was created as a robotic stage companion that supports this atmosphere through light and repetition rather than narration or action. Positioned in the background, the robot continuously collects and launches illuminated balls, releasing spectacle of short arcs of light that recall fireflies or shooting stars: momentary glimmers of hope in an otherwise dark space.
 
 At the same time, the endless cycle of collecting and throwing evokes the myth of Sisyphus. The robot's task never resolves; meaning emerges through repetition and persistence rather than progress. Imperfect motion, visible effort, and mechanical delay are not errors but expressive qualities that align the system with the emotional undercurrent of the play.
 
@@ -22,34 +22,34 @@ This repository documents the design and development of the prototype, exploring
 
 Ball-E is an autonomous robotic sytem designed to repeatedly collect and shoot illumintaed balls in a theatrical dark environment. The system integrates mechanical, electronic and software components to create a continuous loop of perception, movement, and collection and propulsion.
 
-So conceptually, the robot performs two core actions:
+Conceptually, the robot performs two core actions:
 
-- Detect and move to illuminated balls
-- Collect and launch the balls
+- Detect and move to illuminated LED-balls
+- Collect and launch the LED-balls
 
 ### System Architecture
 
 This leads us to the following system architecture, composed of three tightly coupled subsytems:
 
 1. **Perception**: Lead by..
-   - A full-HD Usb camera mounted on the robot used for "seeing" the balls and send to the maincomputing station
+   - A full-HD USB camera mounted on the robot used for "seeing" the balls, sending its image to the maincomputing station
    - A script for executing real-time blob detection for lights executed on the maincomputing station
 2. **Movement and Control**: Making use of..
-   - Prebuild [Turtlebot](./Media/turtle_bot_sideview.jpeg) with a lidar for object detection and navigating the landscape
-   - Raspberry Pi 4 for communicating with the maincomputing station by means of pub/sub
+   - Prebuild [Turtlebot](./Media/turtle_bot_sideview.jpeg) with LIDAR for object detection and navigating the landscape
+   - Raspberry Pi 4 for communicating with the maincomputing station by means of publishing and subscribing to ROS topics
 3. **Collection and Launch Mechanism**: With making use of or printing..
-   - A Breadboard connecting 2x 5V DC-motors for the propulsion, connected to
+   - A Breadboard connecting 2x 2.5-6V DC-motors for the propulsion, connected to
    - A [ramp](./Media/base_ramp_2.jpeg) which is connected to the robot and
    - An extension of the ramp which gives the optimal angle for the propulsion in regards to the chosen motors
    - A [funnel](./Media/funnel_2.jpeg) guiding the balls to the DC-motors
 4. **Connecting everything**: By a Python  script which automates
-   - the movement
-   - the detection
-   - the threshold for activating the propulsion motors
+   - the movement,
+   - the detection,
+   - and activating the propulsion motors to collect and launch the LED-Ball
 
-### Hardware List
+<img src="./Schemas/component_diagramm.png" style="max-width:600px; width:100%; height:auto;">
 
-TODO: reference pictures!
+### Hardware  Components
 
 | Amount | Parts                                                                        | Descriptions |
 |--------|------------------------------------------------------------------------------|--------------|
@@ -70,70 +70,146 @@ TODO: reference pictures!
 | 1x     | [Microcontroller](./Media/Images/microcontroller.jpeg)                       |              |
 | 1x     | [Funnel](./Media/Images/funnel_2.jpeg)                                       |              |
 
-### System Schemas
+## Mechanical Design
 
-This is how the finished hardware architecture looks like:
+### Propulsion mechanism
 
-<!-- <img src="path" style="max-width:600px; width:100%; height:auto;"> -->
+Before designing our propulsion mechanism, we did some research like any responsible person would do: By watching YouTube videos. We found a clip where a propulsion device was created using two spinning DC-Motors, with wheels wrapped in rubber band attached, to shoot a Ping Pong ball.
 
-This is how the motors are connected on the breadboard with the microcontroller, the relay and the powerbanks:
+We tried to recreate this contraption, cutting two circles with a hole in the middle into a piece of wood, using a Lasercutter. We attached the wooden circles to the DC-Motors and mounted the Motors onto another piece of wood, with one in between acting as a ramp. We powered the DC-Motors up by using a 4.5V battery pack for each with a button on a breadbord in between to control the power. As a ball, we used a scrambled up piece of paper, with some tape around to hold it together. Et voila, our first prototype was created and it worked:
 
-<img src="./Schemas/circuit.svg" style="max-width:600px; width:100%; height:auto;">
-
-This is how the finished software architecture looks like: (todo: is this really software architecture??)
-
-<img src="./Schemas/component_diagramm.png" style="max-width:600px; width:100%; height:auto;">
-
-## Design and Fabrication of Hard- and Software
-
-### Initial Prototype
-
-For designing our propulsion mechanism, we did some research like anybody does by watching some YouTube videos. There we found a video where one was using two DC-Motors to which some type of wheels wrapped with some sort of rubber-band where attached, which thus where spun. Then, a ping pong ball was fed into the wheels and the spinning wheels managed to transfer some of their momentum to the ball to fling it away.
-
-So, we tried to recreate this in our first iteration, using wood, from which we lasercutted two circles and put a hole inside of each to attach them to a DC-Motor each. We connected the DC-Motors to a battery each with a button in between to control whether they spin or not and thus, created the following 1. prototype showcased in this video:
+[Watch the propulsion prototype video](./Media/Videos/propulsion_prototype_1.mp4)
 
 <video src="./Media/Videos/propulsion_prototype_1.mp4" controls style="max-height:600px; height:100%; width:auto;"></video>
 
-This works well, but our protoype wasn't very precise, the ball isn't thrown well consistently. And, although on camera the ball which we created by rolling paper into the shaped of a ball and taping it, looks like it flies quite a bit, in reality it doesn't fly that far, which was a bit of a concern for us. The ball in which we'll place the LED, we knew, would likely be heavier, since alone the coin battery for the LED is heavier. Thus, we need to also make some efficiency adaptations.
+However, we noted that, altough on video the paper ball seems to fly quite a bit, in reality it was rather underwhelming. This could become a critical point of our project. The ball must fly high enough to create a good effect. And to add to that, our actual LED-ball is going to be heavier. Nevertheless, we decided to stick with this idea and hoped that through more precise work, we could still build this propulsion mechanism effective enough.
 
-### Continous Iteration
+Anyhow, our first prototype showed promise and we started with designing and testing key components. After some discussion with our professors, which gave their helpful tips and ideas in class and at the midterm, we made up our mind, how we wanted to begin implementing a more robust prototype:
 
-Since our first prototype showed promise, we started with designing and testing key components. However, we also made some key decisions that motivated the following components. After discussion with our professors which gave their helpful tips and ideas, we adjusted our approach to:
+- Create a 3D-printed ball to hold the LED and coin battery which powers it.
+- To reduce complexity, we decided to combine collection and propulsion into one. Thus, placing the spinning wheels close to the floor, to shoot the LED directly from there.
+- Use a ramp to guide ball upwards and connect the DC-Motors to it.
 
-- combine collection and propulsion into one. Basically, to directly feed the ball into the DC-Motors which instantly propulse it into the air. So, no storage of LED-Balls
-- and decided t make the ball for the led 3d printed, with holes to let the leds light shine through
+And so we began, iterating through these three parts (LED-Ball, DC-Motor holder and wheels, Ramp) through making changes in the 3D-model to printing and adjusting through repeating this. We present the following main iterations and changes we made on these components, in the following Subsections.
 
-As a result the DC-motors should basically be placed at ground level. At least to implement this in the simplest way possible. So, we thought similar to our protoype we could then, use a ramp to guide the ball upwards.
+#### LED-Ball
 
-So, we needed a 3D-printed ball, some type of ramp -> also 3d print and then, somewhat attach the dc-motors to this ramp. We'll now look at each of those components and how, we iterated them in development and highlight special considerations.
+_Intial idea_:
+Our first idea included 3D printing the outside of a ball and putting a LED inside that is directly attached to a coin battery. A bit like a Ping Pong ball with a light inside. To make the light shine through the ball we thought about adding holes to itside outside.
 
-- Present propulsion mechanism by going through the devlopment stage part by part:  
+_Iteration 1_:
 
-  - First two tests (videos?)
-  - LED-Ball
-    - Use following schema to describe iterations
-      - _Intial idea_: ...
-      - _Iteration 1_:
-        - **Considered Implementation:**
-        - **What Worked:**
-        - **What Didn't Work:**
-        - **Next Improvements:**
+- **Considered Implementation:** To check how well our prototype would work with a 3D printed ball, we first pulled a pre-made 3D model from the internet, which useed hexagonal holes.
+- **What Didn't Work:** The large size of the hex-shaped holes, cause the balls surface to be less-smooth. This could decrease how high the ball can be shot, when it rolls up the ramp. Further, the ball we printed was clearly to small to fit a LED and a coin battery inside.
+- **Next Improvements:**
+  - Create are own model
+  - Balance size and number of holes wto maintain roundness of the ball.
 
-  - Ramp
-  - DC-Holders
-  - Another test (ramp exit angle to flat)
-  - Ramp-Extension
-  - Funnel
-  - Turtelbot3 connector
+_Iteration 2_:
 
-  - Circuit Arduino
+- **Considered Implementation:** We modelled our own ball in Fusion360. First, we focused solely on the ball and its shape without the LED and coin battery in mind. But, we already considered that we need to put them inside somehow. Thus, we can't print the full ball at once. The Prusa Slicer has a neat feature, which allows to cut 3D-models and place connectors between the split shapes, such that one can assemble them later on. So, we printed the ball in halves, with small connectors, sticking out of one half and their corresponding holes in the other.
+- **Special Considerations:** To make are ball easily adaptable, especially since, the hole and ball size might need to be changed, excessively used the parameter feature in Fusion360.
+- **What Worked:** Our modelled ball rolled much nicer. Assembling the ball afterwards works.
+- **What Didn't Work:** The connectors where two small and break easily to due the layer direction of the print. Also, the connector placement in  the Prusa Slicer isn't very exact, resulting in difficulties of in putting the halves together, when the connectors where symmetrically placed, such that it wasn't clear which plug belonged to which hole.
+- **Next Improvements:**
+  - Use larger and better placed connectors for increased stability
+  - Add coin batter holder.
 
-    - 2 Schemas:
-      - Visual + camera pic
-      - logical, should be possible to export from same program as done viusal with
-    - Parallel
-    - Relay
-    - 2x battery-pack
+_Iteration 3_:
+
+- **Considered Implementation:** To increase the size of the connectors, the thickness of the balls outside wall needed to be increased. The coin battery we wanted to place at the center of the ball to not disturb the weight distribution too much. Here, we also made a seperate test print, solely printing the coin battery holderholder, to determine a good fit beforehand.
+- **What Worked:** Making the wall thicker added a little improvement. The ball's halves hold better together. The coin battery holder came out need and we even added a little hexagonal pattern to it.
+- **What Didn't Work:** Still, the connectors are suboptimal, because they can still break, especially when disassembling the ball into its halves. The coin battery fits well inside, but there isn't much room for the LED to fit inside the ball.
+- **Next Improvements:**
+  - Model connectors directly in Fusion360, make them somehow larger and more robust.
+  - Make room for the LED.
+
+_Iteration 4_:
+
+- **Considered Implementation:** We realised that using a dowel mechanism to connect the two ball halves instead of a one-sided plug would solve two problems. First, when modelling the connectors ourselves, it is difficult to eyeball the buffer well, such that the plug fits into the whole, but at the same time isn't too loose. Using a dowel allows us test the dowels diameter by printing it alone instead of the whole ball again. Secondly, it allows to print the dowel seperately and thus, by printing it horizontally the layers a printed such that our small dowel becomes nearly indestructible.
+To make room for the LED, we realised that the battery holder might better be placed at the bottom of the ball. This would also provide a nice effect of the ball stabilizing with the LED pointing up, after rolling around due to the battery changing its center of mass.
+Given its new position, we could also nicely align the new connectors with the coin battery hold, using now only two but instead thicker connectors.
+- **What Worked:** The new dowels worked really well, and the coin battery still fits very nicely into its newly positioned holder. Due to placing the connectors no longer on the ball's outside wall, we could also reduce its thickness, reducing its weight.
+- **What Didn't Work:** However, the coin battery fits so well that there isn't enough room for the led pins to fit into. The hex pattern on the battery holder added some print instabilities.
+- **Next Improvements:** We need to add some cutouts for the LED pins to fit and remove the hex pattern.
+
+_Final Iteration_:
+
+- **Considered Implementation:** Early on our professors already gave use the idea to use transparent filament instead of hole cutouts to allow for better blob detection. And while we were first cautious with that, since then the light emitted might be to little, when we saw during blob detection development that the cutout holes create small ball shaped reflections on the floor that get mistaken for the LED ball in detection, we decided to go with their idea. So, we removed the holes, decreased the thickness of the ball's outside and printed with it transparent PLA.
+We decided to remove the hexagonal pattern from the coin battery holder and add the LED pin cutouts.
+
+#### Ramp
+
+_Intial idea_:
+The ramp should have a nice curvature without any edges in it, such that the LED-ball wouldn't be decelerated by anything. But it also needs to well guide the ball, so its track can't be flat, but needs to be curved such that the ball follows a straight line. For the best effect our ball would optimally be shot nearly straight up.
+
+_Iteration 1_:
+
+- **Considered Implementation:** We set out to create a solid base ramp with adjustable parameters for its height, length, curvature etc. such that we can easily adjust these, if they don't fit.
+- **What Worked:** The ramp came out very solid already, proving that our concept is on the right track.
+- **What Didn't Work:** We modelled the ramp such that it was lifted of the floor by a few centimeters. But, we adapted our project to place the wheels spun by the DC-Motors close to the floor, it would make a project a lot simpler to remove this extra cusion below the ramp and placed it at floor level, as well. When testig our ramp by flinging the ball into it using just our fingers, we realised that the curvature of the ramp was way too steep, and the exit angle of 90 degrees might be too.
+- **Next Improvements:**
+  - Change the steepness and exit angle.
+  - Put the ramp to the floor, make adjustment for top cut off.
+
+_Iteration 2_:
+
+- **Considered Implementation:** Adapting the steepness, floor offset and curvature was easily done, due to us using pareameters in fusion. Thus, we could just set the floor height to zero, increase the length of the ramp and change the exit angle.
+- **What Worked:** Now, the ball rolls up more easily and can be rolled into the ramp directly from the floor.
+- **What Didn't Work:** The ramp takes quite some time to print. And we knew that we would still be adding things to it (e.g. DC-Motor holders).
+- **Next Improvements:**
+  - Make ramp more modifiable.
+
+_Final Iteration_:
+
+- **Considered Implementation:** To allow for a adding components to the ramp and thus, making external modifications, we added squared cutouts to the ramp, such that we can later simply uses connectors to plug other things onto it, similar to the dowels for the LED ball.
+
+- DC-Holders
+
+### Preliminary Tests
+
+Having our key components ready, we wanted to check how well they work together. We assembled everything and ran the following tests:
+
+[Watch our test video here](./Media/Videos/test_2_with_ramp_1.mp4) [or here](./Media/Videos/test_2_with_ramp_2.mp4).
+
+<video src="./Media/Videos/test_2_with_ramp_1.mp4" controls style="max-width:500px; width:100%; height:auto;"></video>
+<video src="./Media/Videos/test_2_with_ramp_2.mp4" controls style="max-width:500px; width:100%; height:auto;"></video>
+
+- Ramp-Extension
+- Funnel
+- Turtelbot3 connector
+
+<!--Vorlage für Beschreibung der 3D-Modelle 
+
+_Intial idea_:
+_Iteration 1_:
+
+- _Considered Implementation:_
+- _What Worked:_
+- _What Didn't Work:_
+- _Next Improvements:_ -->
+
+#### Controlling the DC-Motors
+
+To remotely control the DC-Motors we made use of our Arduino Adafruit Feather ESP32-S3, allowing us to control the DC-Motors via a ROS-topic.
+
+Since we were concerned about the power of our propulsion mechanism, we wanted to have at least 5V DC-Motors. However, the Arduino runs on 3.3V and so, taking its signal alone as power isn't enough. We needed an external powersource to power up the DC-Motors, while the Arduinos signal is solely used for control.
+This is the typical scenario for using a relay. Our professors also suggested using a driver module to allow to control more exactly the power the DC-Motors receiver. But since we only need either full or no power, we decided to use a relay module.
+The DC-Motors we got, should be the ones with 2.5 - 6 V. We used a rechargable battery that in theory should generate 5V but in practice managed only about 2.9 V. Hence, we put the DC-Motors in parallel, as otherwise, the battery wouldn't even be able to turn them on.
+
+**Problems:**
+At first we used one batterypack to supply both the dc-motors and the arduino with power. However, this caused the arduino to power of as soon as the DC-Motors where switched on, likely due to different resistances and the batterie's low voltage. Thus, we ended up using two recharagable battery packs, one for the dc-motors and one for the arduino.
+
+This alltogether gave us the following circuit, once more cleanly as a diagram modelled with Fritzing and once, the real implementation:
+
+<img src="./Schemas/circuit.svg" style="max-width:600px; width:100%; height:auto;">
+
+<img src="./Media/Images/circuit_irl.jpg" style="max-width:600px; width:100%; height:auto;">
+(Here, we only have one DC-Motor connected through the red and pink wires leaving the image.)
+
+Now, we only need to set up the connection between the ROS master and our Arduino. For this we modified the `TcpHelloWorld` example from `"File"->"Examples"->"Rosserial Arduino Library"` which comes with the `Rosserial Arduino Library`. But instead of publishing to a topic, we set up a topic called `\dc_motor_cmd`,on which `Strings` are sent, which we subscribe to. If our Arduino receives a String `"off"` then the arduino pushes low or no voltatge over PIN 13, to which the Relay Module is connected. If it receives `"on"`, then it pushes high enough voltage to set off the Relay, turning on the DC-Motors.
+
+We set up the WiFi to connect to the Hotspot that all other components are connected to as well. Then, our ROS-master can communicate with the Arduino over the rosserial python through tcp. And we can simply publish to the ROS topic `\dc_motor_cmd` to control the DC-Motors.
 
 ### Autonomous Movement to LED-Ball
 
@@ -144,7 +220,7 @@ Our first intuition was to use a USB-Camera, and then locate the shining 3D prin
 
 Given a hint by our professors, we decided to go for a more robust detection approach: instead of trying to interpret pixel data in an overly simplistic way, we used opencv's blob detection.
 
-#### Detecting the LED-Balls using Blob Detection
+#### Detecting the LED-Balls
 
 ##### Set up camera
 
@@ -172,7 +248,7 @@ This performed well enough. So, after implementing this algorithm and testing it
 **Color Calibration Issue:**
 We had already begun developing the blob detection when we corrected the camera's auto-exposure and white balance. So, in the demonstration, what occured was that some light sources were detected although they weren't close to our green. This was actually, because our initial example pictures had more of a cyanish green color and we missed out to consider this change after fixing up the camera settings.
 
-### Python Movement Script
+### Navigation to LED Balls
 
 To control to whole movement and operation of our Turtlebot3, we use a Python script similar to the `ca_controller.py` or `goal_controller.py` from the exercise [AN_02] or [AN_03], respectively. Hence, our Python script is executed on the same node as the ROS-master and enforces control over the robot by subscribing and publishing on ROS-topics. We collect and publish the following in- and outputs from and to the Turtelbot3:
 
@@ -319,7 +395,7 @@ Check if the USB camera is sending images by opening RViz and inspecting the Ima
 roslaunch turtlebot3_navigation turtlebot3_navigation.launch # [PC]
 ```
 
-## Result
+## Results
 
 - Show demo video/link demo video
 - Discussion of limitations and result in general?
@@ -334,7 +410,7 @@ roslaunch turtlebot3_navigation turtlebot3_navigation.launch # [PC]
 
 - Summarize our project
 
-## Future Works/Perfect Project
+## Perfect Project
 
 - What improvements would we make?
 - How would the perfect implementation with a team of xx people and many resources be like.
