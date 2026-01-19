@@ -62,13 +62,13 @@ This leads us to the following system architecture, composed of three tightly co
    - A full-HD USB camera mounted on the robot used for "seeing" the balls, sending its image to the maincomputing station
    - A script for executing real-time blob detection for lights executed on the maincomputing station
 2. **Movement and Control**: Making use of..
-   - Prebuild [Turtlebot](./Media/turtle_bot_sideview.jpeg) with LIDAR for object detection and navigating the landscape
+   - Prebuild [Turtlebot](./Media/Images/turtle_bot_sideview.jpeg) with LIDAR for object detection and navigating the landscape
    - Raspberry Pi 4 for communicating with the maincomputing station by means of publishing and subscribing to ROS topics
 3. **Collection and Launch Mechanism**: With making use of or printing..
    - A Breadboard connecting 2x 2.5-6V DC-motors for the propulsion, connected to
-   - A [ramp](./Media/base_ramp_2.jpeg) which is connected to the robot and
+   - A [ramp](./Media/Images/base_ramp_2.jpeg) which is connected to the robot and
    - An extension of the ramp which gives the optimal angle for the propulsion in regards to the chosen motors
-   - A [funnel](./Media/funnel_2.jpeg) guiding the balls to the DC-motors
+   - A [funnel](./Media/Images/funnel_2.jpeg) guiding the balls to the DC-motors
 4. **Connecting everything**: By a Python  script which automates
    - the movement,
    - the detection,
@@ -107,9 +107,9 @@ We tried to recreate this contraption, cutting two circles, each with a hole in 
 
 [Watch the propulsion prototype video](./Media/Videos/propulsion_prototype_1.mp4)
 
-<video src="./Media/Videos/propulsion_prototype_1.mp4" controls style="max-height:600px; height:100%; width:auto;"></video>
+<Video src="./Media/Videos/propulsion_prototype_1.mp4" controls style="max-height:600px; height:100%; width:auto;"></video>
 
-However, we noted that, altough on video the paper ball seems to fly quite a bit, in reality it was rather underwhelming. This could become a critical point of our project. The ball must fly high enough to create a good effect. And to add to that, our actual LED-ball is going to be heavier. Nevertheless, we decided to stick with this idea and hoped that through more precise work, we could still build this propulsion mechanism effective enough.
+However, we noted that, although on video the paper ball seems to fly quite a bit, in reality it was rather underwhelming. This could become a critical point of our project. The ball must fly high enough to create a good effect. And to add to that, our actual LED-ball is going to be heavier. Nevertheless, we decided to stick with this idea and hoped that through more precise work, we could still build this propulsion mechanism effective enough.
 
 Anyhow, our first prototype showed promise and we started with designing and testing key components. After some discussion with our professors, which gave their helpful tips and ideas in class and at the midterm presentation, we made up our mind on how we wanted to begin implementing a more robust prototype:
 
@@ -129,23 +129,23 @@ Our first idea included 3D printing the outside of a ball and putting a LED insi
 - **Considered Implementation:** To check how well our prototype would work with a 3D printed ball, we first pulled a pre-made 3D model from the internet, which useed hexagonal holes.
 - **What Didn't Work:** The large size of the hex-shaped holes, caused the balls surface to be less-smooth. This could decrease how high the ball can be shot, when it rolls up the ramp. Further, the ball we printed was clearly to small to fit a LED and a coin battery inside.
 - **Next Improvements:**
-  - Create are own model
+  - Create our own model
   - Balance size and number of holes to maintain roundness of the ball.
 
 *Iteration 2*:
 
 - **Considered Implementation:** We modelled our own ball in Fusion360. First, we focused solely on the ball and its shape without the LED and coin battery in mind. But, we already considered that we need to put them inside somehow. Thus, we can't print the full ball at once. The Prusa Slicer has a neat feature, which allows to cut 3D-models and place connectors between the split shapes, such that one can assemble them later on. So, we printed the ball in halves, with small connectors, sticking out of one half and their corresponding holes in the other.
-- **Special Considerations:** To make are ball easily adaptable, especially since, the hole and ball size might need to be changed, we excessively used the parameter feature in Fusion360.
-- **What Worked:** Our modelled ball rolled much nicer. Assembling the ball afterwards works.
-- **What Didn't Work:** The connectors where two small and break easily due to the layer direction of the print. Also, the connector placement in  the Prusa Slicer isn't very exact, resulting in difficulties of in putting the halves together, when the connectors where symmetrically placed, such that it wasn't clear which plug belonged to which hole.
+- **Special Considerations:** To make our ball easily adaptable, especially since, the hole and ball size might need to be changed, we excessively used the parameter feature in Fusion360.
+- **What Worked:** Our modelled ball rolled much nicer. Assembling the ball afterwards worked.
+- **What Did Not Work:** The connectors where too small and broke easily due to the layer direction of the print. Also, the connector placement in the Prusa Slicer isn't very exact, resulting in difficulties of putting the halves together, when the connectors where symmetrically placed, such that it wasn't clear which plug belonged to which hole.
 - **Next Improvements:**
   - Use larger and better placed connectors for increased stability
-  - Add coin batter holder.
+  - Add coin battery holder.
 
 *Iteration 3*:
 
-- **Considered Implementation:** To increase the size of the connectors, the thickness of the balls outside wall needed to be increased. The coin battery we wanted to place at the center of the ball to not disturb the weight distribution too much. Here, we also made a seperate test print, solely printing the coin battery holderholder, to determine a good fit beforehand.
-- **What Worked:** Making the wall thicker added a little improvement. The ball's halves hold better together. The coin battery holder came out need and we even added a little hexagonal pattern to it.
+- **Considered Implementation:** To increase the size of the connectors, the thickness of the balls outside wall needed to be increased. For not disturbing the weight distribution too much, we wanted to place the coin battery at the center of the ball. Here, we also made a separate test print, solely printing the coin battery holder, to determine a good fit beforehand.
+- **What Worked:** Making the wall thicker added a little improvement. The ball's halves held better together. The coin battery holder came out neat, and we even added a little hexagonal pattern to it.
 - **What Didn't Work:** Still, the connectors are suboptimal, because they can still break, especially when disassembling the ball into its halves. The coin battery fits well inside, but there isn't much room for the LED to fit inside the ball.
 - **Next Improvements:**
   - Model connectors directly in Fusion360, make them somehow larger and more robust.
@@ -153,45 +153,93 @@ Our first idea included 3D printing the outside of a ball and putting a LED insi
 
 *Iteration 4*:
 
-- **Considered Implementation:** We realised that using a dowel mechanism to connect the two ball halves instead of a one-sided plug would solve two problems. First, when modelling the connectors ourselves, it is difficult to eyeball the buffer well, such that the plug fits into the whole, but at the same time isn't too loose. Using a dowel allows us test the dowels diameter by printing it alone instead of the whole ball again. Secondly, it allows to print the dowel seperately and thus, by printing it horizontally the layers a printed such that our small dowel becomes nearly indestructible.
-To make room for the LED, we realised that the battery holder might better be placed at the bottom of the ball. This would also provide a nice effect of the ball stabilizing with the LED pointing up, after rolling around due to the battery changing its center of mass.
-Given its new position, we could also nicely align the new connectors with the coin battery hold, using now only two but instead thicker connectors.
+- **Considered Implementation:** We realised that using a dowel mechanism to connect the two ball halves instead of a one-sided plug would solve two problems. First, when modelling the connectors ourselves, it is difficult to eyeball the buffer well, such that the plug fits into the whole, but at the same time isn't too loose. Using a dowel allows us to test the dowels diameter by printing it alone instead of the whole ball again. Secondly, it allows to print the dowel separately and thus, by printing it horizontally the layers are printed such that our small dowel becomes nearly indestructible.
+To make room for the LED, we realised that the battery holder might better be placed at the bottom of the ball. This would also provide a nice effect of the ball stabilizing with the LED pointing up after rolling around, due to the battery changing its center of mass.
+Given its new position, we could also nicely align the new connectors with the coin battery hold, using now only two and instead thicker connectors.
 - **What Worked:** The new dowels worked really well, and the coin battery still fits very nicely into its newly positioned holder. Due to placing the connectors no longer on the ball's outside wall, we could also reduce its thickness, reducing its weight.
-- **What Didn't Work:** However, the coin battery fits so well that there isn't enough room for the led pins to fit into. The hex pattern on the battery holder added some print instabilities.
+- **What Didn't Work:** However, the coin battery fits so well that there isn't enough room for the LED pins to fit as well. The hex pattern on the battery holder added some print instabilities.
 - **Next Improvements:** We need to add some cutouts for the LED pins to fit and remove the hex pattern.
 
 *Final Iteration*:
 
-- **Considered Implementation:** Early on our professors already gave use the idea to use transparent filament instead of hole cutouts to allow for better blob detection. And while we were first cautious with that, since then the light emitted might be to little, when we saw during blob detection development that the cutout holes create small ball shaped reflections on the floor that get mistaken for the LED ball in detection, we decided to go with their idea. So, we removed the holes, decreased the thickness of the ball's outside and printed with it transparent PLA.
-We decided to remove the hexagonal pattern from the coin battery holder and add the LED pin cutouts.
+- **Considered Implementation:** Early on our professors already gave use the idea to use transparent filament instead of hole cutouts to allow for better blob detection. And while we were first cautious with that, since the light emitted might be too little by doing so, when we saw during blob detection development that the cutout holes create small ball shaped reflections on the floor that get mistaken for the LED ball in the detection, we decided to go with their idea. So, we removed the holes, decreased the thickness of the balls outside and printed it with transparent PLA.
+We decided to remove the hexagonal pattern from the coin battery holder and added the LED pin cutouts.
+  
+Model file of the last iteration can be found ```./3D-Models/led_ball_no_holes.f3d``` and ```./3D-Models/led_ball_with_holes.f3d```
+This is what they look like:
+
+<img src="./Media/Images/led_ball_2.jpeg" alt="led ball with holes" width="400"/>
+<img src="./Media/Images/led_ball_2.jpeg" alt="led ball without holes" width="400"/>
 
 #### Ramp
 
 *Intial idea*:
-The ramp should have a nice curvature without any edges in it, such that the LED-ball wouldn't be decelerated by anything. But it also needs to well guide the ball, so its track can't be flat, but needs to be curved such that the ball follows a straight line. For the best effect our ball would optimally be shot nearly straight up.
+The ramp should have a nice curvature without any edges in it, such that the LED-ball wouldn't be decelerated by anything. But it also needs to guide the ball well enough. Therefor its track can't be flat, but needs to be curved such that the ball follows a straight line. For the best effect, our ball would optimally be shot nearly straight up.
 
 *Iteration 1*:
 
 - **Considered Implementation:** We set out to create a solid base ramp with adjustable parameters for its height, length, curvature etc. such that we can easily adjust these, if they don't fit.
 - **What Worked:** The ramp came out very solid already, proving that our concept is on the right track.
-- **What Didn't Work:** We modelled the ramp such that it was lifted of the floor by a few centimeters. But, we adapted our project to place the wheels spun by the DC-Motors close to the floor, it would make a project a lot simpler to remove this extra cusion below the ramp and placed it at floor level, as well. When testig our ramp by flinging the ball into it using just our fingers, we realised that the curvature of the ramp was way too steep, and the exit angle of 90 degrees might be too.
+- **What Didn't Work:** We modelled the ramp such that it was lifted of the floor by a few milimeters. But, we adapted our project to place the wheels spun by the DC-Motors close to the floor, it would make the project a lot simpler to remove this extra cushion below the ramp and placed it at floor level, as well. When testing our ramp by flinging the ball into it using just our fingers, we realised that the curvature of the ramp was way too steep, as well as the exit angle of 90 degrees.
 - **Next Improvements:**
   - Change the steepness and exit angle.
   - Put the ramp to the floor, make adjustment for top cut off.
 
 *Iteration 2*:
 
-- **Considered Implementation:** Adapting the steepness, floor offset and curvature was easily done, due to us using pareameters in fusion. Thus, we could just set the floor height to zero, increase the length of the ramp and change the exit angle.
+- **Considered Implementation:** Adapting the steepness, floor offset and curvature was easily done, due to us using parameters in fusion. Thus, we could just set the floor height to zero, increase the length of the ramp and change the exit angle.
 - **What Worked:** Now, the ball rolls up more easily and can be rolled into the ramp directly from the floor.
-- **What Didn't Work:** The ramp takes quite some time to print. And we knew that we would still be adding things to it (e.g. DC-Motor holders).
+- **What Didn't Work:** The ramp takes quite some time to print. Because we knew that we would still be adding things to it (e.g. DC-Motor holders), it could not stay that way.
 - **Next Improvements:**
   - Make ramp more modifiable.
 
 *Final Iteration*:
 
-- **Considered Implementation:** To allow for a adding components to the ramp and thus, making external modifications, we added squared cutouts to the ramp, such that we can later simply uses connectors to plug other things onto it, similar to the dowels for the LED ball.
+- **Considered Implementation:** To allow for adding components to the ramp and thus, making external modifications, we added squared cutouts to the ramp, such that we can later simply use self-made connectors to plug other things onto it, similar to the dowels for the LED ball.
+  
+Model file of the last iteration can be found ```./3D-Models/ramp_it_up_3.f3d```
+This is what it looked like:
 
-- DC-Holders
+<img src="./Media/Images/base_ramp_2.jpeg" alt="Ramp" width="400"/>
+
+#### DC-Holders
+*Initial Idea*:
+The DC-motor-holders are supposed to hold the DC-motors with a good fit, while staying fixed in front of the ramp so that the motors and their attached "gear" are close enough to shoot the LED ball, without pushing it off.
+
+*Iteration 1*:
+
+- **Considered Implementation:** We started out to create a holder directly attached to the side of the ramp for gathering a better rotational momentum by complementing big gears with smaller gears to each other. The only consideration, it should be directly attached to the ramp and hold the motors afloat while rotating the gears all the way to the front.
+- **What Worked:** The mechanism worked, the gears turned, the holders held the motor.
+- **What Didn't Work:** The holders were too heavy, chunky and spread like wings. Also, the mechanism was too complicated. The connectors were to tight a fit. 
+- **Next Improvements:** 
+  - Make smaller holders, less chunky, closer to the ramp.
+  - Include cable-management for the DC-motor cables.
+  - Add a bigger offset for connectors
+
+*Final Iteration*:
+- **Considered Implementation:** We restarted the designing mechanism with a more minimalistic approach. This time we wanted something that can stand on its own, but can easily be attached to the ramp. All this, while keeping in mind, that later on we will need something for gathering the balls. Therefore we added a connector indentation for that purpose. 
+At the same time, we added a bigger offset for the connectors and added a small notch for the DC-motor cables.
+
+Model file of the last iteration can be found ```./3D-Models/motor_holder_2.f3d```.
+This is what it looked like:
+
+<img src="./Media/Images/motor_holder.jpeg" alt="DC-motor holder" width="400"/>
+<img src="./Media/Images/assembled_motor.jpeg" alt="DC-motor holder assembled" width="400"/>
+
+#### Small Gear
+*Initial Idea*:
+The Small is supposed to be attached directly onto the dc-holder, and use the rotation provided by the dc motor to propell the ball onto the ramp
+It is thus favorable, to be as small as possible to have more rotations and traction.
+
+*Final Iteration*:
+- **Considered Iteration:** Design a gear with a diameter of 4cm, the width as that of the length of the rod of the dc motor (minus the holder offset) and a hole in the middle with the diameter of the rod.
+
+Model file of the last iteration can be found ```./3D-Models/small_spur_gear_2.f3d```.
+The gear can be seen marginally on the picture of the dc-holders with a rubber band overlay.
+
+#### Ramp Extension
+#### Funnel
+#### Turtlebot connector
 
 ### Preliminary Tests
 
@@ -201,20 +249,6 @@ Having our key components ready, we wanted to check how well they work together.
 
 <video src="./Media/Videos/test_2_with_ramp_1.mp4" controls style="max-width:500px; width:100%; height:auto;"></video>
 <video src="./Media/Videos/test_2_with_ramp_2.mp4" controls style="max-width:500px; width:100%; height:auto;"></video>
-
-- Ramp-Extension
-- Funnel
-- Turtelbot3 connector
-
-<!--Vorlage für Beschreibung der 3D-Modelle 
-
-_Intial idea_:
-_Iteration 1_:
-
-- _Considered Implementation:_
-- _What Worked:_
-- _What Didn't Work:_
-- _Next Improvements:_ -->
 
 #### Controlling the DC-Motors
 
@@ -481,7 +515,7 @@ We detailed the design decisions and iterative steps behind the prototype, from 
 
 ## Outlook: The Perfect Implementation
 
-Although our implementation had all functionality with some little quirks, it is only a prototype and we are only scholars, not experts. We want to give an outlook hinting at what could be, if such project was truly implemented with the right team and time. Already, if we ourselves, would put some further time into, given that we gained a lot of knowledge and skills, we could think of many adaptations.
+Although our implementation had all functionality with some little quirks, it is only a prototype and we are only students, not experts. We want to give an outlook hinting at what could be, if such project was truly implemented with the right team and time. Already, if we ourselves, would put some further time into, given that we gained a lot of knowledge and skills, we could think of many adaptations.
 
 On the software side, perception and navigation could be made more robust and precise. More stable blob detection, improved color calibration, and tighter coupling with spatial information from the LIDAR could reduce false detections and enable more controlled movement behavior on stage. In a full on pro version Blob Detection could be combined with the LIDAR map, inducing the LEDs position on a scanned map, from the detected blobs and the cameras known perspective.
 
