@@ -251,7 +251,7 @@ Given a hint by our professors, we decided to go for a more robust detection app
 
 ##### Set up camera
 
-First, we installed a USB-camera by following the tutorial in [AN_02](...), plugging it directly into the Raspi on the Turtlebot3.
+First, we installed a USB-camera by following the tutorial in [AN_02](/2025/assignments/AN_02)(...), plugging it directly into the Raspi on the Turtlebot3.
 However, we could only receive the camera's raw image on the ROS master, which had a laggy framerate. It turned out that we were missed installing a certain package.
 
 While testing the blob detection under different lighting, we noticed that the camera's auto-exposure and white balance interfered with LED detection. When we tested dim lighting conditions similar to the FabLab's, the camera's automatic configurations overcompensated and lit the image as if we were at a sunny beach. We solved this by disabling auto-exposure and white balance and setting a fixed exposure via a startup service [camera-fix.service](./Code/camera-fix.service), such that the Turtlebot would automatically configure the camera at boot.
@@ -275,9 +275,18 @@ This performed well enough. So, after implementing this algorithm and testing it
 **Color Calibration Issue:**
 We had already begun developing the blob detection when we corrected the camera's auto-exposure and white balance. So, in the demonstration, what occured was that some light sources were detected although they weren't close to our green. This was actually, because our initial example pictures had more of a cyanish green color and we missed out to consider this change after fixing up the camera settings.
 
+**Set Up Code Project**
+To make use of the LED detection script when navigating the robot, from our repository copy the [src folder](./Code/src) into `/home/<user>/profab_ws/src/turtlebot3_profab/` on your ROS_master. This is the folder we used in [AN_02](/2025/assignments/AN_02) to create the `ca_controller.py` script.
+
 ### Navigation to LED Balls
 
-To control to whole movement and operation of our Turtlebot3, we use a Python script similar to the `ca_controller.py` or `goal_controller.py` from the exercise [AN_02] or [AN_03], respectively. Hence, our Python script is executed on the same node as the ROS-master and enforces control over the robot by subscribing and publishing on ROS-topics. We collect and publish the following in- and outputs from and to the Turtelbot3:
+To control to whole movement and operation of our Turtlebot3, we use a Python script called [led_nav.py](./Code/led_nav.py) similar to the `ca_controller.py` or `goal_controller.py` from the exercise [AN_02](/2025/assignments/AN_02) or [AN_03](/2025/assignments/AN_03), respectively. Similarly, you need to add the following line to the CMakeLists.txt file at `/home/<user>/profab_ws/src/turtlebot3_profab/CMakeLists.txt`:
+
+```CMake
+catkin_install_python(PROGRAMS scripts/led_nav.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+```
+
+This is also well documented in the exercise [AN_02](/2025/assignments/AN_02), so don't forget to follow the steps of rebuilding the project using `catkin_make`. Thus, our Python script is executed on the same node as the ROS-master and enforces control over the robot by subscribing and publishing on ROS-topics. We collect and publish the following in- and outputs from and to the Turtelbot3:
 
 | Direction | Description       | Purpose              | Type       | Object Type     | Topic                         |
 |-----------|-------------------|----------------------|------------|-----------------|-------------------------------|
@@ -362,7 +371,7 @@ To start the whole interconnected system, the code should be run in the followin
 - All devices have been set up on the same Wi-Fi network
 - The connection to the ROS master has been correctly configured
 - The following components have been correctly set up:
-  - **USB-camera**: Plugged into the Raspi on the TurtleBot3, with setup steps from exercise [AN_02, task 6, method 1] completed
+  - **USB-camera**: Plugged into the Raspi on the TurtleBot3, with setup steps from exercise [AN_02,(/2025/assignments/AN_02) task 6, method 1] completed
   - **Python script**: Located correctly on your PC, with the CMake file properly modified and built
   - **Arduino**: The correct firmware has been loaded onto it
 
@@ -395,7 +404,7 @@ roslaunch turtlebot3_bringup turtlebot3_robot_usbcam.launch # [turtlebot_raspi]
 Finally, run the Python script that contains all the control logic:
 
 ```bash
-rosrun turtlebot3_profab blob_centeration.py # [PC]
+rosrun turtlebot3_profab led_nav.py # [PC]
 ```
 
 #### Testing
