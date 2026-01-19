@@ -251,7 +251,7 @@ Given a hint by our professors, we decided to go for a more robust detection app
 
 ##### Set up camera
 
-First, we installed a USB-camera by following the tutorial in [AN_02](/2025/assignments/AN_02)(...), plugging it directly into the Raspi on the Turtlebot3.
+First, we installed a USB-camera by following the tutorial in [AN_02](/2025/assignments/AN_02), plugging it directly into the Raspi on the Turtlebot3.
 However, we could only receive the camera's raw image on the ROS master, which had a laggy framerate. It turned out that we were missed installing a certain package.
 
 While testing the blob detection under different lighting, we noticed that the camera's auto-exposure and white balance interfered with LED detection. When we tested dim lighting conditions similar to the FabLab's, the camera's automatic configurations overcompensated and lit the image as if we were at a sunny beach. We solved this by disabling auto-exposure and white balance and setting a fixed exposure via a startup service [camera-fix.service](./Code/camera-fix.service), such that the Turtlebot would automatically configure the camera at boot.
