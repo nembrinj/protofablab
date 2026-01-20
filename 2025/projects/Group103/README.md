@@ -122,6 +122,7 @@ And so we began, iterating through these three parts (LED-Ball, DC-Motor holder 
 #### LED-Ball
 
 *Intial idea*:
+
 Our first idea included 3D printing the outside of a ball and putting a LED inside that is directly attached to a coin battery. A bit like a Ping Pong ball with a light inside. To make the light shine through the ball we thought about adding holes to its outside.
 
 *Iteration 1*:
@@ -174,6 +175,7 @@ This is what they look like:
 #### Ramp
 
 *Intial idea*:
+
 The ramp should have a nice curvature without any edges in it, such that the LED-ball wouldn't be decelerated by anything. But it also needs to guide the ball well enough. Therefor its track can't be flat, but needs to be curved such that the ball follows a straight line. For the best effect, our ball would optimally be shot nearly straight up.
 
 *Iteration 1*:
@@ -204,6 +206,7 @@ This is what it looked like:
 
 #### DC-Holders
 *Initial Idea*:
+
 The DC-motor-holders are supposed to hold the DC-motors with a good fit, while staying fixed in front of the ramp so that the motors and their attached "gear" are close enough to shoot the LED ball, without pushing it off.
 
 *Iteration 1*:
@@ -217,6 +220,7 @@ The DC-motor-holders are supposed to hold the DC-motors with a good fit, while s
   - Add a bigger offset for connectors
 
 *Final Iteration*:
+
 - **Considered Implementation:** We restarted the designing mechanism with a more minimalistic approach. This time we wanted something that can stand on its own, but can easily be attached to the ramp. All this, while keeping in mind, that later on we will need something for gathering the balls. Therefore we added a connector indentation for that purpose. 
 At the same time, we added a bigger offset for the connectors and added a small notch for the DC-motor cables.
 
@@ -228,18 +232,75 @@ This is what it looked like:
 
 #### Small Gear
 *Initial Idea*:
-The Small is supposed to be attached directly onto the dc-holder, and use the rotation provided by the dc motor to propell the ball onto the ramp
+
+The Small Gear is supposed to be attached directly onto the dc-holder, and use the rotation provided by the dc motor to propell the ball onto the ramp
 It is thus favorable, to be as small as possible to have more rotations and traction.
 
 *Final Iteration*:
-- **Considered Iteration:** Design a gear with a diameter of 4cm, the width as that of the length of the rod of the dc motor (minus the holder offset) and a hole in the middle with the diameter of the rod.
+
+- **Considered Implementation:** Design a gear with a diameter of 4cm, the width as that of the length of the rod of the dc motor (minus the holder offset) and a hole in the middle with the diameter of the rod.
 
 Model file of the last iteration can be found ```./3D-Models/small_spur_gear_2.f3d```.
 The gear can be seen marginally on the picture of the dc-holders with a rubber band overlay.
 
-#### Ramp Extension
 #### Funnel
-#### Turtlebot connector
+*Initial Idea*:
+
+As the Turtlebot is moving towards the LED balls, it is important, that the ball reaches the propulsion mechanism. To do that we thought about having a funnel, which makes the collecting easier. The disadvantage of that however being, that the robot might have a bigger turning radius than initially expected.
+
+*Iteration 1*:
+
+- **Considered Implementation:** Using cardboard for testing out what angle is needed for the LED ball to be collected at the intended moving speed of the robot, we started at 45 degrees and adjusted it accordingly.  
+- **What Worked:** The angle was too wide initially, we adjusted it to 60 degrees
+- **What Didn't Work:**
+- **Next Improvements:**
+  - Make it connectable to the Motor holders
+  - Design it so that the LED ball is getting led to the gears
+
+*Iteration 2*:
+
+- **Considered Implementation:** We started designing it in Fusion360 with adjustable parameters for the angles, in case we would want to readjust it later. We also made it connectors with the right length to the motors.
+- **What Worked:** The design was already well thought out, everything worked as intended.
+- **What Didn't Work:** We realised, when connecting it to the robot, that it started to get slow because of the weight and maybe also the friction with the floor
+- **Next Improvements:**
+    - Make it more lightweight
+    - Raise the funnel so that it has less friction with the floor when moving around
+
+*Final Iteration*:
+
+-**Considered Implementation:** We raised the funnel by only having the first part of the funnel touching the floor and thus having its weight directly on the connectors to the motor holders. We also made the funnel less light weight by cutting out some of the filled parts in the design while still keeping a stable build.
+
+Model file of the last iteration can be found ```./3D-Models/funnel_2.f3d```.
+This is what it looked like:
+
+<img src="./Media/Images/funnel_2.jpeg" alt="Funnel" width="400"/>
+
+#### Ramp Extension
+*Initial Idea*:
+Having the Turtlebot assembled to this stage, we realised, that the ramp will shoot the bot itself instead of propelling the ball into the air. So we decided we needed to change the final propulsion angle. Instead of redesigning the ramp however, we build an extension. This is more modular, material- and ecofirendly as well.
+
+*Final Iteration*:
+
+-**Considered Implementation:** It has to extend the ramp such that it directly continues the direction of the ball to the desired angle. It also should include connectors to the ramp.
+
+For this model, as it needed to be modeled directly onto the ramp, you can find the extension in the same file as the ramp ```./3D-Models/ramp_it_up_3.f3d```.
+
+#### Turtlebot mounts
+*Initial Idea*:
+Having the ramp and all the other parts connected together, it still needs to be attached to the robot. For that purpose, additional connectors are needed. The main consideration for the connectors is that they should hold well together and that they should be able to lift the ramp up a bit on the backside (where the connectors are attached).
+
+*Final Iteration*: 
+
+-**Considered Implementation:** Measuring the optimal distance from the ramp to the robot with the extension considered as well, and inspired by how we designed the LED ball to fit together, the connectors where a resounding success from the getgo.   
+
+Model file of the last iteration can be found ```./3D-Models/bot_mounts_1.f3d```.
+
+Finally, to conclude this part, it remains to say, that before printing each part, we always checked with the integrated assembling functionality of Fusion360, if the parts fit together or if they need any offsets or paddings etc.
+The Assembly file can be found ```./3D-Models/assembly_4.f3z```.
+
+This what the final assembled robot looked like:
+
+<img src="./Media/Images/final_bot.jpeg" alt="Assembled Robot" width="400"/>
 
 ### Preliminary Tests
 
