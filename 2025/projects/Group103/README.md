@@ -78,24 +78,27 @@ This leads us to the following system architecture, composed of three tightly co
 
 ### Hardware Components
 
-| Amount | Parts                                                                        | Descriptions |
-|--------|------------------------------------------------------------------------------|--------------|
-| 1x     | [TurtleBot Preassembled](./Media/Images/turtle_bot_frontview.jpeg)           |              |
-| 1x     | [3D-printend base_ramp](./Media/Images/base_ramp_2.jpeg)                     |              |
-| 1x     | [3D-printend ramp_extension](./Media/Images/ramp_extension.jpeg)             |              |
-| 1x     | [3D-printend ramp clamps](./Media/Images/ramp_clamps.jpeg)                   |              |
-| 2x     | [3D-printend motor holders](./Media/Images/ramp_clamps.jpeg)                 |              |
-| 2x     | [3D-printend gears without teeth](./Media/Images/gear.jpeg)                  |              |
-| 1x     | [foam for coating the gears](./Media/Images/foam.jpeg)                       |              |
-| 2x     | [5V DC-Motors](./Media/Images/dc-motors.jpeg)                                |              |
-| 1x     | [Motor Relay](./Media/Images/relay.jpeg)                                     |              |
-| 2x     | [Powerbanks](./Media/Images/powerbanks.jpeg)                                 |              |
-| 2x     | [Usb power connectors](./Media/Images/usb_power_connectors.jpeg)             |              |
-| 2x     | [Usb power connectors](./Media/Images/usb_power_connectors.jpeg)             |              |
-| 1x     | [Bread Board](./Media/Images/bread_board.jpeg)                               |              |
-| xx     | [Some male-male and male-female electric wires](./Media/Images/cables.jpeg) |              |
-| 1x     | [Microcontroller](./Media/Images/microcontroller.jpeg)                       |              |
-| 1x     | [Funnel](./Media/Images/funnel_2.jpeg)                                       |              |
+| Amount      | Parts                                                              | Descriptions                                                                                                                                                                             |
+|-------------|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1x          | [TurtleBot preassembled](./Media/Images/turtle_bot_frontview.jpeg) | A preassembled turtlebot burger 3. Can move and be communicated over a network directly.                                                                                                 |
+| 1x or more  | [3D-printend ball](#LED-Ball)                                      | Balls designed to contain cell batteries and LEDs                                                                                                                                        |
+| 1x or more  | Coin batteries                                                     | For the LED balls                                                                                                                                                                        |
+| 1x or more  | LED light                                                          | For the LED balls                                                                                                                                                                        |
+| 1x          | [3D-printend base ramp](#ramp)                                     | A ramp with holes to be connected on                                                                                                                                                     |
+| 1x          | [3D-printend ramp extension](#Ramp-Extension)                      | An extension for the ramp to adjust the propulsion angle                                                                                                                                 |
+| 1x          | [3D-printend mounts / clamps](#Turtlebot-mounts)                   | Clamps for the ramp to be mounted on to the Turtlebot                                                                                                                                    |
+| 2x          | [3D-printend motor holders](#DC-Holders)                           | Motor holders for the motors to be mounted on and attached to the ramp for the propulsion                                                                                                |
+| 2x          | [3D-printend gears without teeth](#Small-gear)                     | Gears directly on the dc motors creating the propulsion effect                                                                                                                           |
+| 2x          | Stripes of Foam for coating the gears                              | Stripes of foam making the gears less hard and more adaptable for incoming angles of the LED balls                                                                                       |
+| 2x          | 5V DC-Motors                                                       | The spinning motors are the main mechanism for the propulsion                                                                                                                            |
+| 1x          | [Motor Relay](./Media/Images/relay.jpeg)                           | The motor relay is needed for letting the motors be controlled externally                                                                                                                |
+| 2x          | Powerbanks                                                         | 1x powerbank for powering the motor relay; 1x powerbank for powering the DC motors (can be adapted to one powerbank in case of a stronger battery than ours)                             |
+| 2x          | Usb power connectors                                               | For connecting the powerbanks directly to the elctric wires                                                                                                                              |
+| 1x          | Bread Board                                                        | The breadboard is used for connecting all the electrical components together, in our case the motors, the microcontroller, the relay and the powerbanks through the usb power connectors. |
+| xx          | Some male-male and male-female electric wires                      | The electric wires are used for connecting the different parts on the breadboard to the external parts apart or on the breadboard                                                        |
+| 1x          | [Microcontroller](./Media/Images/microcontroller.jpeg)             | The microcontroller is used to send signals from the main computing station to the motor relay to activate                                                                               |
+| 1x          | [Funnel](#Funnel)                                                  | The funnel is used to spread the gathering radius for the robot when moving about                                                                                                       |
+| xx          | Some cable ties                                                    | Cable ties are need for attaching the powerbanks with the breadboard onto the turtlebot or possibly other parts                                                                          |
 
 ## Mechanical Design
 
