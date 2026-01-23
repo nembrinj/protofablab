@@ -375,7 +375,7 @@ Blob detection was a crucial part of our method. Because in order to develop the
 
 To support our development, we first recorded some [example data](./Code/example_data/), allowing us to test and tune the detector without needing the full robot setup.
 
-Our first implementation attempt revealed an unexpected challenge. The initial version of our 3D-printed ball had holes to maximize LED light emission. Combined with a somewhat reflective floor surface, this created blob-shaped reflections  [placeholder for such picture](..) that confused OpenCV's `SimpleBlobDetector` module, leading us to develop a custom approach that works as follows:
+Our first implementation attempt revealed an unexpected challenge. The initial version of our 3D-printed ball had holes to maximize LED light emission. Combined with a somewhat reflective floor surface, this created [blob-shaped reflections](./Media/Images/led_ball_reflections.jpg) that confused OpenCV's `SimpleBlobDetector` module, leading us to develop a custom approach that works as follows:
 
 1. **Peak Detection**: Identify the brightest local maxima in the image, assuming LED balls are the brightest light sources on stage
 2. **Circularity Validation**: Approximate a radius around each peak and measure the light intensity fall-off pattern. A true LED ball should have relatively uniform radial intensity decay
