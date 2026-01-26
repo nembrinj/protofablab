@@ -1,7 +1,8 @@
 # Ball-E
 
-Alessio Petrone: <alessio.petrone@students.unibe.ch>  
-Silas Leuenberger: <silas.leuenberger@students.unibe.ch>
+Alessio Petrone: [alessio.petrone@students.unibe.ch](mailto:alessio.petrone@students.unibe.ch)\
+Silas Leuenberger: [silas.leuenberger@students.unibe.ch](mailto:silas.leuenberger@students.unibe.ch)
+
 
 ## Abstract
 
@@ -23,7 +24,7 @@ In the theatre piece *Le Train*, a scene creates the opportunity for a robot to 
     - [Preliminary Tests](#preliminary-tests)
     - [Funnel](#funnel)
     - [Ramp Extension](#ramp-extension)
-    - [Turtlebot mounts](#turtlebot-mounts)
+    - [Turtlebot Mounts](#turtlebot-mounts)
     - [Assembly](#assembly)
     - [Controlling the DC-Motors](#controlling-the-dc-motors)
   - [Autonomous Movement to LED-Ball](#autonomous-movement-to-led-ball)
@@ -39,9 +40,9 @@ In the theatre piece *Le Train*, a scene creates the opportunity for a robot to 
 
 In [Le Train](https://www.opus89-collectif.com/en-creation.html) by Joséphine de Weck, hope appears only briefly; fragile, fleeting, and easily lost. Ball-E was created as a robotic stage companion that supports this atmosphere through light and repetition rather than narration or action. Positioned in the background, the robot continuously collects and launches illuminated balls, releasing short arcs of light that recall fireflies or shooting stars: momentary glimmers of hope in an otherwise dark space.
 
-At the same time, the endless cycle of collecting and throwing evokes the myth of Sisyphus and show parallels to the tirelessly working robot WALL-E, although Ball-E gathers sparkly light balls and not cubes of trash. The robot's task never resolves; meaning emerges through repetition and persistence rather than progress. Imperfect motion, visible effort, and mechanical delay are not errors but expressive qualities that align the system with the emotional undercurrent of the play.
+At the same time, the endless cycle of collecting and throwing evokes the myth of Sisyphus and shows parallels to the tirelessly working robot WALL-E, although Ball-E gathers sparkly light balls and not cubes of trash. The robot's task never resolves; meaning emerges through repetition and persistence rather than progress. Imperfect motion, visible effort, and mechanical delay are not errors but expressive qualities that align the system with the emotional undercurrent of the play.
 
-Technically, Ball-E combines mechanical design, embedded electronics, and computer vision to autonomously detect illuminated objects, move toward them, and launch them back into the environment.
+Technically, Ball-E combines mechanical design, embedded electronics, and computer vision to autonomously detect illuminated objects, move towards them, and launches them back into the environment.
 
 To this project we contributed:
 
@@ -85,27 +86,27 @@ This leads us to the following system architecture, composed of three tightly co
 
 ### Hardware Components
 
-| Amount      | Parts                                                              | Descriptions                                                                                                                                                                             |
-|-------------|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 1x          | [TurtleBot preassembled](./Media/Images/turtle_bot_frontview.jpeg) | A preassembled turtlebot burger 3. Can move and be communicated over a network directly.                                                                                                 |
-| 1x or more  | [3D-printend ball](#led-ball)                                      | Balls designed to contain cell batteries and LEDs                                                                                                                                        |
-| 1x or more  | Coin cell batteries                                                | For the LED balls                                                                                                                                                                        |
-| 1x or more  | LED light                                                          | For the LED balls                                                                                                                                                                        |
-| 1x          | [3D-printend base ramp](#ramp)                                     | A ramp with holes to be connected on                                                                                                                                                     |
-| 1x          | [3D-printend ramp extension](#ramp-extension)                      | An extension for the ramp to adjust the propulsion angle                                                                                                                                 |
-| 1x          | [3D-printend mounts / clamps](#turtlebot-mounts)                   | Clamps for the ramp to be mounted on to the Turtlebot                                                                                                                                    |
-| 2x          | [3D-printend motor holders](#dc-holders)                           | Motor holders for the motors to be mounted on and attached to the ramp for the propulsion                                                                                                |
-| 2x          | [3D-printed gears without teeth](#small-gear)                      | Gears directly on the dc motors creating the propulsion effect                                                                                                                           |
-| 2x          | Strips of foam for coating the gears                               | Strips of foam making the gears less hard and more adaptable for incoming angles of the LED balls                                                                                        |
-| 2x          | 5V DC-Motors                                                       | The spinning motors are the main mechanism for the propulsion                                                                                                                            |
-| 1x          | [Motor Relay](./Media/Images/relay.jpeg)                           | The motor relay is needed for letting the motors be controlled externally                                                                                                                |
-| 2x          | Powerbanks                                                         | 1x powerbank for powering the motor relay; 1x powerbank for powering the DC motors (can be adapted to one powerbank in case of a stronger battery than ours)                             |
-| 2x          | Usb power connectors                                               | For connecting the powerbanks directly to the elctric wires                                                                                                                              |
+| Amount      | Parts                                                              | Descriptions                                                                                                                                                                              |
+|-------------|--------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1x          | [TurtleBot preassembled](./Media/Images/turtle_bot_frontview.jpeg) | A preassembled turtlebot burger 3. Can move and be communicated with over a network directly.                                                                                             |
+| 1x or more  | [3D-printend ball](#led-ball)                                      | Balls designed to contain cell batteries and LEDs                                                                                                                                         |
+| 1x or more  | Coin cell batteries                                                | To power the the LED in the LED balls                                                                                                                                                     |
+| 1x or more  | LED light                                                          | To illuminate the LED balls                                                                                                                                                               |
+| 1x          | [3D-printend base ramp](#ramp)                                     | A ramp with holes to be connected to                                                                                                                                                      |
+| 1x          | [3D-printend ramp extension](#ramp-extension)                      | An extension for the ramp to adjust the propulsion angle                                                                                                                                  |
+| 1x          | [3D-printend mounts / clamps](#turtlebot-mounts)                   | Clamps for the ramp to be mounted on to the Turtlebot                                                                                                                                     |
+| 2x          | [3D-printend motor holders](#dc-holders)                           | Motor holders for the motors to be mounted on and attached to the ramp for the propulsion                                                                                                 |
+| 2x          | [3D-printed wheels](#small-gear)                                   | Wheels directly on the DC-motors creating the propulsion effect                                                                                                                           |
+| 2x          | Strips of foam for coating the gears                               | Strips of foam making the gears less hard and more adaptable for incoming angles of the LED balls                                                                                         |
+| 2x          | 5V DC-Motors                                                       | The spinning motors are the main mechanism for the propulsion                                                                                                                             |
+| 1x          | [Motor Relay](./Media/Images/relay.jpeg)                           | The motor relay is needed for letting the motors be controlled externally                                                                                                                 |
+| 2x          | Powerbanks                                                         | 1x powerbank for powering the motor relay; 1x powerbank for powering the DC motors (can be adapted to one powerbank in case of a stronger battery than ours)                              |
+| 2x          | Usb power connectors                                               | For connecting the powerbanks directly to the elctric wires                                                                                                                               |
 | 1x          | Breadboard                                                         | The breadboard is used for connecting all the electrical components together, in our case the motors, the microcontroller, the relay and the powerbanks through the usb power connectors. |
-| xx          | Some male-male and male-female electric wires                      | The electric wires are used for connecting the different parts on the breadboard to the external parts or on the breadboard                                                              |
-| 1x          | [Microcontroller](./Media/Images/microcontroller.jpeg)             | The microcontroller is used to send signals from the main computing station to the motor relay to activate                                                                               |
-| 1x          | [Funnel](#funnel)                                                  | The funnel is used to spread the gathering radius for the robot when moving about                                                                                                       |
-| xx          | Some cable ties                                                    | Cable ties are needed for attaching the powerbanks with the breadboard onto the turtlebot or possibly other parts                                                                        |
+| xx          | Some male-male and male-female electric wires                      | The electric wires are used for connecting the different parts on the breadboard to the external parts or on the breadboard                                                               |
+| 1x          | [Microcontroller](./Media/Images/microcontroller.jpeg)             | The microcontroller is used to send signals from the main computing station to the motor relay to activate. We used the Arduino Adafruit Feather ESP32-S3.                                |
+| 1x          | [Funnel](#funnel)                                                  | The funnel is used to spread the gathering radius for the robot when moving about                                                                                                         |
+| xx          | Some cable ties                                                    | Cable ties are needed for attaching the powerbanks with the breadboard onto the turtlebot or possibly other parts                                                                         |
 
 ## Mechanical Design
 
@@ -127,7 +128,7 @@ Anyhow, our first prototype showed promise and we started with designing and tes
 - To reduce complexity, we decided to combine collection and propulsion into one. Thus, placing the spinning wheels close to the floor, to shoot the LED directly from there.
 - Use a ramp to guide ball upwards and connect the DC-Motors to it.
 
-And so we began, iterating through these three parts (LED-Ball, DC-Motor holder and wheels, Ramp) through making changes in the 3D-model to printing it and adjusting through repeating these two steps. We present the following main iterations and changes we made on these components, in the following Subsubsections.
+And so we began, iterating through these three parts (LED-Ball, DC-Motor holder and wheels, Ramp) through making changes in the 3D-model to printing it and adjusting through repeating these two steps. We present the following main iterations and changes we made on these components, in the following subsubsections.
 
 #### LED-Ball
 
@@ -177,7 +178,7 @@ Given its new position, we could also nicely align the new connectors with the c
 - **Considered Implementation:** Early on our professors already gave use the idea to use transparent filament instead of hole cutouts to allow for better blob detection. And while we were first cautious with that, since the light emitted might be too little by doing so, when we saw during blob detection development that the cutout holes create small ball shaped reflections on the floor that get mistaken for the LED ball in the detection, we decided to go with their idea. So, we removed the holes, decreased the thickness of the balls outside and printed it with transparent PLA.
 We decided to remove the hexagonal pattern from the coin battery holder and added the LED pin cutouts.
   
-Model file of the last iteration can be found ```./3D-Models/led_ball_no_holes.f3d``` and ```./3D-Models/led_ball_with_holes.f3d```
+Model file of the last iteration can be found [here without holes](./3D-Models/led_ball_no_holes.f3d) and [here with holes](./3D-Models/led_ball_with_holes.f3d).
 
 Here some pictures from start to end of our implementation with the last picture displaying our [final LED-Ball implementation](./Media/Images/led_ball_final.jpg):
 
@@ -212,9 +213,11 @@ The ramp should have a nice curvature without any edges in it, such that the LED
 
 - **Considered Implementation:** To allow for adding components to the ramp and thus, making external modifications, we added squared cutouts to the ramp, such that we can later simply use self-made connectors to plug other things onto it, similar to the dowels for the LED ball.
   
-Model file of the last iteration can be found ```./3D-Models/ramp_it_up_3.f3d```
-This is what it looked like:
+Model file of the last iteration can be found [here](./3D-Models/ramp_it_up_3.f3d).
+This is what it looked like from prototype to final iteration:
 
+<img src="./Media/Images/base_ramp_prototype.jpeg" alt="Ramp" height="300"/>
+<img src="./Media/Images/base_ramp_1.jpeg" alt="Ramp" height="300"/>
 <img src="./Media/Images/base_ramp_2.jpeg" alt="Ramp" height="300"/>
 
 #### DC-Holders
@@ -237,9 +240,9 @@ The DC-motor-holders are supposed to hold the DC-motors with a good fit, while s
 
 - **Considered Implementation:** We restarted the designing mechanism with a more minimalistic approach. This time we wanted something that can stand on its own, but can easily be attached to the ramp. All this, while keeping in mind, that later on we will need something for gathering the balls. Therefore we added a connector indentation for that purpose.
 At the same time, we added a bigger offset for the connectors and added a small notch for the DC-motor cables.
-- **Special Considerations:** The lip that holds the DC-Motor came out very thin. This is good for attaching the wheels, but could be problematic for stability. Thus, we printed the holders on their side, such that the layer direction would add to make the lip more solid.
+- **Special Considerations:** The lip that holds the DC-motor came out very thin. This is good for attaching the wheels, but could be problematic for stability. Thus, we printed the holders on their side, such that the layer direction would add to make the lip more solid.
 
-Model file of the last iteration can be found ```./3D-Models/motor_holder_2.f3d```.
+Model file of the last iteration can be found [here](./3D-Models/motor_holder_2.f3d).
 This is what it looked like:
 
 <img src="./Media/Images/motor_holder.jpeg" alt="DC-motor holder" height="300"/>
@@ -249,14 +252,14 @@ This is what it looked like:
 
 *Initial Idea*:
 
-The small gear is supposed to be attached directly onto the dc-holder, and use the rotation provided by the dc motor to propel the ball onto the ramp.
+The small gear is supposed to be attached directly onto the DC-motor attached to the DC-holder, and use the rotation provided by the DC-motor to propel the ball onto the ramp.
 
 *Final Iteration*:
 
-- **Considered Implementation:** Design a gear with a diameter of 4 cm, the width as that of the length of the rod of the dc motor (minus the holder offset) and a hole in the middle with the diameter of the rod.
+- **Considered Implementation:** Design a gear with a diameter of 4 cm, the width as that of the length of the rod of the DC-motor (minus the holder offset) and a hole in the middle with the diameter of the rod.
 
-The model file of the last iteration can be found at ```./3D-Models/small_spur_gear_2.f3d```.
-The gear can be seen marginally on the picture of the dc-holders with a rubber band overlay.
+The model file of the last iteration can be found at [here](./3D-Models/small_spur_gear_2.f3d).
+The gear can be seen marginally on the picture of the DC-holders with a rubber band overlay.
 
 ### Preliminary Tests
 
@@ -267,6 +270,8 @@ Having our key components ready, we wanted to check how well they work together.
 <video src="./Media/Videos/test_2_with_ramp_1.mp4" controls style="max-width:500px; width:100%; height:auto;"></video>
 <video src="./Media/Videos/test_2_with_ramp_2.mp4" controls style="max-width:500px; width:100%; height:auto;"></video>
 
+After the tests we started designing the funnel, the ramp extension and the mounts for the Turtlebot in the same iterative way as before.
+
 #### Funnel
 
 *Initial Idea*:
@@ -275,11 +280,11 @@ As the Turtlebot is moving towards the LED balls, it is important that the ball 
 
 *Iteration 1*:
 
-- **Considered Implementation:** Using cardboard for testing out what angle is needed for the LED ball to be collected at the intended moving speed of the robot, we started at 45 degrees and adjusted it accordingly.  
+- **Considered Implementation:** Using cardboard for testing out what angle is needed for the LED ball to be collected at the intended moving speed of the robot, we started at 45 degrees and adjusted it accordingly.
 - **What Didn't Work:** The angle was too wide initially, we adjusted it to 60 degrees
 - **Next Improvements:**
-  - Make it connectable to the Motor holders
-  - Design it so that the LED ball is getting led to the gears
+    - Make it connectable to the Motor holders
+    - Design it so that the LED ball is getting led to the gears
 
 *Iteration 2*:
 
@@ -287,17 +292,19 @@ As the Turtlebot is moving towards the LED balls, it is important that the ball 
 - **What Worked:** The design was already well thought out, everything worked as intended.
 - **What Didn't Work:** We realised, when connecting it to the robot, that it started to get slow because of the weight and maybe also the friction with the floor
 - **Next Improvements:**
-  - Make it more lightweight
-  - Raise the funnel so that it has less friction with the floor when moving around
+    - Make it more lightweight
+    - Raise the funnel so that it has less friction with the floor when moving around
 
 *Final Iteration*:
 
 - **Considered Implementation:** We raised the funnel by only having the first part of the funnel touching the floor and thus having its weight directly on the connectors to the motor holders. We also made the funnel more lightweight by cutting out some of the filled parts in the design while still keeping a stable build.
 
-Model file of the last iteration can be found ```./3D-Models/funnel_2.f3d```.
+Model file of the last iteration can be found [here](./3D-Models/funnel_2.f3d).
 This is what it looked like:
 
+<img src="./Media/Images/funnel_1.jpeg" alt="Funnel" height="300"/>
 <img src="./Media/Images/funnel_2.jpeg" alt="Funnel" height="300"/>
+
 
 #### Ramp Extension
 
@@ -309,9 +316,9 @@ From our preliminary test, we gathered that the ball exits the ramp at a flat an
 
 - **Considered Implementation:** It has to extend the ramp such that it directly continues the direction of the ball to the desired angle. It also should include connectors to the ramp.
 
-For this model, as it needed to be modeled directly onto the ramp, you can find the extension in the same file as the ramp ```./3D-Models/ramp_it_up_3.f3d```.
+For this model, as it needed to be modeled directly onto the ramp, you can find the extension in the same file as the ramp [here](./3D-Models/ramp_it_up_3.f3d).
 
-#### Turtlebot mounts
+#### Turtlebot Mounts
 
 *Initial Idea*:
 Having the ramp and all the other parts connected together, it still needs to be attached to the robot. For that purpose, additional connectors are needed. The main consideration for the connectors is that they should hold well together and that they should be able to lift the ramp up a bit on the backside (where the connectors are attached).
@@ -320,14 +327,14 @@ Having the ramp and all the other parts connected together, it still needs to be
 
 - **Considered Implementation:** Measuring the optimal distance from the ramp to the robot with the extension considered as well, and inspired by how we designed the LED ball to fit together, the connectors were a resounding success from the get-go.
 
-Model file of the last iteration can be found ```./3D-Models/bot_mounts_1.f3d```.
+Model file of the last iteration can be found [here](./3D-Models/bot_mounts_1.f3d).
 
 #### Assembly
 
 Finally, to conclude this part, it remains to say, that before printing each part, we always checked with the integrated assembling functionality of Fusion360, if the parts fit together or if they need any offsets or paddings etc.
-The Assembly file can be found ```./3D-Models/assembly_4.f3z```.
+The Assembly file can be found [here](./3D-Models/assembly_4.f3z).
 
-This what the final assembled robot looked like:
+This is what the final assembled robot looked like:
 
 <img src="./Media/Images/final_bot.jpeg" alt="Assembled Robot" width="400"/>
 
@@ -337,12 +344,12 @@ To remotely control the DC-Motors we made use of our Arduino Adafruit Feather ES
 
 Since we were concerned about the power of our propulsion mechanism, we wanted to have at least 5V DC-Motors. However, the Arduino runs on 3.3V and so, taking its signal alone as power isn't enough. We needed an external power source to power up the DC-Motors, while the Arduino's signal is solely used for control.
 This is the typical scenario for using a relay. Our professors also suggested using a driver module to allow to control more exactly the power the DC-Motors receive. But since we only need either full or no power, we decided to use a relay module.
-The DC-Motors we got, should be the ones with 2.5 - 6 V. We used a rechargable battery that in theory should generate 5V but in practice managed only below 3 V. Hence, we put the DC-Motors in parallel, as otherwise, the battery wouldn't even be able to turn them on.
+The DC-Motors we got, should be the ones with 2.5 - 6 V. We used a rechargeable battery that in theory should generate 5V but in practice managed only below 3 V. Hence, we put the DC-Motors in parallel, as otherwise, the battery wouldn't even be able to turn them on.
 
 **Problems:**
-At first we used one battery pack to supply both the dc-motors and the arduino with power. However, this caused the arduino to power off as soon as the DC-Motors were switched on, likely due to different resistances and the battery's low voltage. Thus, we ended up using two rechargeable battery packs, one for the dc-motors and one for the arduino.
+At first we used one battery pack to supply both the DC-motors and the arduino with power. However, this caused the arduino to power off as soon as the DC-Motors were switched on, likely due to different resistances and the battery's low voltage. Thus, we ended up using two rechargeable battery packs, one for the DC-motors and one for the arduino.
 
-This altogether gave us the following circuit, once more cleanly as a diagram modelled with Fritzing and once, the image of the actual implementation, where we only have one DC-Motor connected through the red and pink wires leaving the image:
+This altogether gave us the following circuit, once more cleanly as a diagram modelled with Fritzing and once, the image of the actual implementation, where we only have one DC-Motor connected through the red and purple wires leaving the image:
 
 <img src="./Schemas/circuit.svg" style="max-height: 300px; height:100%; height:auto;">
 <img src="./Media/Images/circuit_irl.jpg" style="max-height:300px; height:100%; height:auto;">
@@ -364,7 +371,7 @@ Given a hint by our professors, we decided to go for a more robust detection app
 
 ##### Set up camera
 
-First, we installed a USB-camera by following the tutorial in [AN_02](/2025/assignments/AN_02), plugging it directly into the Raspi on the Turtlebot3.
+First, we installed a USB-camera by following the tutorial in [AN_02](../../assignments/AN_02), plugging it directly into the Raspi on the Turtlebot3.
 However, we could only receive the camera's raw image on the ROS master, which had a laggy framerate. It turned out that we had missed installing a certain package.
 
 While testing the blob detection under different lighting, we noticed that the camera's auto-exposure and white balance interfered with LED detection. When we tested dim lighting conditions similar to the FabLab's, the camera's automatic configurations overcompensated and lit the image as if we were at a sunny beach. We solved this by disabling auto-exposure and white balance and setting a fixed exposure via a startup service [camera-fix.service](./Code/camera-fix.service), such that the Turtlebot would automatically configure the camera at boot.
@@ -389,17 +396,17 @@ This performed well enough. So, after implementing this algorithm and testing it
 We had already begun developing the blob detection when we corrected the camera's auto-exposure and white balance. So, in the demonstration, what occured was that some light sources were detected although they weren't close to our green. This was actually, because our initial example pictures had more of a cyanish green color and we missed out to consider this change after fixing up the camera settings.
 
 **Set Up Code Project**
-To make use of the LED detection script when navigating the robot, from our repository copy this [src folder](./Code/src) into `/home/<user>/profab_ws/src/turtlebot3_profab/` on your ROS_master. This is the folder we used in [AN_02](/2025/assignments/AN_02) to create the `ca_controller.py` script.
+To make use of the LED detection script when navigating the robot, from our repository copy [this src folder](./Code/src) into `/home/<user>/profab_ws/src/turtlebot3_profab/` on your ROS_master. This is the folder we used in [AN_02](../../assignments/AN_02) to create the `ca_controller.py` script.
 
 ### Navigation to LED Balls
 
-To control to whole movement and operation of our Turtlebot3, we use a Python script called [led_nav.py](./Code/led_nav.py) similar to the `ca_controller.py` or `goal_controller.py` from the exercise [AN_02](/2025/assignments/AN_02) or [AN_03](/2025/assignments/AN_03), respectively. Similarly, you need to add the following line to the CMakeLists.txt file at `/home/<user>/profab_ws/src/turtlebot3_profab/CMakeLists.txt`:
+To control to whole movement and operation of our Turtlebot3, we use a Python script called [led_nav.py](./Code/led_nav.py) similar to the `ca_controller.py` or `goal_controller.py` from the exercise [AN_02](../../assignments/AN_02) or [AN_03](../../assignments/AN_03), respectively. Similarly, you need to add the following line to the CMakeLists.txt file at `/home/<user>/profab_ws/src/turtlebot3_profab/CMakeLists.txt`:
 
 ```CMake
 catkin_install_python(PROGRAMS scripts/led_nav.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 ```
 
-This is also well documented in the exercise [AN_02](/2025/assignments/AN_02), so don't forget to follow the steps of rebuilding the project using `catkin_make`. Thus, our Python script is executed on the same node as the ROS-master and enforces control over the robot by subscribing and publishing on ROS-topics. We collect and publish the following inputs and outputs from and to the Turtlebot3:
+This is also well documented in the exercise [AN_02](../../assignments/AN_02), so don't forget to follow the steps of rebuilding the project using `catkin_make`. Thus, our Python script is executed on the same node as the ROS-master and enforces control over the robot by subscribing and publishing on ROS-topics. We collect and publish the following inputs and outputs from and to the Turtlebot3:
 
 | Direction | Description       | Purpose              | Type       | Object Type     | Topic                         |
 |-----------|-------------------|----------------------|------------|-----------------|-------------------------------|
@@ -453,17 +460,17 @@ As soon as the LED is approximately close, we switch to collecting it. This we d
 
 To collect the ball, the DC-Motors need to be spinning. Letting them spin at all times will drain battery too quickly. Initially, we turned them on at the start of the collecting phase, via publishing on the ROS topic. But in some cases this was too late. Hence, we turn the DC-Motors on when transitioning to the approaching phase and thus, they should already be running.
 
-To allow for the ball to roll through the funnel into the spinning motors, we decelerate our robot and for a fixed duration of 10s tell it to move straight to ensure collection, unless an obstacle blocks its path. This should allow for the ball to be caught by the funnel. We use this timer, as during collecting, it is likely to lose vision of the ball, even though it has not yet been flung into the air. Further, the robot must move slowly, otherwise it just takes the ball on its journey, without actually shooting it out.
+To allow for the ball to roll through the funnel into the spinning motors, we decelerate our robot and for a fixed duration of 10 seconds tell it to move straight to ensure collection, unless an obstacle blocks its path. This should allow for the ball to be caught by the funnel. We use this timer, as during collecting, it is likely to lose vision of the ball, even though it has not yet been flung into the air. Further, the robot must move slowly, otherwise it just takes the ball on its journey, without actually shooting it out.
 
 Why not merge the two centering and approaching phases?
 
 - It helps to simplify selection when multiple balls are detected.
-- Makes moving to it simpler, as clear vision to a centered ball indicates moving straight should not demand any parkour avoidance skills to move around any obstacles, as there shouldn't be any, assuming a clear theatre stage with only rough object props.
+- Makes moving to it simpler, as clear vision to a centered ball indicates moving straight and that should not demand any parkour avoidance skills to move around any obstacles. And there shouldn't be any obstacles anyway, as we are assuming a clear theatre stage with only rough object props.
 - Also, it gives this nice comical/cartoonish effect, of turning and then, moving to it, which could in a further work be even more emphasized.
 
 **Difficulties in centering:**
 
-During centering it can very much occur that the blob detection for one or another frame can fail to detect the LED. Hence, we implemented a cooldown buffer, which counts the successive frames in which no blob was detected. If this exceeds a limit of 15 frames, then we can safely assume that the LED has been lost. Otherwise, we stop the robot from turning and hope the blob detection mechanism can detect it again.
+During centering, it can very much occur that the blob detection for one or another frame can fail to detect the LED. Hence, we implemented a cooldown buffer, which counts the successive frames in which no blob was detected. If this exceeds a limit of 15 frames, then we can safely assume that the LED has been lost. Otherwise, we stop the robot from turning and hope the blob detection mechanism can detect it again.
 
 The following UML-State diagram summarizes the interactions:
 
@@ -473,18 +480,18 @@ The following UML-State diagram summarizes the interactions:
 
 We have three devices that run code:
 
-| Device      | Usage                                     | Short             |
-| ----------- | ----------------------------------------- | ----------------- |
-| Our own PC  | Runs the ROS master and the Python script | [PC]              |
-| The Raspi   | Controls the TurtleBot3                   | [turtlebot_raspi] |
-| The Arduino | Controls the DC-Motors                    | [Arduino]         |
+| Device           | Usage                                     | Short             |
+|------------------| ----------------------------------------- | ----------------- |
+| Our own PC       | Runs the ROS master and the Python script | [PC]              |
+| The Raspberry Pi | Controls the TurtleBot3                   | [turtlebot_raspi] |
+| The Arduino      | Controls the DC-Motors                    | [Arduino]         |
 
 To start the whole interconnected system, the code should be run in the following order, with the target device denoted in square brackets. Use a new terminal for each command. For this to work, we assume that:
 
 - All devices have been set up on the same Wi-Fi network
 - The connection to the ROS master has been correctly configured
 - The following components have been correctly set up:
-  - **USB-camera**: Plugged into the Raspi on the TurtleBot3, with setup steps from exercise [AN_02](/2025/assignments/AN_02) task 6, method 1 completed
+  - **USB-camera**: Plugged into the Raspi on the TurtleBot3, with setup steps from exercise [AN_02](../../assignments/AN_02) task 6, method 1 completed
   - **Python script**: Located correctly on your PC, with the CMake file properly modified and built
   - **Arduino**: The correct code has been loaded onto it
 
@@ -568,13 +575,13 @@ After approaching the LED ball, the propulsion mechanism could successfully laun
 
 ### Revision of the Initial Concept
 
-Initially, we planned to separate ball collection and propulsion into two independent mechanisms, including a storage stage. Early feedback from our professors suggested reducing complexity by combining both functions. We adopted this suggestion and integrated collection and propulsion into a single mechanism, to reduce unnecessary complexity.
+Initially, we planned to separate ball collection and propulsion into two independent mechanisms, including a storage stage. Early feedback from our professors suggested reducing complexity by combining both functions. We adopted this suggestion and integrated collection and propulsion into a single mechanism and forego the storage stage, to reduce unnecessary complexity.
 
 ### Interpretation of Results
 
 We tested the system mainly with a single LED ball. While the original goal was to have multiple LED balls on stage, we didn't manage to test this experimentally. Based on how our selection and centering logic works, the system should in theory be able to select and approach one target among several visible ones, but this was not verified in practice.
 
-During the demo, the robot occasionally mistook strong light sources for LED balls. We attribute this mainly to two factors. First, after switching the camera from automatic exposure and white balance to fixed values, we missed adapting the color for which we filtered as it changed from more cyanish green to strong green. This caused a mismatch between expected and actual LED color values. Second, our detection approach is based on identifying bright peaks in the image, which naturally increases sensitivity to strong light sources. Given the limited development time and the project scope, the blob detection was not optimized to be fully robust under all lighting conditions.
+During the demo, the robot occasionally mistook strong light sources or reflections of strong light sources for LED balls. We attribute this mainly to two factors. First, after switching the camera from automatic exposure and white balance to fixed values, we missed adapting the color for which we filtered as it changed from more cyanish green to strong green. This caused a mismatch between expected and actual LED color values. Second, our detection approach is based on identifying bright peaks in the image, which naturally increases sensitivity to strong light sources. Given the limited development time and the project scope, the blob detection was not optimized to be fully robust under all lighting conditions.
 
 On the mechanical side, the low-mounted ramp caused friction with the floor and required careful tuning of approach speed and motor activation timing. The DC motors were also relatively loud, and the large ramp increased the robot's overall footprint, which made navigation in tighter spaces more difficult.
 
@@ -604,6 +611,6 @@ From a hardware point of view, a more integrated mechanical design would be bene
 
 In terms of visual appearance and expression, the robot could be developed further to communicate emotion and intention more clearly, similar to how WALL-E conveys character through simple movement and visual features. Adding expressive elements such as animated "eyes", lighting feedback, or subtle motion gestures could strengthen Ball-E's presence as a stage character.
 
-Finally, extending the system to collect and store multiple LED balls before launching them in sequences or patterns, as we somewhat initially planned, could amplify the visual effect and introduce new rhythmic and dramaturgical possibilities.
+Finally, extending the system to collect and store multiple LED balls before launching them in sequences or patterns, as we initially planned, could amplify the visual effect and introduce new rhythmic and dramaturgical possibilities.
 
 Combined, one could imagine something close to a real-life incarnation of WALL-E that collects and flings lights into the air instead of compressing waste.
