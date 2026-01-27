@@ -1,0 +1,16 @@
+muselsl
+numpy
+pandas
+matplotlib
+brainflow
+bleak
+scikit-learn
+joblib
+scipy
+streamlit
+mne
+torch
+torchvision
+torchaudio
+paho-mqtt
+supercollider
