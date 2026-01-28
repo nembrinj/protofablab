@@ -17,7 +17,7 @@
 #define LED_TIMER LEDC_TIMER_0
 #define LED_CHANNEL LEDC_CHANNEL_0
 
-// WiFi y MQTT
+// WiFi and MQTT
 const char* ssid = "WIFI";
 const char* password = "password";
 const char* mqtt_server = "IP broker MQTT";

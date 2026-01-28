@@ -8,10 +8,10 @@ const char* password = "password";
 WiFiUDP udp;
 const int localPort = 4210;
 
-// --- Servo ---
+// Servo
 Servo servo1;
 const int servoPin = 6;      // pin of servo
-// --- Servo state ---
+// Servo state
 float pos = 90.0;         // initial position
 float vel = 0.0;          // speed received
 float pos_min = 90.0;      // min position
