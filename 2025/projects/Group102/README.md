@@ -28,8 +28,7 @@ than picking up the object like a normal robotic arm would do, it drags
 the object to the dropoff area. Then goes around searching for other
 bottles around the mapped area.
 
-![](media/image2.jpg){width="2.2816141732283466in"
-height="2.490844269466317in"}
+![](media/image2.jpg)
 
 ### 1.2.1 Hardware Requirements
 
@@ -43,8 +42,7 @@ height="2.490844269466317in"}
 
 -   A powerbank
 
--   3D Printed parts (gripper, camera attachment and bright orange
-    > medicine bottles)
+-   3D Printed parts (gripper, camera attachment and bright orange medicine bottles)
 
 ### 1.2.2 Software Requirements
 
@@ -66,8 +64,7 @@ height="2.490844269466317in"}
 
 ### 1.2.3 System Architecture
 
-![](media/image6.png){width="4.768055555555556in"
-height="3.451388888888889in"}
+![](media/image6.png)
 
 #### 1.2.3.1 Vision Approach Node
 
@@ -170,9 +167,9 @@ started with an existing open-source gripper design to understand basic
 dimensions and principles, and then modified it to fit the exact
 geometry of our target object. However, during testing these many
 different iterations, this adapted design turned out to be too
-restrictive and highly sensitive to
-alignment.![](media/image8.png){width="1.8263888888888888in"
-height="2.4383234908136484in"}
+restrictive and highly sensitive to alignment.
+
+![](media/image8.png)
 
 Due to the limitations, we have decided to discard the initial design
 then create a new gripper from the start. The final version had
@@ -181,10 +178,7 @@ passively to the object instead of relying on the exact measurements.
 This made the grasp more tolerative for small positioning errors, also
 meaning an improvement on the overall reliability.
 
-![A grey object on a graph paper Description automatically
-generated](media/image3.png){width="3.3644280402449693in"
-height="3.7569444444444446in"}![](media/image1.png){width="3.4097222222222223in"
-height="1.756809930008749in"}
+!(media/image3.png)![](media/image1.png)
 
 The servo motor, which is attached to the base of the gripper, controls
 only one arm. The control logic is applied using an Arduino sketch that
@@ -199,9 +193,7 @@ attachment design created by a classmate was used as a starting point
 and then modified to fit the mounting constraints of our robot base.
 These reference designs helped speed up development while still allowing
 us to adapt them to the specific requirements of our
-setup.![](media/image10.jpg){width="3.1458333333333335in"
-height="2.747749343832021in"}![](media/image9.png){width="3.1489227909011372in"
-height="2.51913823272091in"}
+setup.![](media/image10.jpg)![](media/image9.png)
 
 2. System Installation and Setup
 --------------------------------
@@ -232,19 +224,13 @@ height="2.51913823272091in"}
 >
 > *\`\`\`*
 
-5.  Map the operating area using the TurtleBot3 navigation stack and
-    > determine a suitable drop-off location. Update the dropoff area
-    > locations in the nav\_dropoff\_node.py file accordingly.
+5.  Map the operating area using the TurtleBot3 navigation stack and determine a suitable drop-off location. Update the dropoff area locations in the nav\_dropoff\_node.py file accordingly.
 
-> ![](media/image7.png){width="4.21875in" height="1.2708333333333333in"}
+> ![](media/image7.png)
 
-6.  Install an MQTT broker and start the broker and ensure that the
-    > server address is correctly set both in the arduino code and the
-    > gripper\_mqtt\_node.py file.
+6.  Install an MQTT broker and start the broker and ensure that the server address is correctly set both in the arduino code and the gripper\_mqtt\_node.py file.
 
-> ![](media/image4.png){width="3.9305555555555554in"
-> height="0.4538746719160105in"}![](media/image5.png){width="3.8680555555555554in"
-> height="0.6046620734908137in"}
+> ![](media/image4.png)![](media/image5.png)
 
 7.  a.  **Terminal 1:** Start rosmaster
 
@@ -255,13 +241,11 @@ height="2.51913823272091in"}
     d.  **Terminal 4:** Start navigation using the saved map
 
     e.  **Next Terminals:** Launch the nodes in the following order
-        > (patrol\_search\_node, vision\_approach\_node,
-        > gripper\_mqtt\_node, nav\_dropoff\_node)
+        (patrol\_search\_node, vision\_approach\_node, gripper\_mqtt\_node, nav\_dropoff\_node)
 
 8.  It should be working as intended.
 
-![](media/image11.jpg){width="4.901042213473316in"
-height="3.675780839895013in"}
+![](media/image11.jpg)
 
 3. Demo Video
 -------------
