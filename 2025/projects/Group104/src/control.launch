@@ -1,0 +1,26 @@
+<launch>
+
+    <!-- launch map navigation -->
+    <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation.launch">
+        <arg name="map_file" value="""path_to_scanned_room_yaml_file"""/>
+    </include>
+
+    <!-- give time for AMCL to start -->
+    <param name="use_sim_time" value="false" />
+
+    <!-- controller node -->
+    <node pkg="turtlebot3_project" type="controller_node.py" name="controller_node" output="screen"/>
+
+    <!-- publish initial pose -->
+    <node pkg="turtlebot3_project" type="initial_pose_pub.py" name="initial_pose_pub" output="screen">
+        <param name="wait_for_amcl" value="true"/>
+    </node>
+
+    <!-- face search node -->
+    <node pkg="turtlebot3_project" type="face_search.py" name="face_search" output="screen"/>
+
+    <!-- face follower node -->
+    <node pkg="turtlebot3_project" type="face_follower_mp.py" name="face_follower_mp" output="screen"/>
+
+
+</launch>

@@ -1,0 +1,227 @@
+[
+    {
+        "id": "c5ed06c57dc5b769",
+        "type": "tab",
+        "label": "Flujo 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "e5e6ef78efda6436",
+        "type": "ui_slider",
+        "z": "c5ed06c57dc5b769",
+        "name": "",
+        "label": "LED Intensity",
+        "tooltip": "",
+        "group": "30ee1458a8b94218",
+        "order": 0,
+        "width": "6",
+        "height": "4",
+        "passthru": true,
+        "outs": "all",
+        "topic": "topic",
+        "topicType": "msg",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "className": "robot-slider",
+        "x": 150,
+        "y": 320,
+        "wires": [
+            [
+                "a1726fb30f3601c3",
+                "527fe41cc8dc362a"
+            ]
+        ]
+    },
+    {
+        "id": "a1726fb30f3601c3",
+        "type": "function",
+        "z": "c5ed06c57dc5b769",
+        "name": "function 1",
+        "func": "msg.payload = (msg.payload / 100).toFixed(2);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 320,
+        "wires": [
+            [
+                "16d138a76d51d38f"
+            ]
+        ]
+    },
+    {
+        "id": "16d138a76d51d38f",
+        "type": "mqtt out",
+        "z": "c5ed06c57dc5b769",
+        "name": "",
+        "topic": "light/intensity",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "7d68bd335ecf735f",
+        "x": 550,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "527fe41cc8dc362a",
+        "type": "ui_text",
+        "z": "c5ed06c57dc5b769",
+        "group": "30ee1458a8b94218",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Intensity Display",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 360,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "baddc790176e42e7",
+        "type": "mqtt out",
+        "z": "c5ed06c57dc5b769",
+        "name": "",
+        "topic": "robot/command",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "7d68bd335ecf735f",
+        "x": 620,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "23eb1cccdb8e754d",
+        "type": "function",
+        "z": "c5ed06c57dc5b769",
+        "name": "function 4",
+        "func": "msg.topic = \"/controller/cmd\";\nmsg.payload = String(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 640,
+        "wires": [
+            [
+                "baddc790176e42e7"
+            ]
+        ]
+    },
+    {
+        "id": "2bf622db163098f5",
+        "type": "ui_template",
+        "z": "c5ed06c57dc5b769",
+        "group": "ad6015306201e66d",
+        "name": "Movement Controller",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "format": "<div style=\"\n  display: grid;\n  grid-template-columns: repeat(3, 70px);\n  grid-template-rows: repeat(3, 70px);\n  gap: 10px;\n  justify-content: center;\n\">\n\n  <button class=\"ctrl-btn forward\"\n    style=\"grid-column: 2; grid-row: 1;\"\n    ng-click=\"send({payload:'FORWARD'})\">\n    ▲\n  </button>\n\n  <button class=\"ctrl-btn left\"\n    style=\"grid-column: 1; grid-row: 2;\"\n    ng-click=\"send({payload:'CIRCLE_LEFT'})\">\n    ↶\n  </button>\n\n  <button class=\"ctrl-btn stop\"\n    style=\"grid-column: 2; grid-row: 2;\"\n    ng-click=\"send({payload:'STOP'})\">\n    ●\n  </button>\n\n  <button class=\"ctrl-btn right\"\n    style=\"grid-column: 3; grid-row: 2;\"\n    ng-click=\"send({payload:'CIRCLE_RIGHT'})\">\n    ↷\n  </button>\n\n  <button class=\"ctrl-btn backward\"\n    style=\"grid-column: 2; grid-row: 3;\"\n    ng-click=\"send({payload:'BACKWARD'})\">\n    ▼\n  </button>\n</div>\n\n<style>\n  .ctrl-btn {\n    width: 70px;\n    height: 70px;\n    border-radius: 14px;\n    border: none;\n    font-size: 26px;\n    font-weight: bold;\n    cursor: pointer;\n    color: white;\n    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);\n    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s;\n  }\n\n  .ctrl-btn:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);\n  }\n\n  .ctrl-btn:active {\n    transform: translateY(1px);\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);\n  }\n\n  /* Colores por acción */\n  .forward {\n    background: linear-gradient(135deg, #4CAF50, #2E7D32);\n  }\n\n  .backward {\n    background: linear-gradient(135deg, #FF9800, #EF6C00);\n  }\n\n  .left {\n    background: linear-gradient(135deg, #03A9F4, #0277BD);\n  }\n\n  .right {\n    background: linear-gradient(135deg, #03A9F4, #0277BD);\n  }\n\n  .stop {\n    background: linear-gradient(135deg, #F44336, #B71C1C);\n  }\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 160,
+        "y": 640,
+        "wires": [
+            [
+                "23eb1cccdb8e754d"
+            ]
+        ]
+    },
+    {
+        "id": "30ee1458a8b94218",
+        "type": "ui_group",
+        "name": "LED Intensity",
+        "tab": "218e040ba6441cc1",
+        "order": 2,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7d68bd335ecf735f",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "172.20.10.4",
+        "port": 1883,
+        "clientid": "NodeREDClient",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ad6015306201e66d",
+        "type": "ui_group",
+        "name": "Movement",
+        "tab": "218e040ba6441cc1",
+        "order": 1,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "218e040ba6441cc1",
+        "type": "ui_tab",
+        "name": "ROBOT Controller",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "cfc344f790709633",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.6"
+        }
+    }
+]
