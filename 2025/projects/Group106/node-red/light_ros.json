@@ -1,0 +1,190 @@
+[
+    {
+        "id": "e35e42b6d86d7248",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "2eca4325a40fefd8",
+        "type": "ros-server",
+        "url": "ws://0.0.0.0:9090"
+    },
+    {
+        "id": "befe91f21294f4de",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "51b876285aecbee9",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "9da422c08ac967bf",
+        "type": "ui-page",
+        "name": "Page 1",
+        "ui": "befe91f21294f4de",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "51b876285aecbee9",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Tablet",
+                "px": 576,
+                "cols": 6
+            },
+            {
+                "name": "Small Desktop",
+                "px": 768,
+                "cols": 9
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "74ac006d15a00bbf",
+        "type": "ui-group",
+        "name": "Light Intensity",
+        "page": "9da422c08ac967bf",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "1601c78a3d8b1989",
+        "type": "ros-publish",
+        "z": "e35e42b6d86d7248",
+        "server": "2eca4325a40fefd8",
+        "topicname": "/light_intensity",
+        "typepackage": "std_msgs",
+        "typename": "Int16",
+        "stampheader": false,
+        "x": 400,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "9fb5af4153642fc7",
+        "type": "ui-slider",
+        "z": "e35e42b6d86d7248",
+        "group": "74ac006d15a00bbf",
+        "name": "",
+        "label": "slider",
+        "tooltip": "",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "end",
+        "topic": "payload",
+        "topicType": "msg",
+        "thumbLabel": "true",
+        "showTicks": "always",
+        "min": 0,
+        "max": "255",
+        "step": 1,
+        "className": "",
+        "iconPrepend": "",
+        "iconAppend": "",
+        "color": "",
+        "colorTrack": "",
+        "colorThumb": "",
+        "showTextField": false,
+        "x": 110,
+        "y": 180,
+        "wires": [
+            [
+                "7058baafeae0da98"
+            ]
+        ]
+    },
+    {
+        "id": "7058baafeae0da98",
+        "type": "function",
+        "z": "e35e42b6d86d7248",
+        "name": "function 1",
+        "func": "msg.payload = {\n    \"data\": msg.payload\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 180,
+        "wires": [
+            [
+                "1601c78a3d8b1989",
+                "5b90fd54a251b4f3"
+            ]
+        ]
+    },
+    {
+        "id": "5b90fd54a251b4f3",
+        "type": "debug",
+        "z": "e35e42b6d86d7248",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "data",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 420,
+        "y": 100,
+        "wires": []
+    }
+]

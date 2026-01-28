@@ -1,0 +1,45 @@
+# Core ROS base
+ros-noetic-ros-base
+
+# Teleoperation and joystick support
+ros-noetic-joy
+ros-noetic-teleop-twist-joy
+ros-noetic-teleop-twist-keyboard
+
+# Robot description
+ros-noetic-urdf
+ros-noetic-xacro
+
+# Communication with microcontrollers
+ros-noetic-rosserial-python
+ros-noetic-rosserial-arduino
+ros-noetic-rosserial-client
+ros-noetic-rosserial-msgs
+
+# Required
+ros-noetic-interactive-markers
+
+# Camera
+libv4l-dev
+ros-noetic-image-transport
+ros-noetic-camera-info-manager
+ros-noetic-usb-cam
+# Missing in the instructions
+ros-noetic-image-view
+
+# Optional: image compression / camera
+ros-noetic-compressed-image-transport
+
+# Optional: To run navigation locally (could be ok on Raspberry Pi 4)
+ros-noetic-amcl
+ros-noetic-map-server
+ros-noetic-move-base
+ros-noetic-navigation
+ros-noetic-gmapping
+
+
+# Optional: if new raw laser scan stream (usually not needed with TB3 Lidar)
+# ros-noetic-laser-proc
+
+# Optional: if use RGBD-camera on robot
+# ros-noetic-rgbd-launch

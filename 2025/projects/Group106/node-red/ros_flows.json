@@ -1,0 +1,592 @@
+[
+    {
+        "id": "ecd42d42c3237e9c",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "c2837a0481a6aeb8",
+        "type": "ros-server",
+        "url": "ws://0.0.0.0:9090"
+    },
+    {
+        "id": "d3ee7a40d58aab4d",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "e2bfc4b2992e1680",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "e70e48ea35c7426b",
+        "type": "ui-page",
+        "name": "Page 1",
+        "ui": "d3ee7a40d58aab4d",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "e2bfc4b2992e1680",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Tablet",
+                "px": 576,
+                "cols": 6
+            },
+            {
+                "name": "Small Desktop",
+                "px": 768,
+                "cols": 9
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "f701abfdce5f8aad",
+        "type": "ui-group",
+        "name": "Group 1",
+        "page": "e70e48ea35c7426b",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "a139932223901fb5",
+        "type": "function",
+        "z": "ecd42d42c3237e9c",
+        "name": "Twist message",
+        "func": "var linx = flow.get(\"lin_x\")\nvar angz = flow.get(\"ang_z\")\nmsg.payload = {\n    linear: {\n        x: linx,\n        y: 0,\n        z: 0\n    },\n    angular: {\n        x: 0,\n        y: 0,\n        z: angz\n    }\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 640,
+        "wires": [
+            [
+                "13649ee96ca6ae8b"
+            ]
+        ]
+    },
+    {
+        "id": "13649ee96ca6ae8b",
+        "type": "ros-publish",
+        "z": "ecd42d42c3237e9c",
+        "server": "c2837a0481a6aeb8",
+        "topicname": "/cmd_vel",
+        "typepackage": "geometry_msgs",
+        "typename": "Twist",
+        "stampheader": false,
+        "x": 960,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "909b6ba111ac96d8",
+        "type": "ui-button",
+        "z": "ecd42d42c3237e9c",
+        "group": "f701abfdce5f8aad",
+        "name": "fwd",
+        "label": "Forward",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 330,
+        "y": 520,
+        "wires": [
+            [
+                "6610b0d607688ab1"
+            ]
+        ]
+    },
+    {
+        "id": "5a10171154e4f603",
+        "type": "ui-button",
+        "z": "ecd42d42c3237e9c",
+        "group": "f701abfdce5f8aad",
+        "name": "bwd",
+        "label": "Backward",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 330,
+        "y": 580,
+        "wires": [
+            [
+                "7a208edf7bc71613"
+            ]
+        ]
+    },
+    {
+        "id": "013fc32185a45ca9",
+        "type": "ui-button",
+        "z": "ecd42d42c3237e9c",
+        "group": "f701abfdce5f8aad",
+        "name": "rot_right",
+        "label": "Rotate right",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 340,
+        "y": 640,
+        "wires": [
+            [
+                "3fbb4e3c63ea066b"
+            ]
+        ]
+    },
+    {
+        "id": "d662272f5a25485c",
+        "type": "ui-button",
+        "z": "ecd42d42c3237e9c",
+        "group": "f701abfdce5f8aad",
+        "name": "rot_left",
+        "label": "Rotate left",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 330,
+        "y": 700,
+        "wires": [
+            [
+                "e57b202a6c743adf"
+            ]
+        ]
+    },
+    {
+        "id": "160047ff8863954a",
+        "type": "ui-button",
+        "z": "ecd42d42c3237e9c",
+        "group": "f701abfdce5f8aad",
+        "name": "stop",
+        "label": "Stop",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 330,
+        "y": 760,
+        "wires": [
+            [
+                "d0b6f40b698820ee"
+            ]
+        ]
+    },
+    {
+        "id": "cbb24155a4dcc0e7",
+        "type": "function",
+        "z": "ecd42d42c3237e9c",
+        "name": "Init Twist values on start and clean on stop",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\nflow.set(\"lin_x\", 0)\nflow.set(\"ang_z\", 0)",
+        "finalize": "// Code added here will be run when the\n// node is being stopped or re-deployed.\nflow.set(\"lin_x\", 0)\nflow.set(\"ang_z\", 0)",
+        "libs": [],
+        "x": 350,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6610b0d607688ab1",
+        "type": "function",
+        "z": "ecd42d42c3237e9c",
+        "name": "Twist message fwd",
+        "func": "var linx = flow.get(\"lin_x\")\nflow.set(\"lin_x\", linx + 0.05);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 520,
+        "wires": [
+            [
+                "a139932223901fb5"
+            ]
+        ]
+    },
+    {
+        "id": "7a208edf7bc71613",
+        "type": "function",
+        "z": "ecd42d42c3237e9c",
+        "name": "Twist message bwd",
+        "func": "var linx = flow.get(\"lin_x\")\nflow.set(\"lin_x\", linx - 0.05);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 580,
+        "wires": [
+            [
+                "a139932223901fb5"
+            ]
+        ]
+    },
+    {
+        "id": "3fbb4e3c63ea066b",
+        "type": "function",
+        "z": "ecd42d42c3237e9c",
+        "name": "Twist message rot right",
+        "func": "var angz = flow.get(\"ang_z\")\nflow.set(\"ang_z\", angz - 0.05);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 640,
+        "wires": [
+            [
+                "a139932223901fb5"
+            ]
+        ]
+    },
+    {
+        "id": "d0b6f40b698820ee",
+        "type": "function",
+        "z": "ecd42d42c3237e9c",
+        "name": "Twist message stop",
+        "func": "\nflow.set(\"lin_x\", 0);\nflow.set(\"ang_z\", 0);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 760,
+        "wires": [
+            [
+                "a139932223901fb5"
+            ]
+        ]
+    },
+    {
+        "id": "e57b202a6c743adf",
+        "type": "function",
+        "z": "ecd42d42c3237e9c",
+        "name": "Twist message rot left",
+        "func": "var angz = flow.get(\"ang_z\")\nflow.set(\"ang_z\", angz + 0.05);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 700,
+        "wires": [
+            [
+                "a139932223901fb5"
+            ]
+        ]
+    },
+    {
+        "id": "0c949ed80bc6d55e",
+        "type": "inject",
+        "z": "ecd42d42c3237e9c",
+        "name": "Inject every 0.1 seconds",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "0.1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 790,
+        "y": 860,
+        "wires": [
+            [
+                "a139932223901fb5"
+            ]
+        ]
+    },
+    {
+        "id": "3c173bb2a9ff1fbb",
+        "type": "ros-subscribe",
+        "z": "ecd42d42c3237e9c",
+        "server": "c2837a0481a6aeb8",
+        "topicname": "/battery_state",
+        "x": 330,
+        "y": 960,
+        "wires": [
+            [
+                "8ea5456f84957df6"
+            ]
+        ]
+    },
+    {
+        "id": "8ea5456f84957df6",
+        "type": "function",
+        "z": "ecd42d42c3237e9c",
+        "name": "Battery %",
+        "func": "msg.payload.percentage = Math.floor(msg.payload.percentage * 100)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 960,
+        "wires": [
+            [
+                "c370bba57ca6d69c",
+                "c7f40c7b065f2be8"
+            ]
+        ]
+    },
+    {
+        "id": "c370bba57ca6d69c",
+        "type": "ui-text",
+        "z": "ecd42d42c3237e9c",
+        "group": "f701abfdce5f8aad",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "msg",
+        "label": "text",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.percentage",
+        "valueType": "msg",
+        "x": 710,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "c7f40c7b065f2be8",
+        "type": "ui-gauge",
+        "z": "ecd42d42c3237e9c",
+        "name": "Battery State",
+        "group": "f701abfdce5f8aad",
+        "order": 0,
+        "value": "payload.percentage",
+        "valueType": "msg",
+        "width": 3,
+        "height": 3,
+        "gtype": "gauge-half",
+        "gstyle": "needle",
+        "title": "Battery %",
+        "alwaysShowTitle": false,
+        "floatingTitlePosition": "top-left",
+        "units": "units",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "0",
+                "color": "#ea5353",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "33",
+                "color": "#ffc800",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "66",
+                "color": "#5cd65c",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": 0,
+        "max": "100",
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 730,
+        "y": 1000,
+        "wires": [
+            []
+        ]
+    }
+]

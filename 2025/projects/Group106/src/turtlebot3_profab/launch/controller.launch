@@ -1,0 +1,7 @@
+<launch>
+    <!-- Bring up the robot --> 
+    <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch"/>
+
+    <!-- Run controller node --> 
+    <node name="controller" pkg="turtlebot3_profab" type="controller.py" output="screen"/>
+</launch>

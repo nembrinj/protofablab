@@ -1,0 +1,519 @@
+[
+    {
+        "id": "24d44b42125fca5d",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "370b15434d179e41",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.6"
+        }
+    },
+    {
+        "id": "b68cca53b1b6c0bf",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "d2fad17cb78edcf3",
+        "type": "ui_tab",
+        "name": "Robot Control",
+        "icon": "robot",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "5572db023c7006a5",
+        "type": "ui_group",
+        "name": "Movement",
+        "tab": "d2fad17cb78edcf3",
+        "order": 1,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "bc176cb17f3ab9e3",
+        "type": "ui_group",
+        "name": "Motor and Light Control",
+        "tab": "d2fad17cb78edcf3",
+        "order": 2,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "0a50a7c875b04700",
+        "type": "ros-server",
+        "url": "ws://0.0.0.0:9090"
+    },
+    {
+        "id": "c64831fa417a7c38",
+        "type": "ros-server",
+        "url": "ws://0.0.0.0:9090"
+    },
+    {
+        "id": "eb436ea8db921f59",
+        "type": "ui_button",
+        "z": "24d44b42125fca5d",
+        "name": "",
+        "group": "5572db023c7006a5",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Position 3",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "{   \"x\": 3.0,   \"y\": 2.5,   \"z\": 0.0, \"orientation\": 0.6,   \"tiempo\": 5 }",
+        "payloadType": "json",
+        "topic": "position3",
+        "topicType": "msg",
+        "x": 300,
+        "y": 340,
+        "wires": [
+            [
+                "5758262894399cc8"
+            ]
+        ]
+    },
+    {
+        "id": "4a26594779a723c3",
+        "type": "ui_button",
+        "z": "24d44b42125fca5d",
+        "name": "",
+        "group": "5572db023c7006a5",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Position 2",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "{   \"x\": 2.0,   \"y\": 1.5,   \"z\": 0.0, \"orientation\": 0.6,   \"tiempo\": 5 }",
+        "payloadType": "json",
+        "topic": "position2",
+        "topicType": "msg",
+        "x": 300,
+        "y": 280,
+        "wires": [
+            [
+                "372bb8c409db3ecf"
+            ]
+        ]
+    },
+    {
+        "id": "38ee22aa80ca8236",
+        "type": "ui_button",
+        "z": "24d44b42125fca5d",
+        "name": "",
+        "group": "5572db023c7006a5",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Position 1",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "{   \"x\": 1.0,   \"y\": 0.5,   \"z\": 0.0, \"orientation\": 0.6,   \"tiempo\": 5 }",
+        "payloadType": "json",
+        "topic": "position1",
+        "topicType": "msg",
+        "x": 300,
+        "y": 220,
+        "wires": [
+            [
+                "1236fd5a72fb19f1"
+            ]
+        ]
+    },
+    {
+        "id": "1ec0940bfda1569e",
+        "type": "ui_slider",
+        "z": "24d44b42125fca5d",
+        "name": "",
+        "label": "Light intensity",
+        "tooltip": "",
+        "group": "bc176cb17f3ab9e3",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "all",
+        "topic": "light",
+        "topicType": "msg",
+        "min": 0,
+        "max": "255",
+        "step": 1,
+        "className": "",
+        "x": 320,
+        "y": 480,
+        "wires": [
+            [
+                "de164e7c58d2d8de"
+            ]
+        ]
+    },
+    {
+        "id": "06dbd28ec35e8142",
+        "type": "ui_slider",
+        "z": "24d44b42125fca5d",
+        "name": "",
+        "label": "Motor velocity",
+        "tooltip": "",
+        "group": "bc176cb17f3ab9e3",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "all",
+        "topic": "motor",
+        "topicType": "msg",
+        "min": "-15",
+        "max": "15",
+        "step": 1,
+        "className": "",
+        "x": 320,
+        "y": 540,
+        "wires": [
+            [
+                "957c66f72455d2a9"
+            ]
+        ]
+    },
+    {
+        "id": "de164e7c58d2d8de",
+        "type": "function",
+        "z": "24d44b42125fca5d",
+        "name": "format payload 1",
+        "func": "msg.payload = {\n    \"data\": msg.payload\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 480,
+        "wires": [
+            [
+                "13cb7e7df3cb9f9f"
+            ]
+        ]
+    },
+    {
+        "id": "13cb7e7df3cb9f9f",
+        "type": "ros-publish",
+        "z": "24d44b42125fca5d",
+        "server": "0a50a7c875b04700",
+        "topicname": "/light_intensity",
+        "typepackage": "std_msgs",
+        "typename": "Int16",
+        "stampheader": false,
+        "x": 820,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "957c66f72455d2a9",
+        "type": "function",
+        "z": "24d44b42125fca5d",
+        "name": "format payload 2",
+        "func": "msg.payload = {\n    \"data\": msg.payload\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 540,
+        "wires": [
+            [
+                "4a5f5b95bcf078e5"
+            ]
+        ]
+    },
+    {
+        "id": "4a5f5b95bcf078e5",
+        "type": "ros-publish",
+        "z": "24d44b42125fca5d",
+        "server": "c64831fa417a7c38",
+        "topicname": "/motor_speed",
+        "typepackage": "std_msgs",
+        "typename": "Int16",
+        "stampheader": false,
+        "x": 820,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "1236fd5a72fb19f1",
+        "type": "function",
+        "z": "24d44b42125fca5d",
+        "name": "PoseStamped 1",
+        "func": "msg.payload = {\n    header: {\n        seq: 0,\n        stamp: {\n            secs: 1764859150,\n            nsecs: 549555319\n        },\n        frame_id: \"map\"\n    },\n    pose: {\n        position: {\n            x: 0.5,\n            y: 0.12,\n            z: 0.0\n        },\n        orientation: {\n            x: 0.0,\n            y: 0.0,\n            z: 0.306,\n            w: 0.952\n        }\n    }\n};\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 220,
+        "wires": [
+            [
+                "31f635352cd60a54"
+            ]
+        ]
+    },
+    {
+        "id": "31f635352cd60a54",
+        "type": "ros-publish",
+        "z": "24d44b42125fca5d",
+        "server": "0a50a7c875b04700",
+        "topicname": "/move_base_simple/goal",
+        "typepackage": "geometry_msgs",
+        "typename": "PoseStamped",
+        "stampheader": false,
+        "x": 850,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "372bb8c409db3ecf",
+        "type": "function",
+        "z": "24d44b42125fca5d",
+        "name": "PoseStamped 2",
+        "func": "msg.payload = {\n    header: {\n        seq: 0,\n        stamp: {\n            secs: 1764859150,\n            nsecs: 549555319\n        },\n        frame_id: \"map\"\n    },\n    pose: {\n        position: {\n            x: 0.16,\n            y: 0.16,\n            z: 0.0\n        },\n        orientation: {\n            x: 0.0,\n            y: 0.0,\n            z: 0.683,\n            w: 0.731\n        }\n    }\n};\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 280,
+        "wires": [
+            [
+                "828a7743271d9cad"
+            ]
+        ]
+    },
+    {
+        "id": "5758262894399cc8",
+        "type": "function",
+        "z": "24d44b42125fca5d",
+        "name": "PoseStamped 3",
+        "func": "msg.payload = {\n    header: {\n        seq: 0,\n        stamp: {\n            secs: 1764859150,\n            nsecs: 549555319\n        },\n        frame_id: \"map\"\n    },\n    pose: {\n        position: {\n            x: 0.21,\n            y: 0.61,\n            z: 0.0\n        },\n        orientation: {\n            x: 0.0,\n            y: 0.0,\n            z: 0.674,\n            w: 0.738\n        }\n    }\n};\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 340,
+        "wires": [
+            [
+                "1b9c3d697c02aa4f"
+            ]
+        ]
+    },
+    {
+        "id": "828a7743271d9cad",
+        "type": "ros-publish",
+        "z": "24d44b42125fca5d",
+        "server": "0a50a7c875b04700",
+        "topicname": "/move_base_simple/goal",
+        "typepackage": "geometry_msgs",
+        "typename": "PoseStamped",
+        "stampheader": false,
+        "x": 850,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "1b9c3d697c02aa4f",
+        "type": "ros-publish",
+        "z": "24d44b42125fca5d",
+        "server": "0a50a7c875b04700",
+        "topicname": "/move_base_simple/goal",
+        "typepackage": "geometry_msgs",
+        "typename": "PoseStamped",
+        "stampheader": false,
+        "x": 850,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "847a93520460fadf",
+        "type": "ui_slider",
+        "z": "24d44b42125fca5d",
+        "name": "",
+        "label": "Light frequency",
+        "tooltip": "",
+        "group": "bc176cb17f3ab9e3",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "all",
+        "topic": "light",
+        "topicType": "msg",
+        "min": 0,
+        "max": "20",
+        "step": 1,
+        "className": "",
+        "x": 320,
+        "y": 420,
+        "wires": [
+            [
+                "eef9445be21a58ab"
+            ]
+        ]
+    },
+    {
+        "id": "eef9445be21a58ab",
+        "type": "function",
+        "z": "24d44b42125fca5d",
+        "name": "format payload 0",
+        "func": "msg.payload = {\n    \"data\": msg.payload\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 420,
+        "wires": [
+            [
+                "adc11a80d6b27358"
+            ]
+        ]
+    },
+    {
+        "id": "adc11a80d6b27358",
+        "type": "ros-publish",
+        "z": "24d44b42125fca5d",
+        "server": "0a50a7c875b04700",
+        "topicname": "/light_frequency",
+        "typepackage": "std_msgs",
+        "typename": "Int16",
+        "stampheader": false,
+        "x": 820,
+        "y": 420,
+        "wires": []
+    }
+]
