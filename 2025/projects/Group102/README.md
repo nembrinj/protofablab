@@ -178,7 +178,8 @@ passively to the object instead of relying on the exact measurements.
 This made the grasp more tolerative for small positioning errors, also
 meaning an improvement on the overall reliability.
 
-!(media/image3.png)![](media/image1.png)
+!(media/image3.png)
+![](media/image1.png)
 
 The servo motor, which is attached to the base of the gripper, controls
 only one arm. The control logic is applied using an Arduino sketch that
@@ -193,23 +194,20 @@ attachment design created by a classmate was used as a starting point
 and then modified to fit the mounting constraints of our robot base.
 These reference designs helped speed up development while still allowing
 us to adapt them to the specific requirements of our
-setup.![](media/image10.jpg)![](media/image9.png)
+setup.
+![](media/image10.jpg)
+![](media/image9.png)
 
 2. System Installation and Setup
 --------------------------------
 
-1.  Print all necessary 3d components. (Important: Medicine bottle
-    > should be printed using a bright orange filament as the blob
-    > detection relies on orange color based detection)
+1.  Print all necessary 3d components. (Important: Medicine bottle should be printed using a bright orange filament as the blob detection relies on orange color based detection)
 
-2.  Upload the arduino sketch to a featherboard and assemble the gripper
-    > mechanism. Then mount the gripper to the TurtleBot3 base.
+2.  Upload the arduino sketch to a featherboard and assemble the gripper mechanism. Then mount the gripper to the TurtleBot3 base.
 
-3.  Connect and mount the USB camera to the robot and verify that the
-    > camera is publishing /usb\_cam/image\_raw/compressed
+3.  Connect and mount the USB camera to the robot and verify that the camera is publishing /usb\_cam/image\_raw/compressed
 
-4.  Install all necessary libraries and packages required to run the
-    > system
+4.  Install all necessary libraries and packages required to run the system
 
 > *\`\`\`*
 >
