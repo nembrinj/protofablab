@@ -178,7 +178,7 @@ passively to the object instead of relying on the exact measurements.
 This made the grasp more tolerative for small positioning errors, also
 meaning an improvement on the overall reliability.
 
-!(media/image3.png)
+![](media/image3.png)
 ![](media/image1.png)
 
 The servo motor, which is attached to the base of the gripper, controls
@@ -195,6 +195,7 @@ and then modified to fit the mounting constraints of our robot base.
 These reference designs helped speed up development while still allowing
 us to adapt them to the specific requirements of our
 setup.
+
 ![](media/image10.jpg)
 ![](media/image9.png)
 
