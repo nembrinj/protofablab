@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Simon Ruffieux">
+<meta name="dcterms.date" content="2026-09-24">
+<meta name="keywords" content="Human-IST, ProtoFab, LearningLab, UniFR">
+
+<title>Introduction to ROS2 and Turtlebot3</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="AN_02_ROS_files/libs/clipboard/clipboard.min.js"></script>
+<script src="AN_02_ROS_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="AN_02_ROS_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="AN_02_ROS_files/libs/quarto-html/popper.min.js"></script>
+<script src="AN_02_ROS_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="AN_02_ROS_files/libs/quarto-html/anchor.min.js"></script>
+<link href="AN_02_ROS_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="AN_02_ROS_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="AN_02_ROS_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="AN_02_ROS_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="AN_02_ROS_files/libs/bootstrap/bootstrap-e45286ae55112de182af3b94459e1a1c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="..\..\..\AN_02_ROS.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Introduction to ROS2 and Turtlebot3</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Simon Ruffieux </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 24, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+<div>
+  <div class="keywords">
+    <div class="block-title">Keywords</div>
+    <p>Human-IST, ProtoFab, LearningLab, UniFR</p>
+  </div>
+</div>
+
+</header>
+
+
+<section id="protofab-assignment-2-introduction-to-ros2-and-turtlebot3" class="level1">
+<h1>ProtoFab Assignment 2: Introduction to ROS2 and Turtlebot3</h1>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This practical work focuses on learning the basic concepts of ROS through small independent tasks. Each task consists of applying hands-on commands in the terminal to illustrate how ROS and Turtlebot3 work. Note that Task 4 is the only task of this assignment where you will have to develop code on your own!</p>
+<p>In this practical work, you will perform the following tasks:</p>
+<ul>
+<li><p><strong>Task 1</strong> – Explore ROS and Linux basic commands</p></li>
+<li><p><strong>Task 2</strong> – Control the Turtlebot3 in the real world</p></li>
+<li><p><strong>Task 3</strong> – Control the Turtlebot3 in simulation</p></li>
+<li><p><strong>Task 4</strong> – Create your first controller <strong>(code on your own)</strong>.</p></li>
+<li><p><strong>Task 5</strong> – [Optional] Update Turtlebot3 Wifi settings</p></li>
+<li><p><strong>Task 6</strong> – [Optional] Enable usb_camera and live-stream on the Turtlebot3</p></li>
+</ul>
+<p><u><strong>Learning objectives:</strong></u></p>
+<p>At the end of the assignment, you should be able to</p>
+<ul>
+<li><p>Run basic commands</p></li>
+<li><p>Use visualization tools (rqt_graph, rqt)</p></li>
+<li><p>Create a package</p></li>
+<li><p>Understand Nodes and Topics (creation, start, code, etc.)</p></li>
+<li><p>Use the Turtlebot3 in simulation and real modes</p></li>
+<li><p>Create a simple controller for the Turtlebot3</p></li>
+</ul>
+</section>
+<section id="pre-requesites" class="level2">
+<h2 class="anchored" data-anchor-id="pre-requesites">Pre-requesites</h2>
+<ul>
+<li><p>A working installation of ROS (ubuntu 24.04 + ROS jazzy) (see AN01)</p></li>
+<li><p>Notions seen in the lecture LN02</p></li>
+</ul>
+</section>
+<section id="hints" class="level2">
+<h2 class="anchored" data-anchor-id="hints">Hints</h2>
+<ol type="1">
+<li><p>When you create a new workspace, do not forget to source it and, ideally, also to add the source command to your ‘~/.bashrc’ file.</p></li>
+<li><p>Do not forget to make your python scripts executables (using the command chmod +x)</p></li>
+<li><p>If you are using Windows WSL2 and Ubuntu, folder and file creations can be done using Visual Studio Code Interface</p>
+<ol type="1">
+<li>You can install code using the command “sudo snap install –classic code”. Or you can simply install the WSL plugin for your Windows VS Code to remotely handle files and folders in your WSL environment.</li>
+</ol></li>
+<li><p>If you are using Windows WSL2 and Ubuntu, do not forget to <span style="color: red;">disable your firewalls</span>, otherwise ROS messages are blocked. Do not forget to re-enable them after the assignments.</p></li>
+</ol>
+</section>
+<section id="tasks" class="level2">
+<h2 class="anchored" data-anchor-id="tasks">Tasks</h2>
+<section id="task-1-explore-ros-basic-commands" class="level3">
+<h3 class="anchored" data-anchor-id="task-1-explore-ros-basic-commands">Task 1 – Explore ROS basic commands</h3>
+<ol type="1">
+<li><p>Basic commands.</p>
+<ul>
+<li><p>Linux basic commands.</p>
+<ol type="a">
+<li><p>List files in current directory</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ls</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Change to directory</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd &lt;dir_name&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Remove directory and subdirectories (delete)</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] rm -r &lt;dir_name&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Print working directory (path of current dir)</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] pwd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Display the content of a file in the terminal</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cat &lt;filename&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Open files in an editor. There are many different text editors available. We recommend using ‘code’ or ‘nano’ to view and edit files.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] code &lt;filename&gt;  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Print the value of a variable</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] echo $ROS_DOMAIN_ID</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol></li>
+</ul></li>
+<li><p>Explore the turtlebot3 Gazebo package (Gazebo is the ROS simulator)</p>
+<ul>
+<li><p>Find the location of <em>turtlebot3_gazebo</em> ros package and move to its directory (replace <simon> with your username in the path below)</simon></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 pkg prefix turtlebot3_gazebo     </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd /home/simon/turtlebot3_ws/src/turtlebot3_simulations/turtlebot3_gazebo</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Explore its files and subdirectories (use <em>cd</em>, <em>ls</em>, <em>cat</em> and/or your preferred file editor).</p></li>
+<li><p>Now find the <em>turtlebot3_world.launch.py</em> launcher file and read its content.&nbsp; This launcher file is a good “simple” example of launcher. It declares a few variables, launches gazebo simulation (server and client), launches robot_state_publishers that brigdges topic (to let you use /cmd_vel), launches the turtlebot3 robot in a specific location. Youz can see that first all the commands are declared and added to the list of actions at the end. Within a launcher file, it is possible to parameterize and start multiple other launchers and nodes. It is very useful within ROS2 ecosystem to make your life easier by starting multiple executables with a single command.</p></li>
+</ul></li>
+</ol>
+<p>Now let’s start a simulation and explore how to visualize the available topics and their content.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/image1.png" class="img-fluid figure-img" style="width:40.0%" data-margin="auto"></p>
+<figcaption>Turlesim GUI</figcaption>
+</figure>
+</div>
+<ol start="3" type="1">
+<li><p>Run a (single) node (simulation)</p>
+<ul>
+<li><p>First install turtlesim package. Turtlesim is a basic package that is often used to introduce newcomers to ROS and robotics. You can find many examples and tutorials online.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] sudo apt install ros-jazzy-turtlesim</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>List the available packages and check that turtlesim is installed</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 pkg list</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>List the available executables of the package turtlesim. You should see four executables: turtlesim draw_square, turtlesim mimic, turtlesim turtle_teleop_key, turtlesim turtlesim_node</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 pkg executables turtlesim</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>In a first terminal, run turtlesim node from the turtlesim package</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-1] ros2 run turtlesim turtlesim_node</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>In a second terminal, run turtle_teleop_key node from the turtlesim package. With focus on this terminal, you should now be able to move the turtle using the arrow keys on your keyboard.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-2] ros2 run turtlesim turtle_teleop_key</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Close the teleop Node. (Hit q or ctrl-c in the terminal 2). Keep the other node running (terminal 1).</p></li>
+<li><p>List available topics.<br>
+Hint: use ‘-h’ option to get some more information about a command (ie. <code>ros2 -h</code>, <code>ros2 topic -h</code>)</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-2] ros2 topic list</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>/parameter_events</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>/rosout</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>/turtle1/cmd_vel</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>/turtle1/color_sensor</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>/turtle1/pose</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Listen to a topic and output constantly its values.<br>
+Hint: use <code>ros2 topic echo --once /turtle1/pose</code> to output once the values of the topic.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-] ros2 topic echo /turtle1/pose</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>x: 5.544444561004639</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>y: 5.544444561004639</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>theta: 0.0</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>linear_velocity: 0.0</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>angular_velocity: 0.0</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>List available services</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-2] ros2 service list</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>/clear</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>/kill</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>/reset</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>/rosout/get_loggers</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>/rosout/set_logger_level</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>/spawn</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>/turtle1/set_pen</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>/turtle1/teleport_absolute</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>/turtle1/teleport_relative</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>/turtlesim/get_loggers</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>/turtlesim/set_logger_level</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Get information about a service. For example, the command below will give you information about the /reset service.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-2] ros2 service info /reset</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>Type: std_srvs/srv/Empty</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>Clients count: 0</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>Services count: 1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Call a service (you must specify the Service and the Type). For example, using the command below will reset the turtle simulation.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-3] ros2 service call /reset std_srvs/srv/Empty</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>List existing nodes</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-3] ros2 node list</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>/turtlesim</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul></li>
+<li><p>Start and use visualization tools. Note: You should still have roscore and turtlesim_node running in distinct consoles.</p>
+<ul>
+<li><p>Start rqt_graph to visualize nodes, topics and their connections. Select all Nodes/Topics (all). Start ‘turtle_teleop_key’ in a third terminal, if you want to see a more interesting graph (with connections). Close it when done.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-3] rqt_graph</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Start rqt to interact and visualize the topics and their data. To display topics, go to Plugins-&gt;Topics-&gt;TopicMonitor. You can select and unselect topics to monitor their values. You can use the different Plugins from the menu to plot graphs (visualization-&gt;plot). You can also publish data to topics (Topics-&gt;ssagePublisher). You can do many more things using the different plugins. Explore them for yourself.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-3] rqt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Now try to move the turtle by publishing messages to the /turtle1/cmd_vel topic. Open the Plugins-&gt;Topics-&gt;MessagePublisher window, select the correct topic, use a rate of 1hz, click on the ‘+’ to create your new Publisher. Now choose values for linear (x value) and angular (z value) vectors. Enable the topic and observe your turtle move.</p></li>
+</ul></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/rqt_turtle_sim_publish.png" class="img-fluid figure-img" style="width:80.0%" data-margin="auto"></p>
+<figcaption>RQT GUI. Showing the Message Publisher plugin.</figcaption>
+</figure>
+</div>
+</section>
+<section id="task-2-control-the-turtlebot3-in-the-real-world" class="level3">
+<h3 class="anchored" data-anchor-id="task-2-control-the-turtlebot3-in-the-real-world">Task 2 – Control the Turtlebot3 in the real world</h3>
+<p>In this task, you will set up and control the real Turtlebot3 robot. To avoid ambiguity, in our command instructions, we use [localpc-terminal] and [turtelbot-terminal] to indicate whether we are referring to the terminal of your own machine or the terminal of the turtlebot (usually over sh). WARNING - Make sure the robot is in a safe area, don’t put it on a table. The robot will move and you don’t want it to fall or hit something. If I put it on the table, I typically put a small bot underneath it so the wheels do not touch the ground, preventing any movement</p>
+<ol start="0" type="1">
+<li><p>Disable your firewalls (Windows or WSL). On Windows, you must disable your firewalls, otherwise ROS messages are blocked. Go to your OS settings and disable firewalls for networks (at least for the ProFab network).</p></li>
+<li><p>Connect to profab_wifi (ssid: ProFab, password: 1700_UniFR.&amp;)</p></li>
+<li><p>Set your ROS_DOMAIN_ID to your Turtlebot3 ID (ie. 101, 102, 103, 104, 105, etc). This is needed to allow your localpc and the robot to communicate with each other. You can set it in your bashrc file (see below) or directly in the terminal using the command below.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] export ROS_DOMAIN_ID=101</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Update your bashrc and add the lines shown below at the end of the file (only the one necessary, don’t duplicate).</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] code ~/.bashrc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here are the lines I added to my bashrc file</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a># Added by SR to enable graphical library use for ROS. Not sure if still necessary anymore (added for safety).</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>export LIBGL_ALWAYS_SOFTWARE=1</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>## Added by SR (required export)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>export ROS_DOMAIN_ID=101 # ID on robot and pc must match to enable communication</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>export TURTLEBOT3_MODEL=burger</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>## Added by SR (integration of ros jazzy commands within terminal)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>source /opt/ros/jazzy/setup.bash</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>source ~/turtlebot3_ws/install/setup.bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Source your new bashrc to apply the changes. Source it on all open terminals.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] source ~/.bashrc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Turn on the robot. It is already configured to connect automatically to ProFab wifi. If you want to use it on a different wifi, you will need to modify some files on the robot (see Task 5 for detailed instructions).</p></li>
+<li><p>SSH into the robot (the IP must be the one of your turtlebot3). Each robot should have a label indicating its IP when using the ProFab wifi.<br>
+Note: Turtlebot3 OS - user: ubuntu, password: turtlebot. We will now refer to this ssh terminal by using [turtlebot-terminal] before indicating commands.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ssh ubuntu@192.168.1.101</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Update the robot bashrc (edit the file using nano editor). If necessary, update ROS_DOMAIN_ID variable in the .bashrc file with the value present on you local machine. Save, exit nano and then source your file.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] nano ~/.bashrc         </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] source ~/.bashrc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Start turtlebot3_robot node on the robot. This establishes the connection between the robot and ROS and brings up all necessary drivers.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] ros2 launch turtlebot3_bringup robot.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Start teleop on your local machine (open a new terminal if necessary)</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-2] ros2 run turtlebot3_teleop teleop_keyboard</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+<p>Now you should be able to move the robot using ‘awsdx’ keys on your keyboard (the focus must be on the terminal running teleop).</p>
+<ol start="11" type="1">
+<li>When you are done playing with the robot, terminate all processes on the localpc (keep the real robot running with its node on)</li>
+</ol>
+<p>Now let’s visualize the sensors of the robot on rviz in real-time</p>
+<ol start="12" type="1">
+<li><p>Launch rviz to visualize the robot and its sensors in real-time</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-1] ros2 launch turtlebot3_bringup rviz2.launch.py   </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><u>Hints:</u> If you do not see Lidar readings (the dots on the image below), do the following changes. In your terminal, type the command below before typing the roslaunch command. You may also want to add this command in your ‘~/.bashrc’ file to avoid retyping it every time you launch a new terminal.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>$ export LIBGL_ALWAYS_SOFTWARE=1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/rviz_laserscan.png" class="img-fluid figure-img" style="width:80.0%" data-margin="auto"></p>
+<figcaption>Rviz interface displaying the robot and the lidar data. The Lidar scan data are represented with the dots.</figcaption>
+</figure>
+</div></li>
+<li><p>Do not hesitate to play a bit with the robot and its sensors. You can move the robot using teleop, visualize the Lidar data, etc. You can also use rqt to visualize topics and their data. Once finished, terminate all processes on your local machine and turn off the robot.</p></li>
+</ol>
+</section>
+<section id="task-3-control-the-turtlebot3-in-simulation" class="level3">
+<h3 class="anchored" data-anchor-id="task-3-control-the-turtlebot3-in-simulation">Task 3 – Control the Turtlebot3 in simulation</h3>
+<ol type="1">
+<li><p>Start the gazebo simulation for the turtlebot3</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal1] ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Start teleop node and move the robot (using awsdx keys)</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal2] ros2 run turtlebot3_teleop teleop_keyboard</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Stop teleop (Hit ctrl-c in the terminal)</p></li>
+<li><p>Start rqt and send Twist commands to the right topic to make the robot move</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal1] rqt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+<p>Note that when you stop sending commands, the robots does not stop moving. You must send a linear(0,0,0), angular(0,0,0) Twist command to stop it. You can also use the teleop node to stop it.</p>
+</section>
+<section id="task-4---create-a-controller-for-the-turtlebot3" class="level3">
+<h3 class="anchored" data-anchor-id="task-4---create-a-controller-for-the-turtlebot3">Task 4 - Create a controller for the Turtlebot3</h3>
+<p>In this task, you will create your first package and then develop the code for a simple collision avoidance controller for the Turtelbot3. You will test it in the simulated environment. Finally, you will create a launch file to start your controller and the simulated world. Note: the developed controller will be tested in simulation but it could also be used to control the real turtlebot3 without any modification.</p>
+<section id="create-a-package" class="level4">
+<h4 class="anchored" data-anchor-id="create-a-package">Create a package</h4>
+<p>(see https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Creating-Your-First-ROS2-Package.html)</p>
+<ol type="1">
+<li><p>Create a directory for your workspace (if you have not done it yet) and a ‘src’ subdirectory. You can name your workspace as you prefer, here we will use <em>profab_ws</em>.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] mkdir -p ~/profab_ws/src</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd ~/profab_ws/src/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Create the new package using the <em>ros2 pkg create</em> command. The command below creates a new package named <em>turtlebot3_profab</em>, which depends on std_messages, turtlebot3_msgs, sensor_msgs, geometry_msgs and rclpy. This will create a <em>turtlebot3_profab</em> folder which contains the <em>package.xml</em> and the <em>CMakeLists.txt</em> files, which have been partially filled out with the information you gave.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 pkg create turtlebot3_profab --build-type ament_python --license Apache-2.0 --dependencies std_msgs turtlebot3_msgs sensor_msgs geometry_msgs rclpy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Note</strong>: if you need to add external dependencies such as msgs and/or packages afterward, you need to modify these two files and rebuild the package with ‘colcon build’.</p></li>
+<li><p>Now you must build packages in your workspace (which will also build your package). Go back to the root of your workspace and (re)build it</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd ~/profab_ws/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] colcon build</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>Starting &gt;&gt;&gt; turtlebot3_profab</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>Finished &lt;&lt;&lt; turtlebot3_profab [1.07s]</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>Summary: 1 package finished [1.26s]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Note</strong>: after the workspace has been built, it has created a standardized directory structure (src, build, install, log). You may want to have a quick look at the content of the different directories.</p></li>
+<li><p>Source your workspace, so you make sure you can use/call its packages and executables from your terminals. You may actually add this source to your bashrc to make sure it is automatically loaded in all new terminals.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] source ~/profab_ws/install/setup.bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] echo 'source ~/profab_ws/install/setup.bash' &gt;&gt; ~/.bashrc </span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] source ~/.bashrc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+</section>
+<section id="create-and-run-your-first-controller-node" class="level4">
+<h4 class="anchored" data-anchor-id="create-and-run-your-first-controller-node">Create and run your first controller node</h4>
+<p>Now let’s start creating our first controller node.</p>
+<p>Start a terminal and type the following commands:</p>
+<ol start="4" type="1">
+<li><p>Change directory to your newly created package</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd ~/profab_ws/src/turtlebot3_profab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Change directory to the ‘turtlebot3_profab’ folder (~/profab_ws/src/turtlebot3_profab/turtlebot3_profab)</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal]  cd turtlebot3_profab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Create a new file for your ‘controller’ node with the ‘touch’ command and make it executable with the chmod command<br>
+<strong>Info</strong>: If want to know more about a command, you can always use its –help option (see below).</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] touch --help</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] touch my_first_controller.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] chmod +x my_first_controller.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Start coding with your favorite IDE (using Visual Studio Code here)</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] code my_first_controller.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Use the partial source code below for your script (you can copy-paste) First have a look at the code to understand its structure. It is a typical structure for the code of a node.</p>
+<ul>
+<li>Look at the run() function. When does the controller stops ?</li>
+<li>Look at the initialisation of the two different topics (publisher, subscriber). What do their parameters correspond to ?</li>
+<li>Look and understand the scan_callback() function. What is the current moving logic ? What will be the behaviour of the robot ?</li>
+<li>Look at the clean shutdown logic. What should you do here to prevent problems ?</li>
+<li>Test compiling and running the script before modifying it (see steps 9, 10 and 11 below) .</li>
+</ul></li>
+<li><p>Edit your setup.py file to include your new script in the ‘entry_points’ section. This is needed to make your script executable.</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd setup.py</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] code setup.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Note: I like to open directly the whole workspace in Visual Studio Code, so I can easily navigate between files and folders. You can do it by typing the command below in your terminal (or by opening VS Code and selecting the folder of your workspace).</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ~/profab_ws</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] code .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/package_structure.png" class="img-fluid figure-img" style="width:80.0%" data-margin="auto"></p>
+<figcaption>Screenshot of Visual Studio Code with package folder hierarchy and setup.py file open with the entry_points section</figcaption>
+</figure>
+</div></li>
+<li><p>Go back to the root directory of your workspace and (re)build it</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd ~/profab_ws/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] colcon build</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Now start your node<br>
+<strong>Hint</strong>: Use two distinct terminals: start your turtlebot3 simulation in the first terminal and your controller node in the second terminal.</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 run turtlebot3_profab my_first_controller</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Terminate both nodes using “ctrl-c” from their respective terminal</p></li>
+</ol>
+</section>
+<section id="modify-the-controller-to-include-a-collision-avoidance-logic" class="level4">
+<h4 class="anchored" data-anchor-id="modify-the-controller-to-include-a-collision-avoidance-logic">Modify the controller to include a collision avoidance logic</h4>
+<ol start="14" type="1">
+<li><p>Now reopen the ‘my_first_controller.py’ and modify it according to the provided comments so that the robot moves forward and avoid obstacles. Most of the necessary changes that must be made are located in the scan_callback() and control_loop() functions (see all TODOs). The expected new behaviour is to avoid obstacles in front of the robot to avoid collisions. One possible solution is the following: if front_scans are below a defined threshold, stop moving forward and rotate left or right (depending on left or right scans). Otherwise, move straight. Of course, you may code a more complex logic; do not hesitate to play with this controller once you have a first working solution. (You need to rebuild the package after modifying the code, see step 10 above).</p></li>
+<li><p>Restart Gazebo and your controller node to test your new logic. You should see the robot moving forward and avoiding obstacles.<br>
+<strong>Hint</strong>: Use two distinct terminals: start your turtlebot3 simulation in a terminal and your controller node in the other terminal.</p></li>
+</ol>
+<div class="sourceCode" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env python3</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="co">##</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Exercise</span></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="co">## You need to fill the </span><span class="al">TODO</span><span class="co"> parts to implement your logic</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a><span class="co">##</span></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a><span class="co">## LIDAR INFORMATION </span></span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Contrary to simulation, real robot does not receive exactly 360 measures every scan (more or less around 270). Therefore it is necessary to know where it started its scan, the angle between two measures (provided by the robot /scan topic). We can use this information to convert that to 0 - 360 information in order to facilitate processing. The lambda function below helps doing that. In the end, the user receives two arrays of same lengths. The first array contains the angles and the second array contains the distances. (0 degree is ahead, 90 is left, 180 is behind and 270 is right)</span></span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a><span class="co"># More information on how to process lidar data https://stanbaek.github.io/ece387/Module8_LIDAR/LIDAR.html</span></span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rclpy</span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rclpy.node <span class="im">import</span> Node</span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> signal</span>
+<span id="cb54-16"><a href="#cb54-16" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rclpy.signals <span class="im">import</span> SignalHandlerOptions</span>
+<span id="cb54-17"><a href="#cb54-17" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rclpy.qos <span class="im">import</span> qos_profile_default, qos_profile_sensor_data</span>
+<span id="cb54-18"><a href="#cb54-18" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geometry_msgs.msg <span class="im">import</span> TwistStamped</span>
+<span id="cb54-19"><a href="#cb54-19" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sensor_msgs.msg <span class="im">import</span> LaserScan</span>
+<span id="cb54-20"><a href="#cb54-20" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> time <span class="im">import</span> sleep</span>
+<span id="cb54-21"><a href="#cb54-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-22"><a href="#cb54-22" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb54-23"><a href="#cb54-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-24"><a href="#cb54-24" aria-hidden="true" tabindex="-1"></a><span class="co"># lambda function to convert rad to deg</span></span>
+<span id="cb54-25"><a href="#cb54-25" aria-hidden="true" tabindex="-1"></a>RAD2DEG <span class="op">=</span> <span class="kw">lambda</span> x: ((x)<span class="op">*</span><span class="fl">180.</span><span class="op">/</span>math.pi)</span>
+<span id="cb54-26"><a href="#cb54-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-27"><a href="#cb54-27" aria-hidden="true" tabindex="-1"></a><span class="co"># The main class that extends the Node class of ROS2. It contains all the necessary functions to implement a simple collision avoidance controller for the Turtlebot3 robot.</span></span>
+<span id="cb54-28"><a href="#cb54-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Subscribe to the /scan topic to get LIDAR data and publish to the /cmd_vel topic to send velocity commands to the robot.</span></span>
+<span id="cb54-29"><a href="#cb54-29" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> CollisionAvoidance(Node):</span>
+<span id="cb54-30"><a href="#cb54-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb54-31"><a href="#cb54-31" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(<span class="st">'collision_avoidance_controller'</span>)</span>
+<span id="cb54-32"><a href="#cb54-32" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.get_logger().info(<span class="st">"Collision avoidance controller has started"</span>)</span>
+<span id="cb54-33"><a href="#cb54-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-34"><a href="#cb54-34" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Publisher to send velocity commands</span></span>
+<span id="cb54-35"><a href="#cb54-35" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cmd_vel_pub <span class="op">=</span> <span class="va">self</span>.create_publisher(TwistStamped, <span class="st">'/cmd_vel'</span>, <span class="dv">10</span>)</span>
+<span id="cb54-36"><a href="#cb54-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-37"><a href="#cb54-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Subscriber to get LIDAR scans</span></span>
+<span id="cb54-38"><a href="#cb54-38" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.scan_sub <span class="op">=</span> <span class="va">self</span>.create_subscription(LaserScan, <span class="st">'/scan'</span>, <span class="va">self</span>.scan_callback, <span class="dv">10</span>)</span>
+<span id="cb54-39"><a href="#cb54-39" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb54-40"><a href="#cb54-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> - Define a good value for your safety distance threshold in meters (Minimum distance to consider an obstacle (in meters)). </span></span>
+<span id="cb54-41"><a href="#cb54-41" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> - You will use this value in your control loop logic to decide whether to move forward or rotate to avoid obstacles. You can test different values to see how it affects the robot's behaviour.</span></span>
+<span id="cb54-42"><a href="#cb54-42" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.min_dist <span class="op">=</span> <span class="dv">0</span> <span class="co"># Minimum distance to consider an obstacle (in meters)</span></span>
+<span id="cb54-43"><a href="#cb54-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-44"><a href="#cb54-44" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.get_logger().info(<span class="ss">f"Collision avoidance controller initialized with min_dist = </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>min_dist<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb54-45"><a href="#cb54-45" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb54-46"><a href="#cb54-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-47"><a href="#cb54-47" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.front_dist <span class="op">=</span> <span class="bu">float</span>(<span class="st">'inf'</span>)  <span class="co"># Initialize front distance to infinity</span></span>
+<span id="cb54-48"><a href="#cb54-48" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.left_dist <span class="op">=</span> <span class="bu">float</span>(<span class="st">'inf'</span>)   <span class="co"># Initialize left distance to infinity</span></span>
+<span id="cb54-49"><a href="#cb54-49" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.right_dist <span class="op">=</span> <span class="bu">float</span>(<span class="st">'inf'</span>)  <span class="co"># Initialize right distance to infinity</span></span>
+<span id="cb54-50"><a href="#cb54-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-51"><a href="#cb54-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-52"><a href="#cb54-52" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Main loop rate</span></span>
+<span id="cb54-53"><a href="#cb54-53" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.ctrl_loop_timer <span class="op">=</span> <span class="va">self</span>.create_timer(<span class="fl">0.1</span>, <span class="va">self</span>.control_loop)  <span class="co"># 10 Hz</span></span>
+<span id="cb54-54"><a href="#cb54-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-55"><a href="#cb54-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-56"><a href="#cb54-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Callback function to process LIDAR scan data</span></span>
+<span id="cb54-57"><a href="#cb54-57" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This function will be called whenever a new scan message is received</span></span>
+<span id="cb54-58"><a href="#cb54-58" aria-hidden="true" tabindex="-1"></a>    <span class="co"># It processes the scan data to determine if there are obstacles in the way</span></span>
+<span id="cb54-59"><a href="#cb54-59" aria-hidden="true" tabindex="-1"></a>    <span class="co"># and sets the appropriate movement commands for the robot</span></span>
+<span id="cb54-60"><a href="#cb54-60" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> scan_callback(<span class="va">self</span>, scan_data):</span>
+<span id="cb54-61"><a href="#cb54-61" aria-hidden="true" tabindex="-1"></a>        degrees <span class="op">=</span> []</span>
+<span id="cb54-62"><a href="#cb54-62" aria-hidden="true" tabindex="-1"></a>        ranges <span class="op">=</span> []</span>
+<span id="cb54-63"><a href="#cb54-63" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb54-64"><a href="#cb54-64" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Arrays with detected distances for each considered directions</span></span>
+<span id="cb54-65"><a href="#cb54-65" aria-hidden="true" tabindex="-1"></a>        front <span class="op">=</span> []</span>
+<span id="cb54-66"><a href="#cb54-66" aria-hidden="true" tabindex="-1"></a>        left <span class="op">=</span> []</span>
+<span id="cb54-67"><a href="#cb54-67" aria-hidden="true" tabindex="-1"></a>        right <span class="op">=</span> []</span>
+<span id="cb54-68"><a href="#cb54-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-69"><a href="#cb54-69" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Determine how many scans were taken during rotation</span></span>
+<span id="cb54-70"><a href="#cb54-70" aria-hidden="true" tabindex="-1"></a>        count <span class="op">=</span> <span class="bu">len</span>(scan_data.ranges)</span>
+<span id="cb54-71"><a href="#cb54-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-72"><a href="#cb54-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(count):</span>
+<span id="cb54-73"><a href="#cb54-73" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Using scan_data.angle_min and scan_data.angle_increment data to determine current angle, </span></span>
+<span id="cb54-74"><a href="#cb54-74" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Also convert radian to degrees (0 degree is ahead, 90 is left, 180 is behind and 270 is right)</span></span>
+<span id="cb54-75"><a href="#cb54-75" aria-hidden="true" tabindex="-1"></a>            degrees.append(<span class="bu">int</span>(RAD2DEG(scan_data.angle_min <span class="op">+</span> scan_data.angle_increment<span class="op">*</span>i)))</span>
+<span id="cb54-76"><a href="#cb54-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-77"><a href="#cb54-77" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Append the distance detected to the array of distances</span></span>
+<span id="cb54-78"><a href="#cb54-78" aria-hidden="true" tabindex="-1"></a>            rng <span class="op">=</span> scan_data.ranges[i]</span>
+<span id="cb54-79"><a href="#cb54-79" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb54-80"><a href="#cb54-80" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Ensure range values are valid; set to 0 if not</span></span>
+<span id="cb54-81"><a href="#cb54-81" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> rng <span class="op">&lt;</span> scan_data.range_min <span class="kw">or</span> rng <span class="op">&gt;</span> scan_data.range_max:</span>
+<span id="cb54-82"><a href="#cb54-82" aria-hidden="true" tabindex="-1"></a>                ranges.append(<span class="fl">0.0</span>)</span>
+<span id="cb54-83"><a href="#cb54-83" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb54-84"><a href="#cb54-84" aria-hidden="true" tabindex="-1"></a>                ranges.append(rng)</span>
+<span id="cb54-85"><a href="#cb54-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-86"><a href="#cb54-86" aria-hidden="true" tabindex="-1"></a>        <span class="co"># python way to iterate two lists at once!</span></span>
+<span id="cb54-87"><a href="#cb54-87" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> deg, rng <span class="kw">in</span> <span class="bu">zip</span>(degrees, ranges):</span>
+<span id="cb54-88"><a href="#cb54-88" aria-hidden="true" tabindex="-1"></a>            <span class="co"># if the range is not 0, append to the appropriate list</span></span>
+<span id="cb54-89"><a href="#cb54-89" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> rng <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb54-90"><a href="#cb54-90" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> (deg <span class="op">&gt;=</span> <span class="dv">340</span> <span class="kw">or</span> deg <span class="op">&lt;=</span> <span class="dv">20</span>): </span>
+<span id="cb54-91"><a href="#cb54-91" aria-hidden="true" tabindex="-1"></a>                    front.append(rng)</span>
+<span id="cb54-92"><a href="#cb54-92" aria-hidden="true" tabindex="-1"></a>                <span class="cf">elif</span> <span class="dv">30</span> <span class="op">&lt;=</span> deg <span class="op">&lt;=</span> <span class="dv">60</span>:</span>
+<span id="cb54-93"><a href="#cb54-93" aria-hidden="true" tabindex="-1"></a>                    left.append(rng)</span>
+<span id="cb54-94"><a href="#cb54-94" aria-hidden="true" tabindex="-1"></a>                <span class="cf">elif</span> <span class="dv">300</span> <span class="op">&lt;=</span> deg <span class="op">&lt;=</span> <span class="dv">330</span>:</span>
+<span id="cb54-95"><a href="#cb54-95" aria-hidden="true" tabindex="-1"></a>                    right.append(rng)</span>
+<span id="cb54-96"><a href="#cb54-96" aria-hidden="true" tabindex="-1"></a>                    </span>
+<span id="cb54-97"><a href="#cb54-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-98"><a href="#cb54-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-99"><a href="#cb54-99" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> - Find minimum distances for each considered direction (use front, left and right arrays computed above)</span></span>
+<span id="cb54-100"><a href="#cb54-100" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.front_dist  <span class="op">=</span> <span class="op">-</span><span class="dv">1</span></span>
+<span id="cb54-101"><a href="#cb54-101" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.left_dist <span class="op">=</span> <span class="op">-</span><span class="dv">1</span></span>
+<span id="cb54-102"><a href="#cb54-102" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.right_dist <span class="op">=</span> <span class="op">-</span><span class="dv">1</span></span>
+<span id="cb54-103"><a href="#cb54-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-104"><a href="#cb54-104" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.get_logger().info(<span class="ss">f"Front distance: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>front_dist<span class="sc">}</span><span class="ss">, Left distance: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>left_dist<span class="sc">}</span><span class="ss">, Right distance: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>right_dist<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb54-105"><a href="#cb54-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-106"><a href="#cb54-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-107"><a href="#cb54-107" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Control logic to determine the robot's movement based on the distances measured by the LIDAR</span></span>
+<span id="cb54-108"><a href="#cb54-108" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This function is called at a regular interval (10 Hz) to continuously evaluate the situation and send movement commands</span></span>
+<span id="cb54-109"><a href="#cb54-109" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The regular interval has been defined in the __init__ function using self.ctrl_loop_timer = self.create_timer(0.01, self.control_loop)  # 10 Hz</span></span>
+<span id="cb54-110"><a href="#cb54-110" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> control_loop(<span class="va">self</span>):        </span>
+<span id="cb54-111"><a href="#cb54-111" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Initialise a new TwistStamped message to send velocity commands to the robot</span></span>
+<span id="cb54-112"><a href="#cb54-112" aria-hidden="true" tabindex="-1"></a>        twist_msg <span class="op">=</span> TwistStamped()</span>
+<span id="cb54-113"><a href="#cb54-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-114"><a href="#cb54-114" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> - Code a safe decision logic for the motion. Currently it just blindly moves forward.</span></span>
+<span id="cb54-115"><a href="#cb54-115" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> - Hint: Use the LIDAR values processed above (self.front_dist, self.left_dist, self.right_dist). Choose to rotate left or right if something is detected ahead, below the defined safety_threshold, otherwise move straight forward.</span></span>
+<span id="cb54-116"><a href="#cb54-116" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> - Note. You can do more or less complex logics, but the goal is to avoid collisions without getting blocked. Start with something simple and then complexify if you like.</span></span>
+<span id="cb54-117"><a href="#cb54-117" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb54-118"><a href="#cb54-118" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Modify the Twist message to send a move forward to the robot</span></span>
+<span id="cb54-119"><a href="#cb54-119" aria-hidden="true" tabindex="-1"></a>        twist_msg.twist.linear.x <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb54-120"><a href="#cb54-120" aria-hidden="true" tabindex="-1"></a>        twist_msg.twist.angular.z <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb54-121"><a href="#cb54-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-122"><a href="#cb54-122" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cmd_vel_pub.publish(twist_msg)</span>
+<span id="cb54-123"><a href="#cb54-123" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb54-124"><a href="#cb54-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-125"><a href="#cb54-125" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Send a stop command to the robot </span></span>
+<span id="cb54-126"><a href="#cb54-126" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> stop_robot(<span class="va">self</span>):</span>
+<span id="cb54-127"><a href="#cb54-127" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Stop the robot if the node is shut down</span></span>
+<span id="cb54-128"><a href="#cb54-128" aria-hidden="true" tabindex="-1"></a>        stop_msg <span class="op">=</span> TwistStamped()</span>
+<span id="cb54-129"><a href="#cb54-129" aria-hidden="true" tabindex="-1"></a>        stop_msg.twist.linear.x <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb54-130"><a href="#cb54-130" aria-hidden="true" tabindex="-1"></a>        stop_msg.twist.angular.z <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb54-131"><a href="#cb54-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-132"><a href="#cb54-132" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cmd_vel_pub.publish(stop_msg)</span>
+<span id="cb54-133"><a href="#cb54-133" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.get_logger().info(<span class="st">"Robot STOP command sent"</span>)</span>
+<span id="cb54-134"><a href="#cb54-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-135"><a href="#cb54-135" aria-hidden="true" tabindex="-1"></a><span class="co">#Main functions that gets called on startup</span></span>
+<span id="cb54-136"><a href="#cb54-136" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main(args<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb54-137"><a href="#cb54-137" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb54-138"><a href="#cb54-138" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Init rclpy (make sure we handle termination ourself with the signal handler NO option)</span></span>
+<span id="cb54-139"><a href="#cb54-139" aria-hidden="true" tabindex="-1"></a>    rclpy.init(args<span class="op">=</span>args, signal_handler_options<span class="op">=</span>SignalHandlerOptions.NO)</span>
+<span id="cb54-140"><a href="#cb54-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-141"><a href="#cb54-141" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Initialise the collisiaon avoidance controller</span></span>
+<span id="cb54-142"><a href="#cb54-142" aria-hidden="true" tabindex="-1"></a>    controller <span class="op">=</span> CollisionAvoidance()</span>
+<span id="cb54-143"><a href="#cb54-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-144"><a href="#cb54-144" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Make sure we stop the robot when the system is terminated (ctrl-c) or crashed</span></span>
+<span id="cb54-145"><a href="#cb54-145" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Otherwise the robot would continue moving (Dangerous)</span></span>
+<span id="cb54-146"><a href="#cb54-146" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> signal_handler(signum, frame):</span>
+<span id="cb54-147"><a href="#cb54-147" aria-hidden="true" tabindex="-1"></a>        controller.stop_robot()</span>
+<span id="cb54-148"><a href="#cb54-148" aria-hidden="true" tabindex="-1"></a>        rclpy.shutdown()</span>
+<span id="cb54-149"><a href="#cb54-149" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb54-150"><a href="#cb54-150" aria-hidden="true" tabindex="-1"></a>    signal.signal(signal.SIGINT, signal_handler) <span class="co"># Ctrl-C</span></span>
+<span id="cb54-151"><a href="#cb54-151" aria-hidden="true" tabindex="-1"></a>    signal.signal(signal.SIGTERM, signal_handler) <span class="co"># kill / launcher shutdown</span></span>
+<span id="cb54-152"><a href="#cb54-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-153"><a href="#cb54-153" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb54-154"><a href="#cb54-154" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Start the controller and listen to callbacks forever (until termination)</span></span>
+<span id="cb54-155"><a href="#cb54-155" aria-hidden="true" tabindex="-1"></a>        rclpy.spin(controller)</span>
+<span id="cb54-156"><a href="#cb54-156" aria-hidden="true" tabindex="-1"></a>    <span class="cf">finally</span>:</span>
+<span id="cb54-157"><a href="#cb54-157" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Finally destroy the node</span></span>
+<span id="cb54-158"><a href="#cb54-158" aria-hidden="true" tabindex="-1"></a>        controller.destroy_node()</span>
+<span id="cb54-159"><a href="#cb54-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-160"><a href="#cb54-160" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
+<span id="cb54-161"><a href="#cb54-161" aria-hidden="true" tabindex="-1"></a>    main()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Some more details about portions of the code above:</p>
+<ul>
+<li><p>Shebang (<code>#!/usr/bin/env python3</code>): every Python ROS&nbsp;node&nbsp;will have this declaration at the top. This first line makes sure your script is executed as a Python script.</p></li>
+<li><p>Imports: imports the necessary packages</p></li>
+<li><p>def main(args=None): entry point of the application (Node). When you run the node, it enters here. Note the few specific lines of code that enable handling the shutdown of the node gracefully (init option, and signals handlers).</p></li>
+<li><p>Main CollisionAvoidance class :</p>
+<ul>
+<li><p>def init(self): define potential variables, initialize ros node and connect to topics (pub and sub).</p>
+<p>The line <code>super().__init__('collision_avoidance_controller')</code> is important as it tells ‘ROS’ the name of your node; until ROS has this information, it cannot start communicating with other nodes. NOTE: the name must be a base name, i.e.&nbsp;it cannot contain any slashes “/” or other special characters.</p>
+<p>The line <code>self.ctrl_loop_timer = self.create_timer(0.1, self.control_loop)</code> defines the main loop rate: this sets how often the loop will run, in this case, 10 times per second. It allows publishing movement commands at a regular interval. With a frenquency of 10, we should expect to go through the loop 10 times per second (as long as our processing time does not exceed 1/10th of a second!)</p>
+<p>Note the subscription to the LIDAR scan topic that triggers a callback function. The callback function is called upon reception of every new message on the topic. Its goal is then to handle the received data as you can see in the content of the <code>def scan_callback(self, scan_data)</code> defined function.</p></li>
+<li><p>def control_loop(self): is the control logic, it is called 10 times per second (as defined by the timer) and send movement commands to the robot.</p></li>
+<li><p>def stop_robot(self): this function is called upon shut down (i.e.&nbsp;when the user hits ctrl-c or closes the console) and ensures a clean/safe shutdown, for example by sending commands to stop the motors of the robot.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="create-a-launcher" class="level4">
+<h4 class="anchored" data-anchor-id="create-a-launcher">Create a launcher</h4>
+<p>Starting multiple nodes in distinct terminals can be quite painful and boring. The goal of a launch script is to automate the launching of multiple nodes using a single command. You can find additional information about launch files using this <a href="https://docs.ros.org/en/jazzy/Tutorials/Intermediate/Launch/Launch-Main.html">link</a>.</p>
+<p>In a terminal and type the following commands:</p>
+<ol start="16" type="1">
+<li><p>Change directory to the root of your package directory of your package, create a ‘launch’ directory and a new ‘launch’ file in this new directory,</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd ~/profab_ws/src/turtlebot3_profab/</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] mkdir launch</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd launch</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] touch sim_collavoid.launch.xml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Edit the launch file to include start the gazebo simulation launcher and your node Note the ‘output=”screen”’ option that is needed in order to allow your node to output text on the console. Adding a delay is important to let gazebo start before sending commands to the Turtlebot.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>&lt;launch&gt;</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>    &lt;include file="$(find-pkg-share turtlebot3_gazebo)/launch/turtlebot3_world.launch.py"/&gt;</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    &lt;timer period="10.0"&gt;</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>        &lt;node pkg="turtlebot3_profab" exec="my_first_controller" name="my_controller" output="screen"/&gt;</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>    &lt;/timer&gt;</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>&lt;/launch&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Now, you can launch the simulation and your controller node using a single command from the launch folder</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 launch sim_collavoid.launch.xml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Now let’s make it accessible from the package. Modify the setup.py file (in the root of your package) to include the launch file. You need to add a couple of import and add an entry in the ‘data_files’ section. This is needed to make your launch file(s) accessible from the package. The setup.py file should look like the one below.</p></li>
+</ol>
+<div class="sourceCode" id="cb58"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>    from setuptools import find_packages, setup</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>    import os</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>    from glob import glob</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>    package_name = 'turtlebot3_profab'</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>    setup(</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>        name=package_name,</span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>        version='0.0.0',</span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>        packages=find_packages(exclude=['test']),</span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>        data_files=[</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>            ('share/ament_index/resource_index/packages',</span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>                ['resource/' + package_name]),</span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>            ('share/' + package_name, ['package.xml']),</span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>            ('share/' + package_name + "/launch", glob(os.path.join('launch', '*launch.[pxy][yma]*'))),</span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>        install_requires=['setuptools'],</span>
+<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>        zip_safe=True,</span>
+<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a>        maintainer='simon',</span>
+<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a>        maintainer_email='simon@todo.todo',</span>
+<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a>        description='TODO: Package description',</span>
+<span id="cb58-22"><a href="#cb58-22" aria-hidden="true" tabindex="-1"></a>        license='Apache-2.0',</span>
+<span id="cb58-23"><a href="#cb58-23" aria-hidden="true" tabindex="-1"></a>        extras_require={</span>
+<span id="cb58-24"><a href="#cb58-24" aria-hidden="true" tabindex="-1"></a>            'test': [</span>
+<span id="cb58-25"><a href="#cb58-25" aria-hidden="true" tabindex="-1"></a>                'pytest',</span>
+<span id="cb58-26"><a href="#cb58-26" aria-hidden="true" tabindex="-1"></a>            ],</span>
+<span id="cb58-27"><a href="#cb58-27" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb58-28"><a href="#cb58-28" aria-hidden="true" tabindex="-1"></a>        entry_points={</span>
+<span id="cb58-29"><a href="#cb58-29" aria-hidden="true" tabindex="-1"></a>            'console_scripts': [</span>
+<span id="cb58-30"><a href="#cb58-30" aria-hidden="true" tabindex="-1"></a>                'my_first_controller = turtlebot3_profab.my_first_controller:main'</span>
+<span id="cb58-31"><a href="#cb58-31" aria-hidden="true" tabindex="-1"></a>            ],</span>
+<span id="cb58-32"><a href="#cb58-32" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb58-33"><a href="#cb58-33" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="20" type="1">
+<li><p>Change directory to the root of your workspace and (re)build it:</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd ~/profab_ws/         </span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] colcon build</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Now you can start both nodes using this single laucher!</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 launch turtlebot3_profab sim_collavoid.launch.xml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+<p>Congratulations, you have now created your first node and a basic launcher ! Note that launcher can be much more complex and manage parameters, redirect topics and many more that will not be covered within this course.</p>
+</section>
+<section id="optional-test-your-controller-with-the-real-robot" class="level4">
+<h4 class="anchored" data-anchor-id="optional-test-your-controller-with-the-real-robot">[Optional] Test your controller with the real robot</h4>
+<ol start="22" type="1">
+<li>Make sure you are connected to the same network with the robot (and have the same ROS_DOMAIN_ID) and that you firewall is disabled</li>
+<li>SSH onto the robot and start its bringup node</li>
+<li>Start your controller (using ros2 run, not the launcher) on your local pc</li>
+</ol>
+<p>Your Turtlebot3 should now move and avoid obstacle, behaving similarly to the simulation. This is one the the beauty of ROS, allowing to switch from simulation to real robot easily. You may however observe that in a real environment, the developed controller is probably a bit too simple and does not allow to avoid all types of obstacles. Much more work would be needed to allow the robot to navigate in real complex environments.</p>
+<p>Warning - When you hit CTRL-C, the robot may potentially continue moving. You must send a linear(0,0,0), angular(0,0,0) TwistSamped command to stop it. You can typically use the teleop node to stop it.</p>
+<!-- 
+```python         
+##
+## CODE SOLUTION (Works with REAL robot & simulation - DO NOT GIVE TO STUDENTS)
+##
+
+#!/usr/bin/env python3
+
+import rclpy
+from rclpy.node import Node
+from rclpy.signals import SignalHandlerOptions
+from geometry_msgs.msg import TwistStamped
+from sensor_msgs.msg import LaserScan
+
+
+import math
+## LIDAR INFORMATION 
+# Contrary to simulation, real robot does not receive exactly 360 measures every scan (more or less around 270). Therefore it is necessary to know where it started its scan, the angle between two measures (provided by the robot /scan topic). We can use this information to convert that to 0 - 360 information in order to facilitate processing. The lambda function below helps doing that. In the end, the user receives two arrays of same lengths. The first array contains the angles and the second array contains the distances. (0 degree is ahead, 90 is left, 180 is behind and 270 is right)
+# More information on how to process lidar data https://stanbaek.github.io/ece387/Module8_LIDAR/LIDAR.html
+
+# lambda function to convert rad to deg
+RAD2DEG = lambda x: ((x)*180./math.pi)
+
+class CollisionAvoidance(Node):
+    def __init__(self):
+        super().__init__('collision_avoidance_controller')
+        self.get_logger().info("Collision avoidance controller has started")
+
+        # Register the explicit shutdown callback
+        # self.context.on_shutdown(self.on_shutdown)
+
+        # Publisher to send velocity commands
+        self.cmd_vel_pub = self.create_publisher(TwistStamped, '/cmd_vel', 10)
+
+        # Subscriber to get LIDAR scans
+        self.scan_sub = self.create_subscription(LaserScan, '/scan', self.scan_callback, 10)
+                
+        # Safety threshold in meters
+        self.min_dist = 0.5 # Minimum distance to consider an obstacle (in meters)
+        self.get_logger().info(f"Collision avoidance controller initialized with min_dist = {self.min_dist}")
+
+        self.front_dist = float('inf')  # Initialize front distance to infinity
+        self.left_dist = float('inf')   # Initialize left distance to infinity
+        self.right_dist = float('inf')  # Initialize right distance to infinity
+        
+        # Main loop rate
+        self.ctrl_loop_timer = self.create_timer(0.1, self.control_loop)  # 10 Hz
+
+
+    # Callback function to process LIDAR scan data
+    # This function will be called whenever a new scan message is received
+    # It processes the scan data to determine if there are obstacles in the way
+    # and sets the appropriate movement commands for the robot
+    def scan_callback(self, scan_data):
+        degrees = []
+        ranges = []
+        
+        front = []
+        left = []
+        right = []
+
+        # determine how many scans were taken during rotation
+        count = len(scan_data.ranges)
+
+        for i in range(count):
+                # Using scan_data.angle_min and scan_data.angle_increment data to determine current angle, 
+                # Also convert radian to degrees (0 degree is ahead, 90 is left, 180 is behind and 270 is right)
+                degrees.append(int(RAD2DEG(scan_data.angle_min + scan_data.angle_increment*i)))
+
+                # Append the distance detected to the array of distances
+                rng = scan_data.ranges[i]
+                
+                # Ensure range values are valid; set to 0 if not
+                if rng < scan_data.range_min or rng > scan_data.range_max:
+                    ranges.append(0.0)
+                else:
+                    ranges.append(rng)
+
+        # python way to iterate two lists at once!
+        for deg, rng in zip(degrees, ranges):
+            #rospy.loginfo("Processing zipped scan_data - degree: %d, range: %f", deg, rng)
+            # if the range is not 0, append to the appropriate list
+            if rng > 0:
+                if (deg >= 340 or deg <= 20): 
+                    front.append(rng)
+                elif 30 <= deg <= 60:
+                    left.append(rng)
+                elif 300 <= deg <= 330:
+                    right.append(rng)
+                    
+
+        # Average distances
+        self.front_dist = min(front) if front else float('inf')
+        self.left_dist = min(left) if left else float('inf')
+        self.right_dist = min(right) if right else float('inf')
+
+        #self.get_logger().info(f"Front distance: {self.front_dist}, Left distance: {self.left_dist}, Right distance: {self.right_dist}")
+
+
+    def control_loop(self):        
+        twist_msg = TwistStamped()
+         # Decision logic (set movement commands based on distances)
+        if self.front_dist < self.min_dist:
+            # Obstacle ahead, turn (right or left depending on side with more space)
+            twist_msg.twist.linear.x = 0.0
+            twist_msg.twist.angular.z = 0.5 if self.left_dist > self.right_dist else -0.5
+        else:
+            # Clear path, move forward
+            twist_msg.twist.linear.x = 0.1
+            twist_msg.twist.angular.z = 0.0
+        self.get_logger().info(f"Sending Twist command -> Linear: {twist_msg.twist.linear.x}, Angular: {twist_msg.twist.angular.z}")
+        self.cmd_vel_pub.publish(twist_msg)
+
+    # Send a stop command to the robot 
+    def stop_robot(self):
+        # Stop the robot if the node is shut down
+        stop_msg = TwistStamped()
+        stop_msg.twist.linear.x = 0.0
+        stop_msg.twist.angular.z = 0.0
+
+        self.cmd_vel_pub.publish(stop_msg)
+        self.get_logger().info("Robot STOP command sent")
+
+#Main functions that gets called on startup
+def main(args=None):
+    
+    #Init rclpy (make sure we handle termination ourself with the signal handler NO option)
+    rclpy.init(args=args, signal_handler_options=SignalHandlerOptions.NO)
+
+    # Initialise the collisiaon avoidance controller
+    controller = CollisionAvoidance()
+
+    # Make sure we stop the robot when the system is terminated (ctrl-c) or crashed
+    # Otherwise the robot would continue moving (Dangerous)
+    def signal_handler(signum, frame):
+        controller.stop_robot()
+        rclpy.shutdown()
+    
+    signal.signal(signal.SIGINT, signal_handler) # Ctrl-C
+    signal.signal(signal.SIGTERM, signal_handler) # kill / launcher shutdown
+
+    try:
+        # Start the controller and listen to callbacks forever (until termination)
+        rclpy.spin(controller)
+    finally:
+        controller.destroy_node()
+
+if __name__ == "__main__":
+    main()
+
+```
+-->
+</section>
+</section>
+<section id="optional-task-5-modify-wifi-settings-of-turtlebot3" class="level3">
+<h3 class="anchored" data-anchor-id="optional-task-5-modify-wifi-settings-of-turtlebot3">[OPTIONAL] Task 5 – Modify WIFI settings of Turtlebot3</h3>
+<p>In order to modify the wifi settings of your Turtlebot3, you need to connect it directly to a monitor and a keyboard (Note: you can also do it in ssh IF you have remote access capabilities). Then you can modify the network configuration file to change the wifi settings of the robot. You need to modify the file <code>/etc/netplan/cloud-init.yaml</code>: change ProFab to your own wifi name (ssid) and 1700_UniFR.&amp; to your own password. Save the file and reboot the robot. The robot should now connect to your own wifi automatically. Unfortunately, it seems not possible to define multiple networks … the file must be adapted every network change.</p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo nano /etc/netplan/cloud-init.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a># This file is generated from information provided by the datasource. Changes</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a># to it will not persist across an instance reboot. To disable cloud-init's</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a># network configuration capabilities, write a file</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a># /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a># network: {config: disabled} </span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>network:</span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>  version: 2</span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>  renderer: networkd</span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>  ethernets:</span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>    eth0:</span>
+<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>      dhcp4: yes</span>
+<span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a>      dhcp6: yes</span>
+<span id="cb62-14"><a href="#cb62-14" aria-hidden="true" tabindex="-1"></a>      optional: true</span>
+<span id="cb62-15"><a href="#cb62-15" aria-hidden="true" tabindex="-1"></a>  wifis:</span>
+<span id="cb62-16"><a href="#cb62-16" aria-hidden="true" tabindex="-1"></a>    wlan0:</span>
+<span id="cb62-17"><a href="#cb62-17" aria-hidden="true" tabindex="-1"></a>      dhcp4: yes</span>
+<span id="cb62-18"><a href="#cb62-18" aria-hidden="true" tabindex="-1"></a>      dhcp6: yes</span>
+<span id="cb62-19"><a href="#cb62-19" aria-hidden="true" tabindex="-1"></a>      access-points:</span>
+<span id="cb62-20"><a href="#cb62-20" aria-hidden="true" tabindex="-1"></a>        ProFab:</span>
+<span id="cb62-21"><a href="#cb62-21" aria-hidden="true" tabindex="-1"></a>          password: 1700_UniFR.&amp;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="optional-task-6-connect-a-usb-webcam" class="level3">
+<h3 class="anchored" data-anchor-id="optional-task-6-connect-a-usb-webcam">[OPTIONAL] Task 6 – Connect a USB webcam</h3>
+<p>In our test, we used a Logi C270 HD webcam (Logitec); but the tutorial should work for most usb cameras.</p>
+<p>To setup a usb camera on the robot, there are two possible packages that can be used:</p>
+<ol type="1">
+<li><p><strong>usb-cam package</strong>: simple and more configurable, for more details, see <a href="http://wiki.ros.org/usb_cam">link1</a>, <a href="https://github.com/yev-d/tutos/blob/master/ROS/Tutorial-001/Remotely-connecting-to-webcam-using-Raspberry-Pi-3-and-ROS.md">link2</a> or this <a href="https://www.youtube.com/watch?v=StHfHCPrHOw">video</a></p></li>
+<li><p><strong>cv_camera package</strong>: relies on openCV to transmit data (seemed less configurable), for more details, see this <a href="https://www.theconstruct.ai/how-to-install-a-usb-camera-in-turtlebot3/">link</a></p></li>
+</ol>
+<p>In this guide, we will provide instructions for method 1 (usb-cam package).</p>
+<ol type="1">
+<li>Update your sources and install packages (may take a some time …) . Note that this step was already done on your robot, but it is provided here for completeness. You can also do it on your local pc to be able to visualize the camera stream.</li>
+</ol>
+<div class="sourceCode" id="cb63"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt update </span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt upgrade -y </span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y libv4l-dev    </span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-jazzy-image-transport  (to enable compressing images for transport over wifi)     </span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-jazzy-camera-info-manager     </span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo apt install -y ros-jazzy-usb-cam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="2" type="1">
+<li>Add your user to the video group to allow access to the camera device. WARNING: You need to log out and log back in for this change to take effect.</li>
+</ol>
+<div class="sourceCode" id="cb64"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] sudo usermod -aG video $USER </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="3" type="1">
+<li>Install the image transport plugins on your local pc to be able to visualize the camera stream. (Notably the compressed one).</li>
+</ol>
+<div class="sourceCode" id="cb65"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] sudo apt install ros-jazzy-image-transport-plugins</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="3" type="1">
+<li>Use the commands below to launch the camera node. When using image_view on your local pc, select the right topic (might need to refresh them) and you should be able to see the live image. If the procedure below works; this means that your camera is now functional. The pixel format make sure the compressed image is correctly converted to RGB format (and does not appear tinted green). You can use the raw_image and the raw_image/compressed topics to visualize the raw image and the compressed image. The compressed image is more efficient for transport over wifi, but it is not directly usable by some nodes (e.g.&nbsp;OpenCV). Seems that you must sometimes refresh the topics of rqt_image_view so that it correctly detects the topics.</li>
+</ol>
+<div class="sourceCode" id="cb66"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] ros2 run usb_cam usb_cam_node_exe --ros-args -p pixel_format:="mjpeg2rgb"</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 run rqt_image_view rqt_image_view</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="4" type="1">
+<li><p>To integrate it to the Turtlebot, you need to make it start automatically with the robot. Create a new launch file in the turtlebot_bringup package (launch directory) and edit it to start the turtlebot3 bringup and the usb-cam node togther. An example of such launch file is provided below.</p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] cd ~/turtlebot3_ws/src/turtlebot3/turtlebot3_bringup/launch</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] touch usbcam_robot.launch.py</span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] nano usbcam_robot.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>from launch import LaunchDescription</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>from launch.actions import IncludeLaunchDescription</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>from launch.launch_description_sources import PythonLaunchDescriptionSource</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>from launch_ros.actions import Node</span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>from ament_index_python.packages import get_package_share_directory</span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>import os</span>
+<span id="cb68-9"><a href="#cb68-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-10"><a href="#cb68-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a>def generate_launch_description():</span>
+<span id="cb68-12"><a href="#cb68-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-13"><a href="#cb68-13" aria-hidden="true" tabindex="-1"></a>    # Path to the launch file that we want to include</span>
+<span id="cb68-14"><a href="#cb68-14" aria-hidden="true" tabindex="-1"></a>    robot_launch = os.path.join(</span>
+<span id="cb68-15"><a href="#cb68-15" aria-hidden="true" tabindex="-1"></a>        get_package_share_directory('turtlebot3_bringup'),</span>
+<span id="cb68-16"><a href="#cb68-16" aria-hidden="true" tabindex="-1"></a>        'launch',</span>
+<span id="cb68-17"><a href="#cb68-17" aria-hidden="true" tabindex="-1"></a>        'robot.launch.py'</span>
+<span id="cb68-18"><a href="#cb68-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb68-19"><a href="#cb68-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-20"><a href="#cb68-20" aria-hidden="true" tabindex="-1"></a>    # Include another launch file</span>
+<span id="cb68-21"><a href="#cb68-21" aria-hidden="true" tabindex="-1"></a>    include_robot_launch = IncludeLaunchDescription(</span>
+<span id="cb68-22"><a href="#cb68-22" aria-hidden="true" tabindex="-1"></a>        PythonLaunchDescriptionSource(robot_launch)</span>
+<span id="cb68-23"><a href="#cb68-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb68-24"><a href="#cb68-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-25"><a href="#cb68-25" aria-hidden="true" tabindex="-1"></a>    # Start a node</span>
+<span id="cb68-26"><a href="#cb68-26" aria-hidden="true" tabindex="-1"></a>    my_node = Node(</span>
+<span id="cb68-27"><a href="#cb68-27" aria-hidden="true" tabindex="-1"></a>        package='usb_cam',</span>
+<span id="cb68-28"><a href="#cb68-28" aria-hidden="true" tabindex="-1"></a>        executable='usb_cam_node_exe',</span>
+<span id="cb68-29"><a href="#cb68-29" aria-hidden="true" tabindex="-1"></a>        name='my_usb_cam',</span>
+<span id="cb68-30"><a href="#cb68-30" aria-hidden="true" tabindex="-1"></a>        output='screen',</span>
+<span id="cb68-31"><a href="#cb68-31" aria-hidden="true" tabindex="-1"></a>        parameters=[</span>
+<span id="cb68-32"><a href="#cb68-32" aria-hidden="true" tabindex="-1"></a>            {'pixel_format': 'mjpeg2rgb'},</span>
+<span id="cb68-33"><a href="#cb68-33" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb68-34"><a href="#cb68-34" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb68-35"><a href="#cb68-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-36"><a href="#cb68-36" aria-hidden="true" tabindex="-1"></a>    return LaunchDescription([</span>
+<span id="cb68-37"><a href="#cb68-37" aria-hidden="true" tabindex="-1"></a>        include_robot_launch,</span>
+<span id="cb68-38"><a href="#cb68-38" aria-hidden="true" tabindex="-1"></a>        my_node,</span>
+<span id="cb68-39"><a href="#cb68-39" aria-hidden="true" tabindex="-1"></a>    ])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Compile your workspace (You must be at the root of your workspace).</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] cd ~/turtlebot3_ws</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] colcon build --packages-select turtlebot3_bringup</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Now start the launcher that includes the usb camera</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] ros2 launch turtlebot3_bringup usbcam_robot.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>On your local computer, start the navigation2 node and visualize the camera feed. (You might want to run roscore in a distinct terminal …)</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 launch turtlebot3_navigation2 navigation2.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>On your local computer, on the rviz interface, add an Image (‘Add’ button). Name it ‘Logi_Camera’ and then configure it to point to the ‘image_raw/compressed’ topic. You should see the stream at the bottom left of the interface. Ideally, you will always want to configure your camera to provide compressed data, as raw data is bandwidth-intensive.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/rviz_usbcam.png" class="img-fluid figure-img" style="width:80.0%" data-margin="auto"></p>
+<figcaption>Rviz interface with camera stream enabled. Pay attention to the topic selected and the type.</figcaption>
+</figure>
+</div></li>
+</ol>
+</section>
+</section>
+<section id="useful-commands" class="level2">
+<h2 class="anchored" data-anchor-id="useful-commands">Useful commands</h2>
+<div class="sourceCode" id="cb72"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] v4l2-ctl --list-devices</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<p>[1] <a href="https://docs.ros.org/en/jazzy/Tutorials.html" class="uri">https://docs.ros.org/en/jazzy/Tutorials.html</a></p>
+<p>[2] <a href="https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html" class="uri">https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html</a></p>
+<p>[3] <a href="https://docs.ros.org/en/jazzy/Tutorials/Intermediate/Launch/Creating-Launch-Files.html" class="uri">https://docs.ros.org/en/jazzy/Tutorials/Intermediate/Launch/Creating-Launch-Files.html</a></p>
+<p>[4] <a href="https://docs.robotis.com/docs/systems/turtlebot3/overview/" class="uri">https://docs.robotis.com/docs/systems/turtlebot3/overview/</a></p>
+<p>[5] <a href="https://rossimplified.substack.com/p/get-started-with-ros-2" class="uri">https://rossimplified.substack.com/p/get-started-with-ros-2</a></p>
+</section>
+</section>
+<section id="commands-cheat-sheet" class="level1">
+<h1>Commands cheat sheet</h1>
+<p>Below, we provide a list of some useful and frequently used commands when using ROS and the Turtlebot3.</p>
+<section id="on-computer" class="level2">
+<h2 class="anchored" data-anchor-id="on-computer">On computer:</h2>
+<section id="simulation" class="level3">
+<h3 class="anchored" data-anchor-id="simulation">Simulation</h3>
+<ul>
+<li><p>Start gazebo simulator with the turtebot3 world</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-1] ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Start teleop</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-2] ros2 run turtlebot3_teleop teleop_keyboard</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
+</section>
+<section id="real-robots" class="level3">
+<h3 class="anchored" data-anchor-id="real-robots">Real robots</h3>
+<ul>
+<li><p>Start Rviz visualizer (to visualize robot and its data)</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 launch turtlebot3_bringup rviz2.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Start SLAM node (cartographer)</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 launch turtlebot3_cartographer cartographer.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Save a map (created using the SLAM algorithm)</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 run map_server map_saver -f ~/A428_test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Start navigation (loading an existing map given in parameter)</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=$HOME/map.yaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
+</section>
+</section>
+<section id="on-the-real-robot-through-ssh" class="level2">
+<h2 class="anchored" data-anchor-id="on-the-real-robot-through-ssh">On the real robot (through ssh)</h2>
+<ul>
+<li><p>Start the robot</p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal]  ros2 launch turtlebot3_bringup turtlebot3_robot.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Start the robot (with the USB cam, assuming it is set up correctly)</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] ros2 launch turtlebot3_bringup usbcam_robot.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
