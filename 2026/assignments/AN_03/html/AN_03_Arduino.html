@@ -180,17 +180,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="hints" class="level2">
 <h2 class="anchored" data-anchor-id="hints">Hints</h2>
 <ul>
-<li><p>The sample codes presented in this assignment are also available on the Github of the course.</p></li>
 <li><p>Before uploading your first sketch, ensure you have set the right settings in the IDE.</p></li>
 <li><p>Ensure you are using the right board on the Arduino IDE (“Adafruit Feather ESP32-S3…” must be correctly selected on the top left of the interface of the Arduino IDE).</p></li>
-<li><p>The IDE provides a Serial Monitor Console (to display it, you must click on a small icon on the top right of the interfcae of your IDE). Make sure you use this as it is the main way to debug. Any “serial.println()” command should be outputted in this terminal.</p></li>
+<li><p>The IDE provides a Serial Monitor Console. To display this console, you must click on a small icon on the top right of the interfcae of your IDE. Make sure you use this as it is the main way to debug. Any “serial.println()” command in your code should be outputted in this terminal (when the Arduino is connected by USB).</p></li>
 <li><p>When the Serial Monitor Console is reporting “Not Connected: Select …”, try to reselect your board/COM on the top left of the interface of Arduino IDE.</p></li>
-<li><p>After uploading a sketch, if the LED #13 on the ESP32 is blinking or pulsating, it probably indicate that the sketch did not uplod correctly and that it cannot start. Main reasons: wrong settings</p></li>
-<li><p>To be able to upload a sketch, you need to put the board in bootloader mode. You need to hold the “boot” button down and click once on the “reset” button. Otherwise, you’ll get a <em>timeout error</em> when uploading. It seems this is not necessary anymore with latest updates; uploading the sketch automatically puts the card in bootloader mode.</p></li>
+<li><p>After uploading a sketch, if the LED #13 on the ESP32 is blinking or pulsating, it probably indicate that the sketch did not uplod correctly and that it cannot start. Reccurent reason: wrong settings</p></li>
+<li><p>With previous versions of the firware, in order to be able to upload a sketch, you needed to put the board in bootloader mode (‘Timeout error’).<br>
+<strong>Bootloader mode</strong>: On your ESP-32, hold the “boot” button down and click once on the “reset” button. Although this prodedure is not necessary anymore with latest updates; it can sometimes still help.</p></li>
 <li><p>If you are using Linux with WSL (Windows)</p>
 <ul>
 <li><p><strong>Install Arduino IDE on your Windows OS</strong> (WSL only provides limited access to USB ports)</p></li>
-<li><p>Do not forget to disable your firewall when trying to communicate with external devices (i.e.&nbsp;ROS).</p></li>
+<li><p>Do not forget to disable your firewall when trying to communicate with external devices (i.e.&nbsp;Task 4, ROS).</p></li>
 </ul></li>
 </ul>
 </section>
@@ -202,7 +202,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>You can find documentation and detailed instructions on how to use the ESP32-S3 Feather board from its <a href="https://docs.espressif.com/projects/arduino-esp32/en/latest/index.html">official_esp32_documentation</a>. The installation steps listed below are mostly a summary of these documentation. Please refer to the previous link if something is unclear.</p>
 <p>Let’s do the task step by step:</p>
 <ol type="1">
-<li><p>Ensure you have the latest <a href="https://www.arduino.cc/en/software">ArduinoIDE</a> installed on your machine (Note: we tested with the version 2.3.6).</p></li>
+<li><p>Ensure you have the latest <a href="https://www.arduino.cc/en/software">ArduinoIDE</a> installed on your machine (Note: we tested with the version 2.3.10).</p></li>
 <li><p>In the Arduino IDE, install the libraries for the ESP32</p>
 <ol type="a">
 <li><p>Start Arduino IDE and open the “Preferences” window</p></li>
@@ -227,7 +227,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="a">
 <li><p>Make sure your system detects your board, set the right com port from “Tools” -&gt; “Port” -&gt; COM<em>x</em></p></li>
 <li><p>On the bottom right of the IDE, you should see that your card is connected<br>
-<strong>Remark</strong>: You may potentially need to set the card in <strong>bootloader mode</strong> to see it connected.</p></li>
+<strong>Remark</strong>: You may potentially need to set the card in <strong>bootloader mode</strong> to see it connected (see hints).</p></li>
 </ol></li>
 <li><p>From “File”-&gt; “Examples” -&gt; “01. Basics” (built-in examples), load the <em>Blink</em> example<br>
 <strong>Note</strong>: Have a look at the code. Note that it is the same as the one presented during the lecture.</p></li>
@@ -257,7 +257,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>You should now be able to see the small LED right next to the USB connector blink as defined in your code</p>
 <p><strong>Remark 1:</strong> If the code fails to upload, compiles but is not correct or some settings are misconfigured, your card could end up in a Boot loop. The RGB LED will be green (when connected to USB) or red (when connected to Power) and the LED_BUILTIN will be showing a pulsing red light. In Boot loop, the card is not visible anymore from the computer and you must put it back into bootloader mode to re-upload a sketch.<br>
 </p>
-<p><strong>Remark 2:</strong> Do not forget to open the Serial Monitor Console (click on the button an the top-right of your IDE) to be able to see information sent to the Serial Monitor, this can help debugging your programs.<br>
+<p><strong>Remark 2:</strong> Do not forget to open the Serial Monitor Console (click on the button an the top-right of your IDE) to be able to see information sent to the Serial Monitor, if you added any, this can help debugging your programs.<br>
 </p></li>
 </ol>
 <p><strong>A few suggestions to go further:</strong></p>
@@ -479,9 +479,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="optional-task-4---connect-your-arduino-with-ros" class="level3">
 <h3 class="anchored" data-anchor-id="optional-task-4---connect-your-arduino-with-ros">[OPTIONAL] Task 4 - Connect your Arduino with ROS</h3>
-<p>We need to use micro-ROS for ROS2 See https://www.youtube.com/watch?v=tRtfpnu4LjE</p>
-<p>In this fourth task, we will turn our Arduino into a ROS Node to show how to enable a direct communication between an Arduino and ROS. As a first step, we will simply publish a String over WiFi. We will be using the micro-ROS library for ROS2. Find more information <a href="https://github.com/micro-ROS/micro_ros_arduino">here</a>. We recommend to continue further the exercise and modify the code to send the LUX value (and not a string) to a ROS Node.</p>
-<p><strong>Remark</strong>: For Windows users, who have not set network mirroring, it will be slightly trickier as you will need to enable forwarding the packet received on Windows to WSL. But a few commands can do the trick!</p>
+<p>In this fourth task, we will turn our Arduino into a ROS Node to show how to enable a direct communication between an Arduino and ROS. As a first step, we will simply publish an increasing number over WiFi. We will be using the micro-ROS library for ROS2. Find more information <a href="https://github.com/micro-ROS/micro_ros_arduino">here</a>. We recommend to continue further the exercise and modify the code to send the LUX value to a ROS Node.</p>
+<p><strong>Remark</strong>: For Windows users, make sure you have correctly set network mirroring in previous assignment !</p>
 <p>Let’s do this step by step.</p>
 <p>Let’s start with the ROS part on your computer</p>
 <p>We will create an micro-ros node that listens to a string topic and echoes it to the terminal.</p>
@@ -509,12 +508,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol start="3" type="1">
 <li>Terminate the micro-agent for now. We will restart it later.</li>
 </ol>
-<p>Now we can continue with the <u>Arduino part</u>:</p>
+<p>Now let’s continue with the <u>Arduino part</u>:</p>
 <ol type="1">
 <li><p>Install the micro-ROS Arduino library in your IDE. You can do it from the library manager (search for micro_ros_arduino). Install version 3.0.</p></li>
 <li><p>If you try to compile, it will compain the it cannot find the precompiled libraries for esp32s3 in your library (also showing you the path required below). There is a small and dirty trick to bypass that: - Go into the Arduino src directory of micro_ros_arduino. On my machine: ‘C:\Users\simon\OneDrive - Université de Fribourg\Dokumente\Arduino\libraries\micro_ros_arduino\src’</p></li>
 </ol>
-<pre><code>- Make a copy of the library esp32 and rename it esp32s3</code></pre>
+<pre><code>- Make a copy of the library (folder) esp32 and rename it esp32s3</code></pre>
 <ol start="2" type="1">
 <li><p>Below is an example of sketch that works well. It has been isnpired by the “micro-ros_publisher_wifi” example from “File”-&gt;“Examples”-&gt;“micro_ros_arduino”. I added a few elements to also initialise correctly the ROS_DOMAIN_ID</p></li>
 <li><p>Look at the code and try to understand the main elements</p></li>
@@ -661,14 +660,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol start="7" type="1">
 <li><p>Start the different ROS processes in distinct terminals. You can see an example in the two figures below (Figure 1 and Figure 2)</p>
 <ol type="a">
-<li>In a terminal, start your micro_ros_agent</li>
+<li>In a first terminal, start your micro_ros_agent</li>
 </ol>
 <div class="sourceCode" id="cb7"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal1] ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ol start="2" type="a">
 <li><p>Reset/Reboot your Arduino so that it establishes the connection with the micro_ros_agent. You should see the connection occur on the localpc-terminal1, as shown in the picture below</p></li>
-<li><p>In a second terminal, list the topic to see that the new topic is visible.</p></li>
+<li><p>In a second terminal, list the topic to see that the new topic is indeed visible.</p></li>
 </ol>
-<div class="sourceCode" id="cb8"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal1] ros2 topic list</span>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal2] ros2 topic list</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  /esp32/counter</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  /parameter_events</span>
