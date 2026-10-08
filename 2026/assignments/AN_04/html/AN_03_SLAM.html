@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Julien Nembrini">
+<meta name="dcterms.date" content="2026-10-08">
+<meta name="keywords" content="Human-IST, ProtoFab, LearningLab, UniFR">
+
+<title>Introduction to ROS and Turtlebot3</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="AN_03_SLAM_files/libs/clipboard/clipboard.min.js"></script>
+<script src="AN_03_SLAM_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="AN_03_SLAM_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="AN_03_SLAM_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="AN_03_SLAM_files/libs/quarto-html/popper.min.js"></script>
+<script src="AN_03_SLAM_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="AN_03_SLAM_files/libs/quarto-html/anchor.min.js"></script>
+<link href="AN_03_SLAM_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="AN_03_SLAM_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="AN_03_SLAM_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="AN_03_SLAM_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="AN_03_SLAM_files/libs/bootstrap/bootstrap-b5ea2d3fb43de5a4f84a72c5b59b7927.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#protofab-assignment-3-introduction-to-slam-and-navigation-with-the-turtlebot3" id="toc-protofab-assignment-3-introduction-to-slam-and-navigation-with-the-turtlebot3" class="nav-link active" data-scroll-target="#protofab-assignment-3-introduction-to-slam-and-navigation-with-the-turtlebot3">ProtoFab Assignment 3: Introduction to SLAM and navigation with the Turtlebot3</a>
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#pre-requisites" id="toc-pre-requisites" class="nav-link" data-scroll-target="#pre-requisites">Pre-requisites</a></li>
+  <li><a href="#hints" id="toc-hints" class="nav-link" data-scroll-target="#hints">Hints</a></li>
+  <li><a href="#tasks" id="toc-tasks" class="nav-link" data-scroll-target="#tasks">Tasks</a>
+  <ul class="collapse">
+  <li><a href="#task-1-test-slam-mapping-in-simulation" id="toc-task-1-test-slam-mapping-in-simulation" class="nav-link" data-scroll-target="#task-1-test-slam-mapping-in-simulation">Task 1 – Test SLAM mapping in simulation</a></li>
+  <li><a href="#task-2-test-robot-navigation-in-simulation" id="toc-task-2-test-robot-navigation-in-simulation" class="nav-link" data-scroll-target="#task-2-test-robot-navigation-in-simulation">Task 2 – Test robot navigation in simulation</a></li>
+  <li><a href="#task-3-send-a-goal-to-the-robot-through-an-action" id="toc-task-3-send-a-goal-to-the-robot-through-an-action" class="nav-link" data-scroll-target="#task-3-send-a-goal-to-the-robot-through-an-action">Task 3 – Send a goal to the robot through an action</a></li>
+  <li><a href="#task-4-create-a-controller-able-to-navigate-from-one-goal-to-another" id="toc-task-4-create-a-controller-able-to-navigate-from-one-goal-to-another" class="nav-link" data-scroll-target="#task-4-create-a-controller-able-to-navigate-from-one-goal-to-another">Task 4 – Create a controller able to navigate from one goal to another</a></li>
+  <li><a href="#task-5-optional-create-a-map-of-the-project-space-with-the-real-robot-and-navigate-into-it" id="toc-task-5-optional-create-a-map-of-the-project-space-with-the-real-robot-and-navigate-into-it" class="nav-link" data-scroll-target="#task-5-optional-create-a-map-of-the-project-space-with-the-real-robot-and-navigate-into-it">Task 5 [Optional] Create a map of the Project Space with the real robot and navigate into it</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="../../../AN_03_SLAM.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Introduction to ROS and Turtlebot3</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Julien Nembrini </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 8, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+<div>
+  <div class="keywords">
+    <div class="block-title">Keywords</div>
+    <p>Human-IST, ProtoFab, LearningLab, UniFR</p>
+  </div>
+</div>
+
+</header>
+
+
+<section id="protofab-assignment-3-introduction-to-slam-and-navigation-with-the-turtlebot3" class="level1">
+<h1>ProtoFab Assignment 3: Introduction to SLAM and navigation with the Turtlebot3</h1>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This practical work focuses on learning the basic concepts of SLAM, navigation and planning through a series of small tasks involving ROS. Simlar to Assignment 2, each task consists of applying hands-on commands in the terminal to illustrate how ROS and Turtlebot3 work. You will be asked to code on Task 3 and 4.</p>
+<p>In this practical work, you will perform the following tasks:</p>
+<ul>
+<li><p><strong>Task 1</strong> – Test SLAM mapping in simulation</p></li>
+<li><p><strong>Task 2</strong> – Test robot navigation in simulation</p></li>
+<li><p><strong>Task 3</strong> – Send a goal to the robot through a topic</p></li>
+<li><p><strong>Task 4</strong> – Create a controller able to navigate from one goal to another <strong>(code on your own)</strong></p></li>
+<li><p><strong>Task 5</strong> – [Optional] Create a map of (a small part of) the Project Space with the real robot and navigate into it</p></li>
+</ul>
+<p><u><strong>Learning objectives:</strong></u></p>
+<p>At the end of the assignment, you should be able to</p>
+<ul>
+<li><p>Understand the practical implications of classical mobile robotics algorithms</p></li>
+<li><p>Understand the use of callbacks to monitor the robot state</p></li>
+<li><p>Use high-level topics to steer the robot</p></li>
+<li><p>Have a base code canvas to develop your project</p></li>
+</ul>
+</section>
+<section id="pre-requisites" class="level2">
+<h2 class="anchored" data-anchor-id="pre-requisites">Pre-requisites</h2>
+<ul>
+<li><p>A working installation of ROS2 (ubuntu 24.04 + ROS2 jazzy) (see AN01)</p></li>
+<li><p>Basic understanding and hands-on experience of ROS2 workings and concepts (see AN02)</p></li>
+</ul>
+</section>
+<section id="hints" class="level2">
+<h2 class="anchored" data-anchor-id="hints">Hints</h2>
+<ol type="1">
+<li><p>When you switch between simulation and real robot do not forget to change the ROS_DOMAIN_ID in your ‘~/.bashrc’ file AND to source it!</p></li>
+<li><p>Make sure your map is complete. An uncomplete map can lead to problems by path planning.</p></li>
+</ol>
+</section>
+<section id="tasks" class="level2">
+<h2 class="anchored" data-anchor-id="tasks">Tasks</h2>
+<section id="task-1-test-slam-mapping-in-simulation" class="level3">
+<h3 class="anchored" data-anchor-id="task-1-test-slam-mapping-in-simulation">Task 1 – Test SLAM mapping in simulation</h3>
+<p>This task is inspired from <a href="https://docs.robotis.com/docs/systems/turtlebot3/slam">this page</a> (switch to the Jazzy tab) and will be conducted in simulation.</p>
+<ol type="1">
+<li><p>Switch to simulation</p>
+<ul>
+<li><p>If you have run the real robot previously, open a terminal and edit your '~/.bashrc' file to change the ROS_DOMAIN_ID back to 30 (see AN02).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] nano ~/.bashrc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Do not forget to source it afterwards to make the change take effect!</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] source ~/.bashrc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+<li><p>Start the gazebo simulation.</p>
+<ul>
+<li><p>Open a new terminal and start the gazebo simulation with the simple world</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+<li><p>Start the SLAM service</p>
+<ul>
+<li><p>Open a new terminal and start the SLAM algorithm using <a href="https://google-cartographer-ros.readthedocs.io/en/latest/algo_walkthrough.html">Cartographer</a>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 launch turtlebot3_cartographer cartographer.launch.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>This should open rviz with the start of a map based on current LIDAR readings.</p></li>
+</ul></li>
+<li><p>Explore the environment to build the map.</p>
+<ul>
+<li><p>Open a new terminal and start the teleoperation (see AN02)</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 run turtlebot3_teleop teleop_keyboard</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Explore the environment using the keys. Observe how the map is created as more information is available from the LIDAR and the robot odometry.</p></li>
+<li><p>Make sure your map is complete, e.g.&nbsp;that all sides of the world’s obstacles have been mapped, before saving it.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd ~/turtlebot3_ws/</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] mkdir map    </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 run nav2_map_server map_saver_cli -f $HOME/turtlebot3_ws/map/simulation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+</ol>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/incomplete_map.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>Incomplete map</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/complete_map.png" class="img-fluid figure-img" style="width:50.0%" data-margin="auto"></p>
+<figcaption>Complete map</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="task-2-test-robot-navigation-in-simulation" class="level3">
+<h3 class="anchored" data-anchor-id="task-2-test-robot-navigation-in-simulation">Task 2 – Test robot navigation in simulation</h3>
+<p>This task is inspired from <a href="https://docs.robotis.com/docs/systems/turtlebot3/navigation/">this page</a> (switch to the Jazzy tab).</p>
+<p>Navigation is the class of algorithm used to bring a robot from the estimate of its current location to a point on the map. It will use the map information to plan a path that avoids known obstacles. During its movement, the robot will constantly update its location using AMCL (Adaptive Monte Carlo Localization) which uses multiple estimates of its position. We will first show the convergence to the correct position from an initial random estimate, and secondly test interactively the ros2 navigation2 algorithm.</p>
+<ol type="1">
+<li><p>Start gazebo</p>
+<ul>
+<li>If you haven’t stopped the gazebo simulation from Task 1 you can continue. Otherwise restart gazebo following points 1 and 2 from Task 1.</li>
+<li>Make sure the SLAM service is stopped</li>
+</ul></li>
+<li><p>Start the navigation service</p>
+<ul>
+<li><p>Open a new terminal and start the navigation services.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=$HOME/turtlebot3_ws/map/simulation.yaml</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+<li><p>The navigation service uses AMCL to locate the robot. It is a probabilistic model composed of multiple particles that each represent a possible position. The robot’s estimated position is then the average of these positions. To locate itself accurately, the robot can either update its position from an initial random situation or refine an initial estimate. To illustrate the iterative position refinement through the particles we will first randomly spread them over the map.</p>
+<ul>
+<li><p>Open a new terminal and tell the AMCL localization to spread the particles randomly over the map</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 service call /reinitialize_global_localization std_srvs/srv/Empty</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Restart the teleoperation, move the robot around and observe how the particles tend to converge to the real position of the robot. The symmetries of the simulated world may delay the localization process.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 run turtlebot3_teleop teleop_keyboard</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+<li><p>When you start the navigation service, the RViz interface has a button to indicate a initial 2D pose estimate.</p>
+<ul>
+<li>Select the “2D pose estimation” button and then click on the map to indicate where the robot is and its orientation. Note how the particles spread around the robot to account for a possible imprecision in the estimation.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/2D_pose_estimate.png" class="img-fluid figure-img" style="width:35.0%" data-margin="auto"></p>
+<figcaption>2D pose estimation</figcaption>
+</figure>
+</div>
+<ul>
+<li><p>Restart the teleoperation, move the robot around and observe again how the particles converge to the real position of the robot.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 run turtlebot3_teleop teleop_keyboard</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+<li><p>Now that the robot is located on the map, it can use the map information to navigate to another location.</p>
+<ul>
+<li><p>Stop the teleoperation (the robot will not move if it is still active)</p></li>
+<li><p>Select the “2D nav goal” button and then click on the map to indicate where the robot should go to and its final orientation. The robot then plans its path and start moving towards the goal. Check the “local map” box (if not already) to observe the local planner path and cost map.</p></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/2D_nav_goal.png" class="img-fluid figure-img" style="width:35.0%" data-margin="auto"></p>
+<figcaption>2D navigation goal</figcaption>
+</figure>
+</div>
+<ul>
+<li><p>IMPORTANT: the robot will not react to a navigation goal order if it does not consider itself sufficiently located, or if the goal is not reachable.</p></li>
+<li><p>If you see light gray traces on your map. There might be a problem with the costmap (used by the global planner). Here is the command to reset the costmap</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 service call /global_costmap/clear_entirely_global_costmap nav2_msgs/srv/ClearEntireCostmap</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+<li><p>Select a new goal before the robot reaches the current goal, and observe that it triggers replanning and movement of the robot towards the newly defined goal without first reaching the current goal.</p></li>
+</ol>
+<p>In the remaining of the semester, you do not need to reset the position estimate. Just use the “2D pose estimation” button, move the robot around a little to let it locate itself. You will then be able to send goals.</p>
+</section>
+<section id="task-3-send-a-goal-to-the-robot-through-an-action" class="level3">
+<h3 class="anchored" data-anchor-id="task-3-send-a-goal-to-the-robot-through-an-action">Task 3 – Send a goal to the robot through an action</h3>
+<p>In this task we will use the RQt interface and the action “/navigate_to_pose” to send a goal to our robot.</p>
+<ol type="1">
+<li><p>Start gazebo and the navigation as in Task 2 and make sure the robot is well located on the map using teleop</p></li>
+<li><p>Start rqt in a new terminal to monitor the topics</p>
+<pre><code> ```default         
+ [localpc-terminal] rqt
+ ```</code></pre></li>
+<li><p>Understand the pose estimation topic “/acml_pose”</p>
+<ul>
+<li><p>Open the topics monitor (Plugins <span class="math inline">\rightarrow</span> Topics <span class="math inline">\rightarrow</span> Topics Monitor)</p></li>
+<li><p>Expand the “/acml_pose” topic. The message type is a “geometry_msgs/PoseWithCovarianceStamped” and its structure is as follows</p>
+<ul>
+<li>header
+<ul>
+<li>frame_id</li>
+<li>seq</li>
+<li>stamp</li>
+</ul></li>
+<li>pose
+<ul>
+<li>covariance</li>
+<li>pose
+<ul>
+<li>orientation</li>
+<li>position</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><p>The header contains a frame ID, a sequence number and a time stamp.</p></li>
+<li><p>The covariance is a 6x6 matrix which represents the uncertainty about the position estimate with the columns/rows in order (x, y, z, rotation about X axis, rotation about Y axis, rotation about Z axis). If your robot is well localized, the elements in this matrix should be small.</p></li>
+<li><p>Position is a (x,y,z) vector, while orientation is a quaternion (x,y,z,w), which represents an orientation in space. Have a look at the <a href="https://wiki.ros.org/tf2/Tutorials/Quaternions">ROS documentation on quaternions</a> or the <a href="https://docs.ros.org/en/lyrical/ROS-Framework/interfaces/Working-with-interfaces/Quaternion-Fundamentals.html">tutorial</a>. The important information is that this quaternion is <em>normalized</em> (e.g.&nbsp;its norme is equal to 1)</p></li>
+</ul></li>
+<li><p>Send a goal to the robot</p>
+<ul>
+<li><p>Open the Topic Monitor ((Plugins <span class="math inline">\rightarrow</span> Topics <span class="math inline">\rightarrow</span> Topic Monitor)), select the topic “/goal_pose”</p></li>
+<li><p>Expand the topic. The message type is a “geometry_msgs/msg/PoseStamped” and its structure is as follows</p>
+<ul>
+<li>header
+<ul>
+<li>stamp
+<ul>
+<li>seq</li>
+<li>nanosec</li>
+</ul></li>
+<li>frame_id</li>
+</ul></li>
+<li>pose
+<ul>
+<li>position
+<ul>
+<li>x,y,z</li>
+</ul></li>
+<li>orientation
+<ul>
+<li>x,y,z,w</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><p>The only difference is that there is no covariance matrix because there is no uncertainty in the goal definition.</p></li>
+<li><p>The way to send a goal to the robot is through an action message. The action is called “NavigateToPose” and is defined in the package “nav2_msgs”. The action message is sent to the topic “/navigate_to_pose” and has the same structure. Using the following command in a new terminal should make the robot move to the goal position (0.75, 0, 0) with orientation (0,0,0,1).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 action send_goal /navigate_to_pose nav2_msgs/action/NavigateToPose "{pose: {header: {frame_id: map}, pose: {position: {x: 0.75, y: 0.0, z: 0.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}}}" --feedback</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>IMPORTANT: the “frame_id” field is set to “map”, otherwise your goal message will be ignored by the robot (one way to find this information is by monitoring the action feedback topic when manually assigning a goal as in Task 2).</p></li>
+</ul></li>
+<li><p>Test with other goal positions and orientations</p>
+<ul>
+<li><p>Test with goal positions (0,0,0) and (2,0,0) and observe the robot reactions.</p></li>
+<li><p>Test with goal orientations (0,0,1,0), (0,0,1,1), (0, 0, 0.7071068, 0.7071068) and observe the robot reactions.</p></li>
+<li><p>Here is a simple <a href="https://www.andre-gaschler.com/rotationconverter/">converter</a> from Euler angles or axis-angle to quaternion.</p></li>
+</ul></li>
+</ol>
+</section>
+<section id="task-4-create-a-controller-able-to-navigate-from-one-goal-to-another" class="level3">
+<h3 class="anchored" data-anchor-id="task-4-create-a-controller-able-to-navigate-from-one-goal-to-another">Task 4 – Create a controller able to navigate from one goal to another</h3>
+<p>In this task, we will achieve the same behaviour with a python script, which will additionally monitor whether the robot has reached the currently assigned goal to assign another and make the robot go back and forth between two goals.</p>
+<ol type="1">
+<li><p>Make sure you have gazebo simulation and the navigation running (task 2 points 1.and 2.)</p></li>
+<li><p>Create the goal python controller and run it</p>
+<ul>
+<li><p>Create the file ``goal_controller.py’’ and open it in an editor (here VS code)</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] cd ~/turtlebot3_ws/src/scripts</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] touch goal_controller.py</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] code goal_controller.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Use the source code below for your script (you can copy-paste). First have a look at the code to understand its structure.</p></li>
+<li><p>Look at the different callback functions</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> goal_response_callback(<span class="va">self</span>, future):</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> feedback_callback(<span class="va">self</span>, future):</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> goal_result_callback(<span class="va">self</span>, future):</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    ...</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Run the ccontroller</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] python scripts/goal_controller.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>The robot should get to the (2,0,0) goal</p></li>
+</ul></li>
+<li><p>Monitor the goal status and if the goal 1 is reached, switch to goal 2 (TODO 1).</p></li>
+<li><p>Using the distance remaining, switch to the other goal if the distance is below 0.2 m (TODO 2). If setting a new goal is the first naive approach, the appropriate way is to cancel the current goal, wait for the callback and only then set a new goal. Help from LLM is encouraged.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env python3</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rclpy</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rclpy.node <span class="im">import</span> Node</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rclpy.action <span class="im">import</span> ActionClient</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> nav2_msgs.action <span class="im">import</span> NavigateToPose</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GoalNavigation(Node):</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(<span class="st">'goal_nav'</span>)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.action_client <span class="op">=</span> ActionClient(</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>,</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>            NavigateToPose,</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">'/navigate_to_pose'</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># define 2 goals: (x, y, yaw_degrees)</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.goals <span class="op">=</span> [</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>            (<span class="fl">2.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>),</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>            (<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">180.0</span>),</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> send_goal(<span class="va">self</span>):</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>        <span class="co"># only one goal used</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>        x, y, yaw_degrees <span class="op">=</span> <span class="va">self</span>.goals[<span class="dv">0</span>]</span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.get_logger().info(</span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f'Sending goal: '</span></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f'x=</span><span class="sc">{</span>x<span class="sc">:.2f}</span><span class="ss">, y=</span><span class="sc">{</span>y<span class="sc">:.2f}</span><span class="ss">, yaw=</span><span class="sc">{</span>yaw_degrees<span class="sc">:.1f}</span><span class="ss">°'</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>        goal <span class="op">=</span> NavigateToPose.Goal()</span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Coordinate frame</span></span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>        goal.pose.header.frame_id <span class="op">=</span> <span class="st">'map'</span></span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>        goal.pose.header.stamp <span class="op">=</span> <span class="va">self</span>.get_clock().now().to_msg()</span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Position</span></span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a>        goal.pose.pose.position.x <span class="op">=</span> x</span>
+<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a>        goal.pose.pose.position.y <span class="op">=</span> y</span>
+<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a>        goal.pose.pose.position.z <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Convert yaw -&gt; quaternion</span></span>
+<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a>        yaw <span class="op">=</span> math.radians(yaw_degrees)</span>
+<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-53"><a href="#cb17-53" aria-hidden="true" tabindex="-1"></a>        goal.pose.pose.orientation.x <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb17-54"><a href="#cb17-54" aria-hidden="true" tabindex="-1"></a>        goal.pose.pose.orientation.y <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a>        goal.pose.pose.orientation.z <span class="op">=</span> math.sin(yaw <span class="op">/</span> <span class="fl">2.0</span>)</span>
+<span id="cb17-56"><a href="#cb17-56" aria-hidden="true" tabindex="-1"></a>        goal.pose.pose.orientation.w <span class="op">=</span> math.cos(yaw <span class="op">/</span> <span class="fl">2.0</span>)</span>
+<span id="cb17-57"><a href="#cb17-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-58"><a href="#cb17-58" aria-hidden="true" tabindex="-1"></a>        future <span class="op">=</span> <span class="va">self</span>.action_client.send_goal_async(</span>
+<span id="cb17-59"><a href="#cb17-59" aria-hidden="true" tabindex="-1"></a>            goal,</span>
+<span id="cb17-60"><a href="#cb17-60" aria-hidden="true" tabindex="-1"></a>            feedback_callback<span class="op">=</span><span class="va">self</span>.feedback_callback</span>
+<span id="cb17-61"><a href="#cb17-61" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb17-62"><a href="#cb17-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-63"><a href="#cb17-63" aria-hidden="true" tabindex="-1"></a>        future.add_done_callback(<span class="va">self</span>.goal_response_callback)</span>
+<span id="cb17-64"><a href="#cb17-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-65"><a href="#cb17-65" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> goal_response_callback(<span class="va">self</span>, future):</span>
+<span id="cb17-66"><a href="#cb17-66" aria-hidden="true" tabindex="-1"></a>        goal_handle <span class="op">=</span> future.result()</span>
+<span id="cb17-67"><a href="#cb17-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-68"><a href="#cb17-68" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> goal_handle.accepted:</span>
+<span id="cb17-69"><a href="#cb17-69" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.get_logger().error(<span class="st">'Goal was rejected!'</span>)</span>
+<span id="cb17-70"><a href="#cb17-70" aria-hidden="true" tabindex="-1"></a>            rclpy.shutdown()</span>
+<span id="cb17-71"><a href="#cb17-71" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb17-72"><a href="#cb17-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-73"><a href="#cb17-73" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.get_logger().info(<span class="st">'Goal accepted.'</span>)</span>
+<span id="cb17-74"><a href="#cb17-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-75"><a href="#cb17-75" aria-hidden="true" tabindex="-1"></a>        result_future <span class="op">=</span> goal_handle.get_result_async()</span>
+<span id="cb17-76"><a href="#cb17-76" aria-hidden="true" tabindex="-1"></a>        result_future.add_done_callback(<span class="va">self</span>.goal_result_callback)</span>
+<span id="cb17-77"><a href="#cb17-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-78"><a href="#cb17-78" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> feedback_callback(<span class="va">self</span>, feedback_msg):</span>
+<span id="cb17-79"><a href="#cb17-79" aria-hidden="true" tabindex="-1"></a>        feedback <span class="op">=</span> feedback_msg.feedback</span>
+<span id="cb17-80"><a href="#cb17-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-81"><a href="#cb17-81" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> 2: if the distance is below 0.2 m switch to the other goal</span></span>
+<span id="cb17-82"><a href="#cb17-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-83"><a href="#cb17-83" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.get_logger().info(</span>
+<span id="cb17-84"><a href="#cb17-84" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f'Distance remaining: '</span></span>
+<span id="cb17-85"><a href="#cb17-85" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f'</span><span class="sc">{</span>feedback<span class="sc">.</span>distance_remaining<span class="sc">:.2f}</span><span class="ss"> m '</span></span>
+<span id="cb17-86"><a href="#cb17-86" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb17-87"><a href="#cb17-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-88"><a href="#cb17-88" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> goal_result_callback(<span class="va">self</span>, future):</span>
+<span id="cb17-89"><a href="#cb17-89" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> future.result()</span>
+<span id="cb17-90"><a href="#cb17-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-91"><a href="#cb17-91" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> 1: when reached a goal go to the other one</span></span>
+<span id="cb17-92"><a href="#cb17-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-93"><a href="#cb17-93" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 4 = SUCCEEDED</span></span>
+<span id="cb17-94"><a href="#cb17-94" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> result.status <span class="op">==</span> <span class="dv">4</span>:</span>
+<span id="cb17-95"><a href="#cb17-95" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.get_logger().info(</span>
+<span id="cb17-96"><a href="#cb17-96" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f'Goal reached!'</span></span>
+<span id="cb17-97"><a href="#cb17-97" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb17-98"><a href="#cb17-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-99"><a href="#cb17-99" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb17-100"><a href="#cb17-100" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.get_logger().error(</span>
+<span id="cb17-101"><a href="#cb17-101" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f'Navigation failed with status </span><span class="sc">{</span>result<span class="sc">.</span>status<span class="sc">}</span><span class="ss">.'</span></span>
+<span id="cb17-102"><a href="#cb17-102" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb17-103"><a href="#cb17-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-104"><a href="#cb17-104" aria-hidden="true" tabindex="-1"></a>            rclpy.shutdown()</span>
+<span id="cb17-105"><a href="#cb17-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-106"><a href="#cb17-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-107"><a href="#cb17-107" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main(args<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb17-108"><a href="#cb17-108" aria-hidden="true" tabindex="-1"></a>    rclpy.init(args<span class="op">=</span>args)</span>
+<span id="cb17-109"><a href="#cb17-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-110"><a href="#cb17-110" aria-hidden="true" tabindex="-1"></a>    node <span class="op">=</span> GoalNavigation()</span>
+<span id="cb17-111"><a href="#cb17-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-112"><a href="#cb17-112" aria-hidden="true" tabindex="-1"></a>    node.get_logger().info(</span>
+<span id="cb17-113"><a href="#cb17-113" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Waiting for /navigate_to_pose action server...'</span></span>
+<span id="cb17-114"><a href="#cb17-114" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb17-115"><a href="#cb17-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-116"><a href="#cb17-116" aria-hidden="true" tabindex="-1"></a>    node.action_client.wait_for_server()</span>
+<span id="cb17-117"><a href="#cb17-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-118"><a href="#cb17-118" aria-hidden="true" tabindex="-1"></a>    node.get_logger().info(</span>
+<span id="cb17-119"><a href="#cb17-119" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Action server available. Starting navigation.'</span></span>
+<span id="cb17-120"><a href="#cb17-120" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb17-121"><a href="#cb17-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-122"><a href="#cb17-122" aria-hidden="true" tabindex="-1"></a>    node.send_goal()</span>
+<span id="cb17-123"><a href="#cb17-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-124"><a href="#cb17-124" aria-hidden="true" tabindex="-1"></a>    rclpy.spin(node)</span>
+<span id="cb17-125"><a href="#cb17-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-126"><a href="#cb17-126" aria-hidden="true" tabindex="-1"></a>    node.destroy_node()</span>
+<span id="cb17-127"><a href="#cb17-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-128"><a href="#cb17-128" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> rclpy.ok():</span>
+<span id="cb17-129"><a href="#cb17-129" aria-hidden="true" tabindex="-1"></a>        rclpy.shutdown()</span>
+<span id="cb17-130"><a href="#cb17-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-131"><a href="#cb17-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-132"><a href="#cb17-132" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">'__main__'</span>:</span>
+<span id="cb17-133"><a href="#cb17-133" aria-hidden="true" tabindex="-1"></a>main()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ol>
+<p>Some more details about portions of the code above:</p>
+<ul>
+<li><p>Shebang (line 1, <code>#!/usr/bin/env python3</code>): every Python ROS&nbsp;node&nbsp;will have this declaration at the top. This first line makes sure your script is executed as a Python script.</p></li>
+<li><p>Imports: imports the necessary action messages</p></li>
+<li><p>Main GoalNavigation class :</p>
+<ul>
+<li><p>def init(self): define potential variables, initialize an action client</p></li>
+<li><p>def send_goal(self): is called to send a goal to the action server.</p></li>
+<li><p>def goal_response_callback(self, future): returns a result regarding the current goal command.</p></li>
+<li><p>def feedback_callback(self, future): returns a feedback massage that contains for instance an estimate of the current distacne to goal.</p></li>
+<li><p>def goal_result_callback(self, future): is called when the goal is reached or upon a change</p></li>
+</ul></li>
+</ul>
+<!-- 
+#!/usr/bin/env python3
+
+import math
+import time
+
+import rclpy
+from rclpy.node import Node
+from rclpy.action import ActionClient
+
+from nav2_msgs.action import NavigateToPose
+
+
+class GoalNavigation(Node):
+
+    def __init__(self):
+        super().__init__('endless_navigation')
+
+        self.action_client = ActionClient(
+            self,
+            NavigateToPose,
+            '/navigate_to_pose'
+        )
+
+        # Exactly TWO goals: (x, y, yaw_degrees)
+        self.goals = [
+            (2.75, 0.0, 0.0),
+            (0.0, 0.0, 180.0),
+        ]
+
+        self.goal_index = 0
+
+    def send_goal(self):
+        x, y, yaw_degrees = self.goals[self.goal_index]
+
+        self.get_logger().info(
+            f'Sending goal {self.goal_index}: '
+            f'x={x:.2f}, y={y:.2f}, yaw={yaw_degrees:.1f}°'
+        )
+
+        goal = NavigateToPose.Goal()
+
+        # Coordinate frame
+        goal.pose.header.frame_id = 'map'
+        goal.pose.header.stamp = self.get_clock().now().to_msg()
+
+        # Position
+        goal.pose.pose.position.x = x
+        goal.pose.pose.position.y = y
+        goal.pose.pose.position.z = 0.0
+
+        # Convert yaw -> quaternion
+        yaw = math.radians(yaw_degrees)
+
+        goal.pose.pose.orientation.x = 0.0
+        goal.pose.pose.orientation.y = 0.0
+        goal.pose.pose.orientation.z = math.sin(yaw / 2.0)
+        goal.pose.pose.orientation.w = math.cos(yaw / 2.0)
+
+        future = self.action_client.send_goal_async(
+            goal,
+            feedback_callback=self.feedback_callback
+        )
+
+        future.add_done_callback(self.goal_response_callback)
+
+    def goal_response_callback(self, future):
+        goal_handle = future.result()
+
+        if not goal_handle.accepted:
+            self.get_logger().error('Goal was rejected!')
+            rclpy.shutdown()
+            return
+
+        self.get_logger().info('Goal accepted.')
+
+        result_future = goal_handle.get_result_async()
+        result_future.add_done_callback(self.goal_result_callback)
+
+    def feedback_callback(self, feedback_msg):
+        feedback = feedback_msg.feedback
+
+        elapsed = time.monotonic() - self.goal_start_time
+
+        self.get_logger().info(
+            f'Distance remaining: '
+            f'{feedback.distance_remaining:.2f} m '
+            f'Time spent: '
+            f'{elapsed:.1f} s '
+        )
+
+    def goal_result_callback(self, future):
+        result = future.result()
+
+        # 4 = SUCCEEDED
+        if result.status == 4:
+            self.get_logger().info(
+                f'Goal {self.goal_index} reached!'
+            )
+
+            # Alternate between 0 and 1
+            self.goal_index = (self.goal_index + 1) % 2
+
+            self.get_logger().info(
+                f'Going to goal {self.goal_index}...'
+            )
+
+            self.send_goal()
+
+        else:
+            self.get_logger().error(
+                f'Navigation failed with status {result.status}.'
+            )
+
+            rclpy.shutdown()
+
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    node = GoalNavigation()
+
+    node.get_logger().info(
+        'Waiting for /navigate_to_pose action server...'
+    )
+
+    node.action_client.wait_for_server()
+
+    node.get_logger().info(
+        'Action server available. Starting navigation.'
+    )
+
+    node.send_goal()
+
+    # 
+    rclpy.spin(node)
+
+    node.destroy_node()
+
+    if rclpy.ok():
+        rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
+
+-->
+</section>
+<section id="task-5-optional-create-a-map-of-the-project-space-with-the-real-robot-and-navigate-into-it" class="level3">
+<h3 class="anchored" data-anchor-id="task-5-optional-create-a-map-of-the-project-space-with-the-real-robot-and-navigate-into-it">Task 5 [Optional] Create a map of the Project Space with the real robot and navigate into it</h3>
+<ol type="1">
+<li><p>Change the ROS_DOMAIN_ID in your .bashrc to your robot number</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a># Setting to use the real robot </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>export ROS_DOMAIN_ID=101 #TURTLEBOT3 10x</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a># Setting to use the simulation</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>#export ROS_DOMAIN_ID=30 </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Source your .bashrc on <strong>all</strong> open terminals.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] source ~/.bashrc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Turn on the robot. Make sure you are on the right wifi.</p></li>
+<li><p>ssh into the robot (the IP must be the one of your turtlebot3). Turtlebot3 OS - user: ubuntu, password: turtlebot.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ssh ubuntu@192.168.1.101</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>&lt;!–</p></li>
+<li><p>Update the robot bashrc (edit the file using nano editor). Update ROS_MASTER_URI variable in the .bashrc file with the value of your <em>localpc-ip</em>. Save, exit nano and then source your file.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] nano ~/.bashrc         </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] source ~/.bashrc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>–&gt;</p></li>
+<li><p>Start turtlebot3_robot node on the robot. This establishes the connection between the robot and ROS and brings up all necessary drivers.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>[turtlebot-terminal] ros2 launch turtlebot3_bringup turtlebot3_robot.launch</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Start the SLAM service</p>
+<ul>
+<li><p>Open a new terminal and start the SLAM algorithm using Cartographer.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal] ros2 launch turtlebot3_cartographer cartographer.launch.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>This should open rviz with the start of a map based on current LIDAR readings.</p></li>
+</ul></li>
+<li><p>Start teleop on your local machine (open a new terminal if necessary)</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>[localpc-terminal-2] ros2 run turtlebot3_teleop teleop_keyboard</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Explore the environment to build the map. Do not go move or turn too fast.</p></li>
+<li><p>Save the map and start nvaigation with this map.</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
