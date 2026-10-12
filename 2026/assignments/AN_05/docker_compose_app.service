@@ -1,0 +1,17 @@
+# /etc/systemd/system/docker_compose_app.service
+
+[Unit]
+Description=Docker Compose Application Service
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/pi/test/                 # <---------- CHANGE HERE
+ExecStart=/usr/local/bin/docker compose up -d --build
+ExecStop=/usr/local/bin/docker compose down -v
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
