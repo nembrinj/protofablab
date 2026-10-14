@@ -74,49 +74,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="AN_05_DockerMQTT_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="AN_05_DockerMQTT_files/libs/bootstrap/bootstrap-b5ea2d3fb43de5a4f84a72c5b59b7927.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
-  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", function () {
- var mathElements = document.getElementsByClassName("math");
- var macros = [];
- for (var i = 0; i < mathElements.length; i++) {
-  var texText = mathElements[i].firstChild;
-  if (mathElements[i].tagName == "SPAN") {
-   katex.render(texText.data, mathElements[i], {
-    displayMode: mathElements[i].classList.contains('display'),
-    throwOnError: false,
-    macros: macros,
-    fleqn: false
-   });
-}}});
-  </script>
-  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -730,58 +687,82 @@ window.Quarto = {
 <li><p><strong>Flash the microSD card</strong>: Raspberry Pi provides Raspberry Pi OS (former raspbian) - a tailor-made linux distribution for each kind of raspberry pi</p>
 <ul>
 <li><p>Start by downloading the raspberry Pi <a href="https://www.raspberrypi.org/software/">imager</a> and install it on your computer</p></li>
-<li><p>Open the imager: TODO</p>
-<ul>
-<li><p>choose the RasPi type: “raspberry pi zero W”</p></li>
-<li><p><strong>important</strong> select the right OS version: raspberry Pi OS (other) <span class="math inline">\rightarrow</span> raspberry Pi OS lite (legacy,32-bit). We use the previous version (buster) since docker is <a href="https://docs.docker.com/engine/install/raspberry-pi-os/">no longer supported on RasPis zero W</a>. [<a href="https://downloads.raspberrypi.com/raspios_lite_armhf/images/raspios_lite_armhf-2021-03-25/2021-03-04-raspios-buster-armhf-lite.zip">image dowload link</a>] <a href="https://downloads.raspberrypi.org/raspios_lite_armhf/images/">repository link</a></p></li>
-<li><p>introduce the microSD or the microSD adpater on your computer, choose the corresponding storage (make sure it is really the SD card, since everything will be overwritten)</p></li>
-</ul></li>
-<li><p>You should obtain the following image</p></li>
+<li><p>Open the imager:</p></li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="img/raspi_OSconfig_imager.png" class="img-fluid figure-img" style="width:40.0%" data-margin="auto"></p>
-<figcaption>Raspberry Pi imager settings</figcaption>
+<figcaption>Raspberry Pi imager finish</figcaption>
 </figure>
 </div>
+<pre><code> * Choose the RasPi type: "raspberry pi zero W"
+ * Download the [OS image](https://downloads.raspberrypi.com/raspios_lite_armhf/images/raspios_lite_armhf-2021-03-25/2021-03-04-raspios-buster-armhf-lite.zip)
+ * Select the custom OS option: "Use custom". An outdated version (buster) is needed since docker is [no longer supported on RasPis zero W](https://docs.docker.com/engine/install/raspberry-pi-os/). More images can be found on the
+ [repository link](https://downloads.raspberrypi.org/raspios_lite_armhf/images/)
+
+ * Introduce the microSD or the microSD adpater on your computer, choose the corresponding storage (make sure it is really the SD card, since everything will be overwritten)</code></pre>
 <ul>
-<li>Press “NEXT” and “EDIT SETTINGS” to configure the OS: set up (a unique) hostname, locale, ssh username &amp; password, and wifi (ssid:“ProFab”, password:“1700_UniFR.&amp;”). Change the wifi credentials if you are not in the LearningLab</li>
+<li>You should obtain the following image</li>
 </ul>
-<p><img src="img/raspi_OSconfig_settings.png" class="img-fluid" style="width:32.0%" data-margin="auto" alt="Raspberry Pi imager settings"> <img src="img/raspi_OSconfig_ssh.png" class="img-fluid" style="width:32.0%" data-margin="auto" alt="Raspberry Pi imager settings"> <img src="img/raspi_OSconfig_save.png" class="img-fluid" style="width:32.0%" data-margin="auto" alt="Raspberry Pi imager settings"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/raspi_OSconfig_imager_finish.png" class="img-fluid figure-img" style="width:40.0%" data-margin="auto"></p>
+<figcaption>Raspberry Pi imager finish</figcaption>
+</figure>
+</div></li>
+<li><p><strong>Configure the image</strong>: since it is an outdated version we cannot use the “customization” feature to configure the OS. We will have to do it manually after flashing the image.</p>
 <ul>
-<li>Save the settings, and choose “Yes” to apply them. Then flash the image on the SD card (this will overwrite any data on it)</li>
+<li>Configure the wifi and ssh by creating the files “wpa_supplicant.conf” and “ssh” in the boot partition of the SD card. The content of the wpa_supplicant.conf file is</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="va">country</span><span class="op">=</span>CH</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="va">ctrl_interface</span><span class="op">=</span>DIR=/var/run/wpa_supplicant <span class="va">GROUP</span><span class="op">=</span>netdev</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="va">update_config</span><span class="op">=</span>1</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="va">network</span><span class="op">=</span>{</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">ssid</span><span class="op">=</span><span class="st">"ProFab"</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">psk</span><span class="op">=</span><span class="st">"1700_UniFR.&amp;"</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">key_mgmt</span><span class="op">=</span>WPA-PSK</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The ssh file is empty, but needs to be present in the boot partition. This will enable ssh on the RasPi.</p>
+<ul>
+<li>Configure the hostname by editting the files [rootfs]/etc/hostname and [rootfs]/etc/hosts. Replace “rasberrypi” with “profab&lt;robot number&gt;&lt;your initials&gt;” (no underscores) such that we can differentiate them easily on the network. Save the files and eject the SD card</li>
 </ul></li>
 <li><p>Boot the RasPi and log on</p>
 <ul>
 <li><p>Put the image on the RasPi and connect it to the power socket. Careful there are 2 mini-USB connectors: one for USB, one for power (PWR). The latter is the right one.</p></li>
 <li><p>Wait a long time…. 2-3 minutes</p></li>
 <li><p>Check if your RasPi is on the network (see Task 1), using the hostname or fping (make sure your computer is on the ProFab wifi…).</p></li>
-<li><p>Log onto your raspi with ssh using the username &amp; password provided during configuration</p></li>
+<li><p>Log onto your raspi with ssh using “pi” as username &amp; “raspberry” for password</p></li>
+<li><p>to fully comply with the assignment, add a user “protofab” with password “protofab” and add it to the sudoers group.</p></li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo adduser protofab</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo usermod <span class="at">-aG</span> sudo protofab </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
 <li><p>you have now an up-and-running RasPi with linux!</p></li>
 <li><p>update your software when you have something else to do as this may take some time (20-30 minutes depending on how many security updates there has been since the image release). The RasPI Zero is a <em>low performance</em> computer…</p></li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo apt update </span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo apt upgrade</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo apt update </span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo apt upgrade</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
 <li><p>Install docker</p>
 <ul>
 <li>ssh into your pi and install docker by getting the install script and running it</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo curl -sL https://get.docker.com | bash</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb52"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo curl -sL https://get.docker.com | bash</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>add the current user to the docker group, and check if it is set</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo usermod -aG docker ${USER}</span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>[pi-terminal] groups ${USER}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb53"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo usermod -aG docker ${USER}</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>[pi-terminal] groups ${USER}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>reboot and check docker</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker version</span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker info</span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker run --rm hello-world</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb54"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker version</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker info</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker run --rm hello-world</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>docker-compose is installed with docker. test it with</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb52"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker compose version</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb55"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] docker compose version</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <!--\scriptsize Source (not 100% accurate): [install docker-compose on raspi](https://dev.to/elalemanyo/how-to-install-docker-and-docker-compose-on-raspberry-pi-1mo)
 
 \normalsize--></li>
@@ -790,14 +771,14 @@ window.Quarto = {
 <li><p>Power down the pi, remove the SD card and plug it in back to your computer</p></li>
 <li><p>If you are on linux (or mac), identify the SD card using</p></li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb53"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[localpc-terminal]</span> lsblk</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb56"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[localpc-terminal]</span> lsblk</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>or</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb54"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[localpc-terminal]</span> df</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb57"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[localpc-terminal]</span> df</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The card should have the form /media/user/sda or sdb</p>
 <ul>
 <li>Backup your pi system using (in this case your SD card is sda)</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb55"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dd if=/dev/sda status=progress conv=fsync bs=4M <span class="kw">|</span> <span class="fu">gzip</span> <span class="op">&gt;</span> /home/<span class="op">&lt;</span>user<span class="op">&gt;</span>/protofab_pi_backup.gz </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb58"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dd if=/dev/sda status=progress conv=fsync bs=4M <span class="kw">|</span> <span class="fu">gzip</span> <span class="op">&gt;</span> /home/<span class="op">&lt;</span>user<span class="op">&gt;</span>/protofab_pi_backup.gz </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Compressing is needed to avoid huge files, also the system is fresh and should not take much space on the card. If you are on another platform see this <a href="https://thelinuxcode.com/back-up-raspberry-pi-sd-card/">link</a>.</p>
 <p>You can the use the imager to burn a clone of your system on another SD card with the “Use custom” option.</p></li>
 </ol>
