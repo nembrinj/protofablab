@@ -683,11 +683,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="task-6-optional-setup-your-raspberry-pi-zero-w-from-scratch" class="level2">
 <h2 class="anchored" data-anchor-id="task-6-optional-setup-your-raspberry-pi-zero-w-from-scratch">Task 6 – [optional] Setup your Raspberry Pi zero W from scratch</h2>
+<p><strong>IMPORTANT:</strong> This task is suffering from the fact that docker is no longer supported on the RasPi zero W. It is unclear if reverting to legacy OS images will resolve this issue. The following steps are provided for information only, and will not be tested in the lab. The provided images in Task 1 are the recommended way to get started with the assignment.</p>
 <ol type="1">
 <li><p><strong>Flash the microSD card</strong>: Raspberry Pi provides Raspberry Pi OS (former raspbian) - a tailor-made linux distribution for each kind of raspberry pi</p>
 <ul>
-<li><p>Start by downloading the raspberry Pi <a href="https://www.raspberrypi.org/software/">imager</a> and install it on your computer</p></li>
-<li><p>Open the imager:</p></li>
+<li>Start by downloading the raspberry Pi <a href="https://www.raspberrypi.org/software/">imager</a> and install it on your computer</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -695,14 +695,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Raspberry Pi imager finish</figcaption>
 </figure>
 </div>
-<pre><code> * Choose the RasPi type: "raspberry pi zero W"
- * Download the [OS image](https://downloads.raspberrypi.com/raspios_lite_armhf/images/raspios_lite_armhf-2021-03-25/2021-03-04-raspios-buster-armhf-lite.zip)
- * Select the custom OS option: "Use custom". An outdated version (buster) is needed since docker is [no longer supported on RasPis zero W](https://docs.docker.com/engine/install/raspberry-pi-os/). More images can be found on the
- [repository link](https://downloads.raspberrypi.org/raspios_lite_armhf/images/)
-
- * Introduce the microSD or the microSD adpater on your computer, choose the corresponding storage (make sure it is really the SD card, since everything will be overwritten)</code></pre>
 <ul>
-<li>You should obtain the following image</li>
+<li><p>Open the imager:</p>
+<ul>
+<li><p>Choose the RasPi type: “raspberry pi zero W”</p></li>
+<li><p>Download the <a href="https://downloads.raspberrypi.com/raspios_lite_armhf/images/raspios_lite_armhf-2021-03-25/2021-03-04-raspios-buster-armhf-lite.zip">OS image</a></p></li>
+<li><p>Select the custom OS option: “Use custom”. An outdated version (buster) is needed since docker is <a href="https://docs.docker.com/engine/install/raspberry-pi-os/">no longer supported on RasPis zero W</a>. More images can be found on the <a href="https://downloads.raspberrypi.org/raspios_lite_armhf/images/">repository link</a></p></li>
+<li><p>Introduce the microSD or the microSD adpater on your computer, choose the corresponding storage (make sure it is really the SD card, since everything will be overwritten)</p></li>
+</ul></li>
+<li><p>You should obtain the following image</p></li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -714,15 +715,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li>Configure the wifi and ssh by creating the files “wpa_supplicant.conf” and “ssh” in the boot partition of the SD card. The content of the wpa_supplicant.conf file is</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="va">country</span><span class="op">=</span>CH</span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="va">ctrl_interface</span><span class="op">=</span>DIR=/var/run/wpa_supplicant <span class="va">GROUP</span><span class="op">=</span>netdev</span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="va">update_config</span><span class="op">=</span>1</span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="va">network</span><span class="op">=</span>{</span>
-<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">ssid</span><span class="op">=</span><span class="st">"ProFab"</span></span>
-<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">psk</span><span class="op">=</span><span class="st">"1700_UniFR.&amp;"</span></span>
-<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">key_mgmt</span><span class="op">=</span>WPA-PSK</span>
-<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="va">country</span><span class="op">=</span>CH</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="va">ctrl_interface</span><span class="op">=</span>DIR=/var/run/wpa_supplicant <span class="va">GROUP</span><span class="op">=</span>netdev</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="va">update_config</span><span class="op">=</span>1</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="va">network</span><span class="op">=</span>{</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">ssid</span><span class="op">=</span><span class="st">"ProFab"</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">psk</span><span class="op">=</span><span class="st">"1700_UniFR.&amp;"</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">key_mgmt</span><span class="op">=</span>WPA-PSK</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The ssh file is empty, but needs to be present in the boot partition. This will enable ssh on the RasPi.</p>
 <ul>
 <li>Configure the hostname by editting the files [rootfs]/etc/hostname and [rootfs]/etc/hosts. Replace “rasberrypi” with “profab&lt;robot number&gt;&lt;your initials&gt;” (no underscores) such that we can differentiate them easily on the network. Save the files and eject the SD card</li>
@@ -735,19 +736,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Log onto your raspi with ssh using “pi” as username &amp; “raspberry” for password</p></li>
 <li><p>to fully comply with the assignment, add a user “protofab” with password “protofab” and add it to the sudoers group.</p></li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo adduser protofab</span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo usermod <span class="at">-aG</span> sudo protofab </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo adduser protofab</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo usermod <span class="at">-aG</span> sudo protofab </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li><p>you have now an up-and-running RasPi with linux!</p></li>
-<li><p>update your software when you have something else to do as this may take some time (20-30 minutes depending on how many security updates there has been since the image release). The RasPI Zero is a <em>low performance</em> computer…</p></li>
+<li><p>configure the package repos to the new raspberry pi os repos (buster) by editting the file /etc/apt/sources.list</p></li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo apt update </span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo apt upgrade</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo nano /etc/apt/sources.list</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>find the line containing “deb http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi” and modify the repo address to “http://legacy.raspbian.org/raspbian/”. Save the file and exit.</p>
+<ul>
+<li>update your software when you have something else to do as this may take some time (20-30 minutes depending on how many security updates there has been since the image release). The RasPI Zero is a <em>low performance</em> computer…</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo apt clean</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo rm <span class="at">-rf</span> /var/lib/apt/lists/<span class="pp">*</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo apt update </span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[pi-terminal]</span> sudo apt upgrade</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
 <li><p>Install docker</p>
 <ul>
-<li>ssh into your pi and install docker by getting the install script and running it</li>
+<li>ssh into your pi and install docker with apt</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb52"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo curl -sL https://get.docker.com | bash</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb52"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>[pi-terminal] sudo apt install docker.io</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>add the current user to the docker group, and check if it is set</li>
 </ul>
