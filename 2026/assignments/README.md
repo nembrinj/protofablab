@@ -11,7 +11,7 @@ You can access the instructions in your browser [here](https://htmlpreview.githu
 You can access the instructions in your browser [here](https://htmlpreview.github.io/?https://github.com/nembrinj/protofablab/blob/main/2026/assignments/AN_04/html/AN_04_SLAM.html)
 
 ## Pro+Fab Assignement 5: Introduction to Containers and MQTT
-Soon
+You can access the instructions in your browser [here](https://htmlpreview.github.io/?https://github.com/nembrinj/protofablab/blob/main/2026/assignments/AN_05/html/AN_05_DockerMQTT.html)
 
 ## Pro+Fab Assignement 6: Intoduction to Fusion and 3D Printing.
 Soon
