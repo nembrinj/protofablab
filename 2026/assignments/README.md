@@ -14,7 +14,7 @@ You can access the instructions in your browser [here](https://htmlpreview.githu
 You can access the instructions in your browser [here](https://htmlpreview.github.io/?https://github.com/nembrinj/protofablab/blob/main/2026/assignments/AN_05/html/AN_05_DockerMQTT.html)
 
 ## Pro+Fab Assignement 6: Introduction to Fusion and 3D Printing.
-You can access the instructions in your browser [here](https://htmlpreview.github.io/?https://github.com/nembrinj/protofablab/blob/main/2026/assignments/AN_06/html/AN_06.html)
+You can access the instructions in your browser [here](https://htmlpreview.github.io/?https://github.com/nembrinj/protofablab/blob/main/2026/assignments/AN_06/html/AN_06_3D.html)
 
 ## Pro+Fab Assignement 7: Introduction to Node-RED
 Soon
