@@ -419,7 +419,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="optional-pythonscad-1" class="level3">
 <h3 class="anchored" data-anchor-id="optional-pythonscad-1">[optional] Pythonscad</h3>
 <ul>
-<li>Below is the code for generating the sensor support above using Pythonscad. Try it out.</li>
+<li>Below is the code for generating the sensor support above using Pythonscad. It uses an <a href="https://github.com/nembrinj/protofablab/blob/main/2026/assignments/AN_06/pythonscad/outline.svg">SVG outline</a> made with inkscape as sketch. Try it out.</li>
 </ul>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pythonscad <span class="im">import</span> <span class="op">*</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -439,7 +439,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>distance_between_holes<span class="op">=</span><span class="dv">12</span> </span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>base_depth<span class="op">=</span><span class="dv">16</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>drawing <span class="op">=</span> osimport(<span class="st">"drawings/outline.svg"</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>drawing <span class="op">=</span> osimport(<span class="st">"outline.svg"</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> drawing.rotx(<span class="dv">90</span>).linear_extrude(height<span class="op">=</span>base_depth)</span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># sensor hole</span></span>
