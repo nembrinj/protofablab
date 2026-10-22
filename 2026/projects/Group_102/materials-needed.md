@@ -4,4 +4,4 @@
 
 - **Camera** — Detects exercise movements and counts repetitions.
 
-- **Heart-rate sensor** — Measures the user's heart rate during exercise.
+- **Heart-rate sensor** — Measures the user's heart rate during exercise. (Currently investigate if we can our fitbt)
