@@ -264,6 +264,15 @@ or use a network stream in a future capture implementation. On Linux, direct
 capture requires explicitly forwarding the camera device. Desktop preview windows
 also need display access; the current outputs are notebook plots and MP4 files.
 
+## Next steps
+
+- Try the current workflow with video recorded from a camera instead of relying
+  on YouTube videos.
+- Record and test videos with different body framings, including the whole body
+  in frame and only the upper or lower half of the body.
+- Test other pose-detection models to determine which works best with videos
+  showing only the lower body.
+
 ## References
 
 - [MediaPipe Pose Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker)
