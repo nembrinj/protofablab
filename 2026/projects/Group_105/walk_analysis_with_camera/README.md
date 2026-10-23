@@ -272,6 +272,9 @@ also need display access; the current outputs are notebook plots and MP4 files.
   in frame and only the upper or lower half of the body.
 - Test other pose-detection models to determine which works best with videos
   showing only the lower body.
+- Try processing a live video stream instead of saved video files.
+- Test how video size and compression affect pose tracking, step detection,
+  processing speed, and output quality.
 
 ## References
 
