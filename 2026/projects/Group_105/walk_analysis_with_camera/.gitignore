@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.DS_Store
+
+# Downloaded inputs and generated experiment artifacts
+/data/
+/models/
+/old videos/
+.ipynb_checkpoints/
+
+/outputs/
+*.egg-info/
+/build/
+/dist/
