@@ -129,14 +129,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li><p><strong>Task 1</strong> – Install Node-RED</p></li>
 <li><p><strong>Task 2</strong> – A first Node-RED dashboard</p></li>
-<li><p><strong>Task 3</strong> – A dashboard to control ROS your Turtlebot3 (simulation and real robot)</p></li>
-<li><p><strong>Task 4</strong> – [OPTIONAL] A dashboard to monitor your Arduino luxmeter (remote)</p></li>
+<li><p><strong>Task 3</strong> – A Node-RED dashboard to control your Turtlebot3 (simulation &amp; real robot)</p></li>
+<li><p><strong>Task 4</strong> – [OPTIONAL] A Node-RED dashboard to monitor your Arduino luxmeter (Arduino-ROS2-NodeRED integration)</p></li>
 </ul>
 <p><strong><u>Learning objectives:</u></strong></p>
 <p>At the end of the assignment, you should be able to</p>
 <ul>
 <li><p>Know the basics of Node-RED IDE</p></li>
-<li><p>Know how to program and deploy a dashboard</p></li>
+<li><p>Know how to program and deploy a Node-RED dashboard</p></li>
 <li><p>Know how to communicate with local ROS nodes</p></li>
 </ul>
 </section>
@@ -146,11 +146,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>IDE for Arduino installed on your machine</p></li>
 <li><p>Node-RED installed on your machine (Linux). See Task 1 for instructions.</p>
 <ul>
-<li>Windows - Please install it on your Linux WSL machine (where ROS is also installed)</li>
+<li>Windows - We recommend installing it on your Linux WSL machine (where ROS2 is also installed)</li>
 </ul></li>
-<li><p>[For the optional task] Notions seen in the assignment AN04</p>
+<li><p>[For the optional task] Notions seen in the assignment AN03</p>
 <ul>
-<li>The ESP32 circuit with the luxmeter (see AN_04)</li>
+<li>The Arduino ESP32 circuit with the luxmeter (see AN_03)</li>
 </ul></li>
 <li><p>Notions seen in the lecture LN06</p></li>
 </ul>
@@ -166,14 +166,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="tasks">Tasks</h2>
 <section id="task-1-install-node-red" class="level3">
 <h3 class="anchored" data-anchor-id="task-1-install-node-red">Task 1 – Install Node-RED</h3>
-<section id="section" class="level4">
-<h4 class="anchored" data-anchor-id="section"></h4>
 <ol type="1">
 <li><p>Follow these instructions to install node-js on your system</p>
 <ol type="a">
 <li><p><strong>For Windows (WSL Linux)</strong> Follow these instructions to install nvm, node.js, and npm on WSL2 Linux<br>
-<strong>Remark</strong>: You may install only the LTS version of node-js, to save some space on your system <a href="https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl" class="uri">https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl</a></p>
-<p>On my machine, I used the following procedure to install nvm and node-js (LTS version):</p>
+<strong>Remark</strong>: You may install only the LTS version of node-js, to save some space on your system. See <a href="https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl">link</a> for more details.</p>
 <ul>
 <li>Install NVM to manage node.js versions. In a terminal, type the command below to install nvm (Node Version Manager).</li>
 </ul>
@@ -184,11 +181,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>$ nvm ls</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
-<li>Finally install the latest LTS version of node-js by typing the command below. You can check that it was correctly installed by typing “node -v” and “npm -v” to check the versions of node and npm installed on your machine.</li>
+<li>Finally install the latest LTS version of node-js by typing the command below. You can then check that it was correctly installed by typing “node -v” and “npm -v” to check the versions of node and npm installed on your machine (v24.22.1 and v11.19.1 on my system). npm is actually a package manager for node-js, it is used to install node packages (like Node-RED).</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>$ nvm install --lts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p><strong>For Native Linux (Ubuntu)</strong> Follow these instructions to install nvm, node.js, and npm on Ubuntu<br>
-<strong>Remark</strong>: You may install only the LTS version of node-js, to save some space on your system <a href="https://www.freecodecamp.org/news/how-to-install-node-js-on-ubuntu/" class="uri">https://www.freecodecamp.org/news/how-to-install-node-js-on-ubuntu/</a></p></li>
+<strong>Remark</strong>: You may install the LTS version of node-js to save some space on your system. See <a href="https://www.freecodecamp.org/news/how-to-install-node-js-on-ubuntu/">link</a> for more details.</p></li>
 </ol></li>
 <li><p>Then continue by installing Node-RED on your Ubuntu system. In a terminal, type the command below<br>
 <strong>Remark</strong>: You may potentially need to use ‘sudo’ before the command to install it as admin (was not needed in my case)</p>
@@ -203,32 +200,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol></li>
 <li><p>Start Node-RED by typing “node-red” in your terminal</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>$ node-red</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p>Open the Node-Red user interface on your browser using the following url: http://127.0.0.1:1880/</p></li>
-<li><p>Note that to open the Dashboard(s) you created, you can use the url http://127.0.0.1:1880/dashboard</p></li>
-<li><p>Install the node-red ROS2 package (node-red-contrib-ros2-suite) using the command line below or directly using the palette manager within the node-red UI.</p></li>
+<li><p>Open the Node-Red user interface on your browser using the following url: http://127.0.0.1:1880/<br>
+<strong>Note</strong>: to open the Dashboard(s) you created, you can use the url http://127.0.0.1:1880/dashboard</p></li>
+<li><p>Install the Node-RED ROS2 palette (node-red-contrib-ros2-suite) using the palette manager within the node-red UI or directly using the command line below</p></li>
 </ol>
 <div class="sourceCode" id="cb9"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>$ npm install node-red-contrib-ros2-suite</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ol start="8" type="1">
-<li><p>Finally, install the ROS bridge server on your machine running ROS2 (in wour case, it is the same machine). This bridge allows to connect Node-RED and ROS2 together. We will need it for the Task 3 of this assignment</p>
+<li><p>Finally, install the ROS bridge server on your machine running ROS2 (in your case, it is probably the same machine). This bridge allows to connect Node-RED and ROS2 together through a websocket connection. We will need this for the Task 3 of this assignment</p>
 <ol type="a">
 <li><p>To install rosbridge, in a terminal type</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>$ sudo apt update</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>$ sudo apt install ros-jazzy-rosbridge-suite</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p>You should now be able to start rosbridge it using this command in a terminal</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>$ roslaunch rosbridge_server rosbridge_websocket.launch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>You should now be able to start rosbridge using this command in a terminal</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>$ ros2 launch rosbridge_server rosbridge_websocket_launch.xml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol></li>
 </ol>
 </section>
-</section>
-<section id="task-2-a-first-node-red-dashboard" class="level3">
-<h3 class="anchored" data-anchor-id="task-2-a-first-node-red-dashboard">Task 2: A first Node-RED dashboard</h3>
-<p>As a first task, we will ensure everything is working as expected by starting node-red and creating a dummy dashboard. This dashboard will just consist in a button, an output text field and a small function to generate a random number. When clicking on the button, a new random number is generated and displayed on the text field.</p>
+<section id="task-2---a-first-node-red-dashboard" class="level3">
+<h3 class="anchored" data-anchor-id="task-2---a-first-node-red-dashboard">Task 2 - A first Node-RED dashboard</h3>
+<p>As a first task, we will ensure everything is working as expected by starting Node-RED and creating a dummy dashboard. This dashboard will just consist in a button, an output text field and a small function to generate a random number. When clicking on the button, a new random number is generated and displayed on the text field.</p>
 <p>Let’s do the task step by step:</p>
 <ol type="1">
 <li><p>Ensure Node-RED was successfully installed. Start Node-RED and open its UI in your browser. To open Node-RED interface, just open your browser at this url: http://127.0.0.1:1880/<br>
 <strong>Remark</strong>: We recommend using specific flow files for each project (below we specify a flow file name).</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>$ node-red dashboard_flows.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p>Install dashboard 2.0 palette</p>
+<li><p>Add the Dashboard 2.0 palette. This palette provides the elements to create a dashboard (buttons, text, gauges, charts, etc.)</p>
 <ol type="a">
 <li><p>From the web interface, click on the menu button (the 3 horizontal lines on the top-right corner)</p></li>
 <li><p>Select “<em>manage palette</em>”.</p></li>
@@ -242,17 +238,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <ol start="3" type="1">
-<li><p>Create a new flow tab and rename it (i.e.&nbsp;“Dummy Dashboard”)<br>
+<li><p>Now create a new flow tab and rename it (i.e.&nbsp;“Dummy Dashboard”)<br>
 <strong>Hint</strong>: to rename it, you can double-click on its name on the top of the user interface and then change its name in the property window.</p></li>
 <li><p>Add a “button” node to your new flow</p>
 <ol type="a">
-<li><p>Drag and drop a “button” node from the “dashboard 2” palette (left of user interface)</p></li>
+<li><p>Drag and drop a “button” node from the “dashboard 2” palette (left pane of the user interface)</p></li>
 <li><p>Configure the button and the UI (double-click on the newly created button node)</p>
 <ol type="i">
 <li><p>You need add and configure the different parts of your UI (see figure below)<br>
 To enter the configuration of a sub-layout, click on the edit button of the current layout (see red rectangles on the figure below)<br>
 <strong>Remark</strong>: The <em>button</em> is embedded in a <em>group-ui,</em> which is embedded in a <em>page-ui</em>, which is embedded in the <em>base-ui</em> (as illustrated in the figure below).</p></li>
-<li><p>For now, you can just set a name for the different parts of your UI and keep the default values for other parameters. I still advise to have a look at the different layout options to get a sense of what can be done.</p></li>
+<li><p>For now, you can just set a name for the different parts of your UI and keep the default values for other parameters. I would still advise to have a quick look at the different layout options to get a sense of what can be done.</p></li>
 </ol></li>
 </ol></li>
 </ol>
@@ -265,7 +261,7 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <ol start="5" type="1">
 <li><p>Add a “text” node to your flow to display the value</p>
 <ol type="a">
-<li><p>Drag and drop a “text” node to your flow from the <strong>dashboard 2 palette</strong></p></li>
+<li><p>Drag and drop a “text” node to your flow from the “dashboard 2” palette</p></li>
 <li><p>Configure the “text node (UI) (double-click on the text node)</p>
 <ol type="i">
 <li><p>Set a name to your “text” component and set its Label content.</p></li>
@@ -275,7 +271,7 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <li><p>Add a “function” node to your flow</p>
 <ol type="a">
 <li><p>Drag and drop a “function” node to your flow from the <strong>function palette</strong></p></li>
-<li><p>Edit the node to generate a random number between 0-100 (double-click on the node)</p></li>
+<li><p>Edit the node to generate a random integer number between 0-100 (double-click on the node)</p></li>
 <li><p>You can see the javascript code below</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>msg<span class="op">.</span><span class="at">payload</span> <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">random</span>()<span class="op">*</span><span class="dv">100</span>)<span class="op">;</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> msg<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
@@ -296,7 +292,7 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="img/image3_UI.png" class="img-fluid figure-img" style="width:90.0%" data-margin="auto"></p>
-<figcaption>The flow should a user interface similar to the one displayed on the screenshot.</figcaption>
+<figcaption>The flow should generate a user interface similar to the one displayed on the screenshot.</figcaption>
 </figure>
 </div>
 <p><strong>A few suggestions to go further:</strong></p>
@@ -306,8 +302,8 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <li><p>Display the last 20 values received on a chart</p></li>
 </ul>
 </section>
-<section id="task-3---a-dashboard-to-control-your-turtlebot3-simulation" class="level3">
-<h3 class="anchored" data-anchor-id="task-3---a-dashboard-to-control-your-turtlebot3-simulation">Task 3 - A dashboard to control your Turtlebot3 (simulation)</h3>
+<section id="task-3---a-dashboard-to-control-your-turtlebot3-simulation-real-robot" class="level3">
+<h3 class="anchored" data-anchor-id="task-3---a-dashboard-to-control-your-turtlebot3-simulation-real-robot">Task 3 - A dashboard to control your Turtlebot3 (simulation &amp; real robot)</h3>
 <p>As a second task, we will connect to a ROS topic and send commands to control the simulation of the turtlebot3 robot. The controller user interface (developed with Node-RED) will send commands to the right ROS topic. We will first develop a basic flow to test the features and then you will develop the graphical interface to send commands to the turtlebot3. It should be able to move forward (up), backward (down), rotate right (right), rotate left (left) and halt (stop).</p>
 <p>Let’s do the task step by step.</p>
 <p>Let’s start with a basic flow:</p>
@@ -355,7 +351,7 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <ul>
 <li>Setup the connection (you can leave default settings, just give it a custom name). Note that the ROS server is the one running rosbridge (see below) and you must have rosbridge running to be able to connect to it. You can start rosbridge using the command given in below in step 4.</li>
 <li>Select the /cmd_vel topic to send the data to the robot. Note that you must have the topic available on your ROS2 system to be able to select it. Concretely, you need to have rosbridge running and the turtlebot3 simulation running to be able to select the topic, see step 4 below for both commands. Configure the topic “Stamp” parameter to “fill empty header.stamp with the system time”. On the Type parameter, click on the “template” button to see what is the format expected for the message (actually see that the format is the same as the one created in the function node).</li>
-<li>Click “Done” to save your node configuration.</li>
+<li>Click “Done” (“Terminer”) to save your node configuration.</li>
 </ul></li>
 </ol>
 <div class="quarto-figure quarto-figure-center">
@@ -369,7 +365,7 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 </ol></li>
 <li><p>We will now test the flow</p>
 <ol type="a">
-<li><p>On a terminal, start rosbridge. (it should alsready be running)</p>
+<li><p>On a terminal, start rosbridge. (it should already be running)</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>$ ros2 launch rosbridge_server rosbridge_websocket_launch.xml </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>On another terminal, start the gazebo simulation for your robot:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>$ ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
@@ -412,7 +408,7 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <ol type="a">
 <li>Modify the “On Message” code so that it reads the value of the flow variables before creating the TwistStamped JSON object.</li>
 </ol></li>
-<li><p>Connect your TwistStamped message to a “/cmd_vel” ROS pub node (you may reuse the one you used for the initial test).</p></li>
+<li><p>Connect your TwistStamped message to a “/cmd_vel” ROS publisher node (you may reuse the one you used for the initial test).</p></li>
 <li><p>Start rosbridge (if not already running)</p></li>
 <li><p>On Node-RED, start the interface page. The interface should look somewhat similar to the one shown on the figure below. Note that on the interface shown below, we worked on the design to display the buttons nicely and also on two gauges to display current linear and angular speeds. You can optionnally work on that too.</p>
 <ol type="a">
@@ -423,7 +419,7 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <ol type="a">
 <li><p>On a terminal, start the gazebo simulation for your robot:</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>$ ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p>Press the button and see your simulated robot move.</p></li>
+<li><p>Play with the buttons and see your simulated robot move.</p></li>
 <li><p>Once finished, close the simulation.</p></li>
 </ol></li>
 </ol>
@@ -433,8 +429,8 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <figcaption>Overview of the final interface to control the Turtlebot3.</figcaption>
 </figure>
 </div>
-<p>Let’s modify the code to control the real robot.</p>
-<p>In simulation mode, the robot moves upon reception of a single command. The real robot requires to repeatedly receive commands to keep moving. You can test that using the current flow; the real robot will only move briefly upon every button press.</p>
+<p>Now let’s modify the code to control the real robot.</p>
+<p>In simulation mode, the robot moves upon reception of a single command. The real robot requires to repeatedly receive commands to keep moving (to be verified with ROS2). You can test that using the current flow; the real robot will only move briefly upon every button press.</p>
 <ol type="1">
 <li><p>Add an inject node to your flow.</p>
 <ol type="a">
@@ -442,10 +438,10 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 </ol></li>
 <li><p>Connect this inject node to the input of your “Twist message” function.</p></li>
 <li><p>Deploy your flow. Test in simulation (it should still work as before).</p></li>
-<li><p>Instead of running, the simulation, start the real robot.</p>
+<li><p>Instead of running the simulation, start the real robot.</p>
 <ol type="a">
 <li><p>Make sure the real robot is in a safe spot</p></li>
-<li><p>Connect to the robot using ssh, update its bashrc, source it and then connect the robot to your roscore using the command below.</p>
+<li><p>Connect to the robot using ssh, update its bashrc, source it and then start the robot node to maked it accessible through ROS2 using the command below.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>$ ros2 launch turtlebot3_bringup robot.launch.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol></li>
 <li><p>Test your user interface and make the real robot move.</p></li>
@@ -493,7 +489,7 @@ To enter the configuration of a sub-layout, click on the edit button of the curr
 <ol type="a">
 <li><p>Start ROS bridge to enable the connection between Node-RED and ROS</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>$ ros2 launch rosbridge_server rosbridge_websocket_launch.xml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p>Run micros-ROS (install it first if you did not yet do it). See Assignment 4, Task 4 for details to enable the connection between your Arduino and ROS</p>
+<li><p>Run micros-ROS (install it first if you did not yet do it). See Assignment 3, Task 4 for details to enable the connection between your Arduino and ROS</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>$ ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol>
 <p><strong>Windows</strong>: Ensure you have firewall disabled.</p></li>
