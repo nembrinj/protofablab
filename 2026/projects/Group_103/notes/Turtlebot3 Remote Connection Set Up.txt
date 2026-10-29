@@ -109,4 +109,12 @@ TROUBLESHOOTING
 * WSL restarted ---> sudo tailscale up
 * Wheels dont move ---> do not be like me and check that the robot is actually on lol
 * Robot clock wrong ----> this causes issues with tailscale if clock is lagged
+
+
+POTENTIAL ISSUES:
+* I do not think we will ever need more than 2 connections (peer to peer) but 
+	if we do. then the below will be an issue stemming from TAILSCALE & ROS2.
+	-- ROS2 uses DDS for node discovery (which relies on multicast).
+       Subsequent node-to-node communication in ROS2 can be unicast,
+	   but the Node and Topic lookups rely on multicast (DDS discovery
  
