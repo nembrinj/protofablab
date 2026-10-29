@@ -1,0 +1,112 @@
+TURTLEBOT3 (ID 103) - CAEDEN MOTLEY NOTES
+==================================================
+
+ 
+Robot login:      user ubuntu / password turtlebot
+Robot Tailscale IP (Permanent):  100.75.136.77
+ROS_DOMAIN_ID:    103
+Robot is set to:  ProFab / 1700_UniFR.&  
+(Be sure to switch back before leaving home the hotspot hack up fix is still a pain in the ass)
+ 
+ 
+PUT THE ROBOT ON YOUR HOME WIFI USING HOTSPOT
+-----------------------------------------------------------------
+
+1. Windows (or phone): Settings > Network & Internet > Mobile hotspot
+   Name: ProFab   Password: 1700_UniFR.&   (change ur hotspot name to mirror profab network)
+
+2. Robot IP shows under connected devices in hotspot settings.
+3. SSH from PowerShell (not WSL/WSL cant see  hotspot):
+4. run this in turtlebot BE SURE TO CHANGE ACCESS POINTS TO UR WIFI
+ 
+
+
+sudo tee /etc/netplan/50-cloud-init.yaml > /dev/null << 'EOF'
+network:
+  version: 2
+  ethernets:
+    eth0:
+      optional: true
+      dhcp4: true
+      dhcp6: true
+  wifis:
+    wlan0:
+      optional: true
+      dhcp4: true
+      dhcp6: true
+      access-points:
+        "YOUR_WIFI_NAME":
+          password: "YOUR_WIFI_PASSWORD"
+EOF
+sudo chmod 600 /etc/netplan/50-cloud-init.yaml
+sudo netplan generate && sudo reboot
+ 
+
+
+6. you can turn the hotspot off now and connect to the robot with home wifi 
+
+FIND THE ROBOTS IP ON HOME WIFI (just ping every address1-254 , d8:3a:dd is for the raspeberry pi prefix) 
+   hostname -I  {ur laptops ip}
+ 
+   for i in $(seq 1 254); do (ping -c1 -W1 {FIRST THREE NUMS OF UR IP.} $i >/dev/null && echo {FIRST THREE NUMS OF UR IP.}$i) & done 2>/dev/null; wait
+   ip neigh | grep -i "d8:3a:dd"
+ 
+
+
+The IP on the last line is the robot 
+
+Once Tailscale works the above does not matter as you have a permanent IP for robot (100.75.136.77.)
+
+
+CRAZY IMPORTANT NOTE: the robot only knows one wifi at a time. Before giving it back
+	switch it to ProFab the same way (name: ProFab  password: 1700_UniFR.&) 
+	idk a more efficient way other than the hotspot way but it works so I dont care for now
+ 
+ 
+PART 2 - CONNECT WITH TAILSCALE
+----------------------------------------------
+
+
+1. get share link for the robot (tbot).
+2. Install tailscale WSL and log in:
+ 
+   curl -fsSL https://tailscale.com/install.sh | sh
+   sudo tailscale up
+   tailscale ip -4        <- if you sshd into the robot add this to IP to ROS_STATIC_PEERS
+
+
+3  	TURTLEBOT TERMINAL:
+
+	echo 'export ROS_STATIC_PEERS="$ROS_STATIC_PEERS;{whatever ur Ip is}"' >> ~/.bashrc
+	source ~/.bashrc
+	echo $ROS_STATIC_PEERS   # should hopefully print both IPS of our computers  
+
+ 
+3. 	YOUR TERMINAL: 
+ 
+   	echo 'export ROS_DOMAIN_ID=103' >> ~/.bashrc
+   	echo 'export ROS_STATIC_PEERS=100.75.136.77' >> ~/.bashrc
+   	source ~/.bashrc
+ 
+5.	# in theory if you are on the same wifi here this should run wicked fast
+	 Test:  ping -c 3 100.75.136.77
+ 
+ 
+testing connection beyond ping (simple run im jst pasting the commands here for ease):
+
+turtle terminal:
+	
+   ssh ubuntu@100.75.136.77
+   ros2 launch turtlebot3_bringup robot.launch.py
+ 
+your terminal: 
+
+   ros2 run turtlebot3_teleop teleop_keyboard
+  
+ 
+TROUBLESHOOTING
+* Remote Connect Error ---> make sure Ros static peer has your tailscale ip 
+* WSL restarted ---> sudo tailscale up
+* Wheels dont move ---> do not be like me and check that the robot is actually on lol
+* Robot clock wrong ----> this causes issues with tailscale if clock is lagged
+ 
