@@ -4,7 +4,7 @@ Just an initial list of what we think we need for our project. We are open to mo
 
 | # | Sensor / Module | Quantity | Function | From Fablab | 
 |---|-----------------|----------|----------|----------|
-| 01 | Camera | 1 | Ball detection and tracking | 1/1 |
+| 01 | Camera | 1 | Ball detection and tracking | 0/1 |
 | 02 | Motors | 2 | Ball handling | 2/2 |
 
 
