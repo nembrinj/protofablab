@@ -56,9 +56,7 @@ FIND THE ROBOTS IP ON HOME WIFI (just ping every address1-254 , d8:3a:dd is for 
 
 
 The IP on the last line is the robot 
-
 Once Tailscale works the above does not matter as you have a permanent IP for robot (100.75.136.77.)
-
 
 CRAZY IMPORTANT NOTE: the robot only knows one wifi at a time. Before giving it back
 	switch it to ProFab the same way (name: ProFab  password: 1700_UniFR.&) 
