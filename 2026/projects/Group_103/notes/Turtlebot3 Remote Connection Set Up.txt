@@ -46,6 +46,8 @@ sudo netplan generate && sudo reboot
 6. you can turn the hotspot off now and connect to the robot with home wifi 
 
 FIND THE ROBOTS IP ON HOME WIFI (just ping every address1-254 , d8:3a:dd is for the raspeberry pi prefix) 
+
+
    hostname -I  {ur laptops ip}
  
    for i in $(seq 1 254); do (ping -c1 -W1 {FIRST THREE NUMS OF UR IP.} $i >/dev/null && echo {FIRST THREE NUMS OF UR IP.}$i) & done 2>/dev/null; wait
