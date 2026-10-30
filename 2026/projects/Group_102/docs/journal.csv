@@ -1,0 +1,6 @@
+date;person;contribution
+2026-10-07;Andriana;Worked on the project first presentation about our concept and prototype workflow.
+2026-10-26;Andriana;Developed the MediaPipe exercise counter and tested pose detection and ROS communication.
+2026-10-28;Andriana;Integrated the TurtleBot3 camera stream and investigated camera performance issues.
+2026-10-29;Andriana;"Tested exercise-counter and training-logic integration; debugged ROS topics and MediaPipe setup."
+2026-10-30;Andriana;Updated project documentation and prepared the mid-term presentation.
