@@ -9,7 +9,7 @@ The initial idea measured gait with the TurtleBot3 LiDAR: one horizontal plane a
 
 ## Decision
 
-Measure gait with a USB webcam mounted on the robot and a pose-estimation model (MediaPipe Pose Landmarker), which gives labelled left and right hip, ankle and heel positions at camera frame rate. The offline prototype in `walk_analysis_with_camera/` already counts steps and estimates cadence from these positions.
+Measure gait with a USB webcam mounted on the robot and a pose-estimation model (MediaPipe Pose Landmarker), which gives labelled left and right knee, ankle and heel positions at camera frame rate. The offline prototype in `walk_analysis_with_camera/` already counts steps and estimates cadence from these positions.
 
 The LiDAR stays in use for what it does well: localisation on a map, obstacle avoidance while the robot drives to its station, and tracking where the walker is and how fast they walk. Distance in metres needs no camera calibration, and walking speed only needs the position of both legs together, not single steps.
 

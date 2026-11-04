@@ -14,7 +14,7 @@ A bridge node publishes one JSON message per lap and one per session to an MQTT 
 - Eclipse Mosquitto as the MQTT broker
 - Telegraf subscribes to the MQTT topics and writes to InfluxDB
 - InfluxDB stores the time series
-- Grafana shows the physiotherapist dashboard: cadence per lap, stops, lap times, and trends across sessions
+- Grafana shows the physiotherapist dashboard: cadence and step length per lap, stops, uncertain laps, and trends across sessions
 
 ## Consequences
 

@@ -26,7 +26,7 @@ Gait rehabilitation depends on walking exercises that patients do at home, alone
 A robot that supervises the walking exercise between appointments. It:
 
 - **guides**: positions itself beside the walking path and sets the rhythm of the walk with an audible beat;
-- **measures**: detects steps, cadence, and stops with a camera and pose estimation, and walking speed with the LiDAR;
+- **measures**: times each step with a camera and pose estimation, and measures walking speed with the LiDAR. Together they give cadence, step length, and stops, and the LiDAR double-checks the camera's step count;
 - **cues**: speaks a correction when the patient drifts off the rhythm or stops;
 - **reports**: publishes a session summary to a dashboard the physiotherapist can act on.
 

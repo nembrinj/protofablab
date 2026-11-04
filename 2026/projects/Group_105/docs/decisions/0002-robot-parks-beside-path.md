@@ -21,4 +21,5 @@ The robot drives to a station beside the walking path before the session, using 
 ## Alternatives considered
 
 - **Robot leads or follows the walker**: not possible at 0.22 m/s, and unsafe.
+- **Robot in front of or behind the walker, or at the end of the path**: the LiDAR would see the legs better, since they no longer hide each other. But the camera would look along the walking direction, where it cannot see how far each foot moves forward, and the person would walk toward the robot. The side is the only position that suits the camera, which is the main step detector.
 - **Robot rotates in place to keep the walker in frame**: extends the capture zone using the robot's own orientation. Kept as a stretch goal, because the image moves while the robot turns.

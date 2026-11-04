@@ -70,7 +70,7 @@
 
   <rect class="ours" x="950" y="610" width="235" height="80" rx="10"/>
   <text class="name" x="964" y="643" font-size="15">lidar_person_tracker</text>
-  <text class="sub" x="964" y="670">legs → position, speed</text>
+  <text class="sub" x="964" y="670">legs → position, speed, steps</text>
 
   <!-- Dashboard nodes -->
   <rect class="existing" x="1290" y="215" width="240" height="64" rx="10"/>
