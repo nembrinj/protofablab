@@ -19,7 +19,7 @@ Group 105 project for the Prototyping and Fabrication course.
 
 ## Problem
 
-Gait rehabilitation depends on walking exercises that patients do at home, alone. Patients lose their rhythm, drift into asymmetry as they tire, and cut sessions short. The physiotherapist sees none of it, only what the patient remembers at the next appointment.
+Gait rehabilitation depends on walking exercises that patients do at home, alone. Patients lose the rhythm, get tired, and stop early. The physiotherapist sees none of it, only what the patient remembers at the next appointment.
 
 ## Solution
 
@@ -32,16 +32,18 @@ A robot that supervises the walking exercise between appointments. It:
 
 ## Proof of concept
 
-A TurtleBot3 that drives itself to a station beside a walking path and stays still while a person walks back and forth past it. During the session it plays a beat at the target cadence, measures each lap, and speaks a correction when the person stops or drifts off the beat. After each lap it sends a summary to the physiotherapist's dashboard.
+The proof of concept shows that a robot can count a walker's steps reliably by itself and correct them in the moment.
+
+The TurtleBot3 drives itself to a spot beside a walking path and stays still while a person walks back and forth past it. During the session it plays a beat at the target cadence, measures each walk past it, and speaks a correction when the person stops or drifts off the beat. After each walk it sends a summary to the physiotherapist's dashboard.
 
 - One healthy volunteer, one walking exercise, on a flat walking path of about 10 m.
-- Capture zone of about 3–4 m, set by the camera's field of view.
-- Stretch goals: step-time symmetry, and rotating in place to keep the walker in view.
+- Camera zone of about 3–4 m, set by the camera's field of view.
+- Stretch goals: step-time symmetry, step length, and rotating in place to keep the walker in view.
 
 ### Evaluation
 
 - **Detection latency**: how quickly the robot notices that the person has stopped.
-- **Measurement accuracy**: measured cadence compared with a manual step count.
+- **Measurement accuracy**: measured cadence compared with a manual step count. First goal: within ±5%, adjusted after the first recordings. The same walks are compared three ways: camera alone, LiDAR alone, and both together.
 - **Cue reliability**: whether the right cue fires, across repeated walks.
 
 ### Limitations

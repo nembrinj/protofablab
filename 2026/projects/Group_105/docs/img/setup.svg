@@ -16,7 +16,7 @@
   </defs>
   <rect y="90" width="1600" height="630" fill="#ffffff"/>
 
-  <!-- Camera field of view and capture zone -->
+  <!-- Camera field of view and camera zone -->
   <polygon points="800,440 625,220 975,220" fill="#2563eb" fill-opacity="0.10" stroke="#2563eb" stroke-opacity="0.5" stroke-dasharray="6 5"/>
   <rect x="625" y="205" width="350" height="30" rx="4" fill="#2563eb" fill-opacity="0.25"/>
 
@@ -32,10 +32,10 @@
   <circle cx="500" cy="220" r="20" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
   <text class="s" x="500" y="275" text-anchor="middle">patient</text>
 
-  <!-- Capture zone dimension -->
+  <!-- Camera zone dimension -->
   <line class="dimline" x1="625" y1="180" x2="975" y2="180" marker-start="url(#dim)" marker-end="url(#dim)"/>
-  <rect x="690" y="168" width="220" height="24" fill="#ffffff"/>
-  <text class="t" x="800" y="187" text-anchor="middle" font-weight="700" fill="#1d4ed8">capture zone ≈ 3–4 m</text>
+  <rect x="685" y="168" width="230" height="24" fill="#ffffff"/>
+  <text class="t" x="800" y="187" text-anchor="middle" font-weight="700" fill="#1d4ed8">camera zone ≈ 3–4 m</text>
 
   <!-- Distance dimension -->
   <line class="dimline" x1="1040" y1="220" x2="1040" y2="440" marker-start="url(#dim)" marker-end="url(#dim)"/>
@@ -44,7 +44,7 @@
   <!-- Robot -->
   <circle cx="800" cy="465" r="32" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5"/>
   <rect x="788" y="425" width="24" height="16" rx="3" fill="#2563eb"/>
-  <text class="b" x="800" y="535" text-anchor="middle">Robot station</text>
+  <text class="b" x="800" y="535" text-anchor="middle">Robot's spot</text>
   <text class="s" x="800" y="562" text-anchor="middle">camera on mast · beat + spoken cues</text>
   <text class="s" x="800" y="586" text-anchor="middle">stationary while the patient walks</text>
 
@@ -52,7 +52,7 @@
   <rect x="1330" y="560" width="70" height="50" rx="6" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.5"/>
   <text class="s" x="1365" y="640" text-anchor="middle">start / dock</text>
   <path d="M1330,585 C1150,600 950,560 840,480" stroke="#6b7280" stroke-width="2" stroke-dasharray="8 6" fill="none" marker-end="url(#arrow)"/>
-  <text class="s" x="1120" y="620" text-anchor="middle">Nav2: to the station before, back after</text>
+  <text class="s" x="1120" y="620" text-anchor="middle">drives here before the session, back after</text>
 
   <text class="s" x="250" y="690" font-style="italic">Each walk through the camera zone is one measurement. Distances approximate; robot not to scale.</text>
 </svg>

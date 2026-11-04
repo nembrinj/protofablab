@@ -9,12 +9,12 @@ The physiotherapist needs to see results across sessions, not only live values. 
 
 ## Decision
 
-A bridge node publishes one JSON message per lap and one per session to an MQTT broker. A Docker Compose stack on the laptop stores and shows them:
+A bridge node publishes one JSON message per walk and one per session to an MQTT broker. A Docker Compose stack on the laptop stores and shows them:
 
 - Eclipse Mosquitto as the MQTT broker
 - Telegraf subscribes to the MQTT topics and writes to InfluxDB
 - InfluxDB stores the time series
-- Grafana shows the physiotherapist dashboard: cadence, stops and walking speed per lap, laps not measured, and trends across sessions
+- Grafana shows the physiotherapist dashboard: cadence, stops and walking speed per walk, walks not measured, and trends across sessions
 
 ## Consequences
 
