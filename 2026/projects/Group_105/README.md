@@ -6,8 +6,8 @@ Group 105 project for the Prototyping and Fabrication course.
 
 ## Team
 
-- Leonid Pomortsev
-- Matin Mahmoudzadeh
+- Leonid Pomortsev: LiDAR, navigation, session logic, and dashboard
+- Matin Mahmoudzadeh: camera, camera mast, step detection, and audio cues
 
 ## Presentations
 
@@ -25,15 +25,18 @@ Gait rehabilitation depends on walking exercises that patients do at home, alone
 
 A robot that supervises the walking exercise between appointments. It:
 
-- **guides**: sets the route and the rhythm of the walk with an audible beat;
-- **measures**: estimates cadence, speed, and symmetry from leg movement, using a camera and pose estimation;
+- **guides**: positions itself beside the walking path and sets the rhythm of the walk with an audible beat;
+- **measures**: detects steps, cadence, and stops with a camera and pose estimation, and walking speed with the LiDAR;
 - **cues**: speaks a correction when the patient drifts off the rhythm or stops;
 - **reports**: publishes a session summary to a dashboard the physiotherapist can act on.
 
 ## Proof of concept
 
-- One healthy volunteer, one walking exercise, on a flat corridor.
-- Capture zone of about 7 m.
+A TurtleBot3 that drives itself to a station beside a walking path and stays still while a person walks back and forth past it. During the session it plays a beat at the target cadence, measures each lap, and speaks a correction when the person stops or drifts off the beat. After each lap it sends a summary to the physiotherapist's dashboard.
+
+- One healthy volunteer, one walking exercise, on a flat walking path of about 10 m.
+- Capture zone of about 3–4 m, set by the camera's field of view.
+- Stretch goals: step-time symmetry, and rotating in place to keep the walker in view.
 
 ### Evaluation
 
@@ -46,6 +49,12 @@ A robot that supervises the walking exercise between appointments. It:
 - Not a clinical device, and not tested with patients.
 - Provides no physical support.
 - Complements physiotherapy sessions and does not replace them.
+
+## Architecture
+
+![System architecture](docs/img/architecture.svg)
+
+A webcam on the robot streams video to a laptop, which detects steps with pose estimation. The robot's LiDAR tracks where the walker is and how fast they walk. The laptop runs the session logic and sends the beat and spoken cues back to a speaker on the robot. Session summaries go over MQTT to a Grafana dashboard. See [docs/architecture.md](docs/architecture.md) for the components and interfaces, and [docs/decisions/](docs/decisions/) for the design decisions.
 
 ## Hardware
 
@@ -63,5 +72,9 @@ To be added.
 ├── README.md                    # This page
 ├── required-equipment.md        # Hardware we use or borrow from the lab
 ├── presentation_initial.pdf     # Initial idea presentation
+├── docs/
+│   ├── architecture.md          # System architecture and interfaces
+│   ├── decisions/               # Design decision records
+│   └── img/                     # Diagrams
 └── walk_analysis_with_camera/   # Gait and cadence analysis from video
 ```
