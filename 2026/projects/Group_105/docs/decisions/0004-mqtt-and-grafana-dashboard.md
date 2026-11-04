@@ -1,4 +1,4 @@
-# 5. Session results go over MQTT to a Grafana dashboard
+# 4. Session results go over MQTT to a Grafana dashboard
 
 - Status: accepted
 - Date: 2026-11-04
@@ -14,7 +14,7 @@ A bridge node publishes one JSON message per lap and one per session to an MQTT 
 - Eclipse Mosquitto as the MQTT broker
 - Telegraf subscribes to the MQTT topics and writes to InfluxDB
 - InfluxDB stores the time series
-- Grafana shows the physiotherapist dashboard: cadence and step length per lap, stops, uncertain laps, and trends across sessions
+- Grafana shows the physiotherapist dashboard: cadence, stops and walking speed per lap, laps not measured, and trends across sessions
 
 ## Consequences
 

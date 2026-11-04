@@ -14,13 +14,14 @@ The robot is a self-positioning gait station. Before a session it drives to a st
 
 - Flat walking path, about 10 m long, with room for the robot about 2.5 m to the side (lab floor or a wide hallway).
 - Robot parked about 2.5 m from the walking line, camera on a 3D-printed mast at about knee height, looking across the path.
-- Capture zone: the part of the walking line inside the camera's view, about 3–4 m depending on camera and distance. - The robot does not move while anyone is walking in the zone ([ADR 2](decisions/0002-robot-parks-beside-path.md)).
+- Capture zone: the part of the walking line inside the camera's view, about 3–4 m depending on camera and distance.
+- The robot does not move while anyone is walking in the zone ([ADR 2](decisions/0002-robot-parks-beside-path.md)).
 
 ## Session flow
 
 1. **Position**: the robot drives to the station pose on a map built beforehand with SLAM (Nav2 `NavigateToPose`).
 2. **Wait**: the robot says it is ready and starts the beat at the target cadence once a person is in view.
-3. **Lap**: the patient walks through the zone. The camera detects steps (cadence, stops); the LiDAR tracks position and walking speed.
+3. **Lap**: the patient walks through the zone. The camera counts steps; the LiDAR tracks where the person is and how fast they move, and decides when the camera's steps count.
 4. **Between laps**: the robot gives a cue or the lap count, based on the last lap.
 5. **Finish**: after the prescribed number of laps, the session summary is published and the robot returns to its start pose.
 
@@ -32,18 +33,18 @@ The robot is a self-positioning gait station. Before a session it drives to a st
 | --- | --- | --- |
 | Robot drivers | `turtlebot3_bringup` (existing) | `/scan`, `/odom`, `/cmd_vel`, TF |
 | Camera driver | `usb_cam` (existing) | Publishes compressed frames from the USB webcam |
-| Audio player | `audio_cues` (ours) | Plays the beat locally at the target tempo; speaks cue texts with offline text-to-speech ([ADR 4](decisions/0004-audio-cues-on-robot.md)) |
+| Audio player | `audio_cues` (ours) | Plays the beat locally at the target tempo; speaks cue texts with offline text-to-speech ([ADR 3](decisions/0003-what-runs-on-robot-and-laptop.md)) |
 
 ### Laptop (ROS 2 Jazzy, same `ROS_DOMAIN_ID`)
 
 | Component | Package | Role |
 | --- | --- | --- |
-| Gait monitor | `gait_monitor` (ours) | Pose estimation per frame and step detection from heel distance, reusing `walk_analysis` ([ADR 1](decisions/0001-camera-for-gait-sensing.md), [ADR 3](decisions/0003-pose-processing-on-laptop.md)) |
-| LiDAR person tracker | `lidar_person_tracker` (ours) | Finds the walker's legs in the scan: presence, position along the path, walking speed, rough step count |
-| Session manager | `walk_session` (ours) | State machine for the session flow, cue rules, lap summaries, Nav2 goals |
+| Gait monitor | `gait_monitor` (ours) | Pose estimation per frame; a step is the moment the feet are furthest apart. Reuses `walk_analysis` ([ADR 1](decisions/0001-how-we-measure-walking.md), [ADR 3](decisions/0003-what-runs-on-robot-and-laptop.md)) |
+| LiDAR person tracker | `lidar_person_tracker` (ours) | Finds the walker's legs in the scan: presence, position along the path, walking speed; a rough step count for the accuracy comparison |
+| Session manager | `walk_session` (ours) | State machine for the session flow; counts camera steps only when the LiDAR says the person is walking through the middle of the zone; cue rules, lap summaries, Nav2 goals |
 | Navigation | `turtlebot3_navigation2` (existing) | Map, AMCL localisation, path to the station and back |
 | MQTT bridge | `session_reporter` (ours) | Converts lap and session summaries to JSON on MQTT |
-| Dashboard stack | Docker Compose | Mosquitto, Telegraf, InfluxDB, Grafana ([ADR 5](decisions/0005-mqtt-and-grafana-dashboard.md)) |
+| Dashboard stack | Docker Compose | Mosquitto, Telegraf, InfluxDB, Grafana ([ADR 4](decisions/0004-mqtt-and-grafana-dashboard.md)) |
 
 Custom message types live in a separate `gait_interfaces` package.
 
@@ -52,13 +53,13 @@ Custom message types live in a separate `gait_interfaces` package.
 | Topic / action | Type | From → to | Content |
 | --- | --- | --- | --- |
 | `/camera/image_raw/compressed` | `sensor_msgs/CompressedImage` | `usb_cam` → `gait_monitor` | MJPEG frames, camera timestamps |
-| `/gait/steps` | `gait_interfaces/StepEvent` | `gait_monitor` → `walk_session` | Time and foot (left/right) of each detected step |
+| `/gait/steps` | `gait_interfaces/StepEvent` | `gait_monitor` → `walk_session` | Time, foot (left/right) and confidence of each detected step |
 | `/gait/state` | `gait_interfaces/GaitState` | `gait_monitor` → `walk_session` | Person in view, rolling cadence (steps/min), time since last step |
 | `/scan` | `sensor_msgs/LaserScan` | `turtlebot3_bringup` → `lidar_person_tracker`, Nav2 | LiDAR ranges |
-| `/person/state` | `gait_interfaces/PersonState` | `lidar_person_tracker` → `walk_session` | Person detected, position along the path, walking speed, rough step count |
+| `/person/state` | `gait_interfaces/PersonState` | `lidar_person_tracker` → `walk_session` | Person detected, number of people, position along the path, walking speed, rough step count |
 | `/session/beat_bpm` | `std_msgs/Float32` | `walk_session` → `audio_cues` | Beat tempo; 0 stops the beat |
 | `/session/cue` | `std_msgs/String` | `walk_session` → `audio_cues` | Text to speak |
-| `/session/lap_summary` | `gait_interfaces/LapSummary` | `walk_session` → `session_reporter` | Per lap: duration, step count, mean cadence, stops, average speed, step length, uncertain flag |
+| `/session/lap_summary` | `gait_interfaces/LapSummary` | `walk_session` → `session_reporter` | Per lap: measured or not, duration, counted steps, mean cadence, stops, average speed |
 | `navigate_to_pose` | `nav2_msgs/action/NavigateToPose` | `walk_session` → Nav2 | Station pose and return pose |
 
 ## MQTT interface
@@ -67,28 +68,31 @@ Broker: Mosquitto on the laptop, port 1883, local network only. Payloads are JSO
 
 | MQTT topic | When | Payload fields |
 | --- | --- | --- |
-| `rehab/<patient_id>/lap` | After each lap | `session_id`, `lap`, `duration_s`, `steps`, `cadence_spm`, `target_spm`, `stops`, `speed_mps`, `step_length_m`, `uncertain` |
+| `rehab/<patient_id>/lap` | After each lap | `session_id`, `lap`, `duration_s`, `steps`, `measured`, `cadence_spm`, `target_spm`, `stops`, `speed_mps` |
 | `rehab/<patient_id>/session` | End of session | `session_id`, `laps`, `mean_cadence_spm`, `cadence_drift_spm` (last lap minus first), `total_stops` |
 
 `patient_id` is an anonymised ID, never a name.
 
 ## Gait metrics
 
-Each sensor does what it is good at; only `walk_session` compares their results ([ADR 6](decisions/0006-step-detection-and-lidar-cross-check.md)).
+Cadence is the main measurement: it drives the corrections during the walk and the physiotherapist's summary. The camera counts the steps and the LiDAR decides when the count can be trusted ([ADR 1](decisions/0001-how-we-measure-walking.md)).
 
-| Metric | Sensor | Method | Goal |
-| --- | --- | --- | --- |
-| Steps | Camera | A step is the moment the two heels are furthest apart along the path (front heel touches the floor). Heel distance is divided by shin length, so distance to the camera does not matter; the foot in front is the one that stepped. Only the legs need to be in frame | Core |
-| Cadence | Camera | Steps per minute, over the last few seconds and per lap | Core |
-| Walking speed | LiDAR | Slope of a line fitted to the walker's position over the last second | Core |
-| Lap time | LiDAR | Time between entering and leaving the zone | Core |
-| Step length | Both | Walking speed ÷ steps per second | Core |
-| Step count check | Both | LiDAR rough step count from the distance between the leg clusters; the lap is marked uncertain if it differs from the camera count by more than a set margin | Core |
-| Stop | Both | No step from the camera for N seconds and no movement from the LiDAR | Core |
-| Cadence drift | Camera | Last lap cadence minus first lap cadence (fatigue) | Core |
-| Step-time symmetry | Camera | Ratio of left and right step intervals | Stretch |
+| Situation (from the LiDAR) | Camera steps |
+| --- | --- |
+| Walking through the middle of the zone | Counted |
+| Turning at the end of the zone | Ignored |
+| Standing, shifting weight | Ignored; a stop if it lasts N seconds |
+| Entering or leaving the view | Ignored |
+| Person not found, or two people | Lap not measured |
 
-The prototype in [`walk_analysis.cadence`](../walk_analysis_with_camera/src/walk_analysis/cadence.py) detects steps from ankle lift instead. Both methods will be run on our own recordings and compared with hand-counted steps before the heel-distance method replaces it. N, the comparison margin and the cadence band are set from the same recordings, not chosen in advance.
+| Metric | Sensor | Method | Used during the walk | In the summary |
+| --- | --- | --- | --- | --- |
+| Steps | Camera | Moment the feet are furthest apart (front heel lands), divided by shin length; must alternate left/right at a plausible interval | — | Count per lap |
+| Cadence | Camera, LiDAR gate | Counted steps per minute, over the last few seconds and per lap | Compared with the beat → cue | Per lap; first vs last lap (fatigue) |
+| Stop | Both | No step from the camera and no movement from the LiDAR for N seconds | Cue | Count and time |
+| Walking speed | LiDAR | Slope of a line fitted to the walker's position over the last second | — | Per lap |
+
+**Accuracy.** First goal: cadence within ±5% of a hand count, adjusted after the first recordings. The same walks are compared with the hand count three ways: camera alone, LiDAR alone, both together. The current prototype in [`walk_analysis.cadence`](../walk_analysis_with_camera/src/walk_analysis/cadence.py) detects steps from ankle lift and serves as a baseline. N, the plausible step interval and the cadence band are set from the recordings, not chosen in advance.
 
 ## Cue rules
 
@@ -99,7 +103,7 @@ The prototype in [`walk_analysis.cadence`](../walk_analysis_with_camera/src/walk
 | Lap cadence below target band | "Try to step with the beat" |
 | Lap cadence above target band | "A little slower" |
 | Lap within the band | Lap count and encouragement |
-| Lap marked uncertain | Lap count only, no correction |
+| Lap not measured | Lap count only, no correction |
 | Camera stream lost | "Pausing, please wait" (session paused) |
 
 The target cadence, tolerance band, number of laps and station pose come from a session parameter file set by the physiotherapist.
@@ -124,4 +128,5 @@ The work is split by sensor so that both team members can work independently. Th
 
 - Rotate in place to keep the walker in frame and lengthen the capture zone.
 - Step-time symmetry per lap.
+- Step length (walking speed ÷ steps per second).
 - Session start/stop button on an ESP32, over MQTT.
