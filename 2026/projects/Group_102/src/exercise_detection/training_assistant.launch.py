@@ -17,7 +17,7 @@ def generate_launch_description():
         [
             DeclareLaunchArgument(
                 "image_topic",
-                default_value="/image_raw",
+                default_value="/image_raw/compressed",
                 description="ROS sensor_msgs/Image topic published by the TurtleBot camera.",
             ),
             DeclareLaunchArgument(

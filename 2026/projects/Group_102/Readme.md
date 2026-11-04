@@ -2,7 +2,7 @@
 
 > **Work in Progress:** This project is under active development. Features, interfaces, and documentation may change as the prototype evolves.
 
-A ROS 2 prototype that uses a TurtleBot camera and MediaPipe Pose Landmarker to detect arm-raise exercises, count repetitions, and provide basic training feedback.
+A ROS 2 prototype that uses a TurtleBot USB camera and MediaPipe Pose Landmarker to detect arm-raise exercises, count repetitions, and provide basic training feedback.
 
 ## Repository Structure
 
@@ -17,82 +17,117 @@ Group_102/
 │       ├── project_proposal.pptx
 │       └── midterm.pptx
 └── src/
-    └── exercise_detection/
-        ├── exercise_counter_node.py
-        ├── training_logic_node.py
-        └── training_assistant.launch.py
+    ├── exercise_counter_node.py
+    └── training_logic_node.py
 ```
 
 ## Current Implementation
 
 ### Exercise Detection
 
-`exercise_counter_node.py` receives camera images from the TurtleBot and uses MediaPipe Pose Landmarker to detect arm raises. A repetition is counted when both wrists are detected above the shoulders and then return to the lowered position.
+`exercise_counter_node.py` receives camera images from the TurtleBot and uses MediaPipe Pose Landmarker to detect arm raises.
 
-The node publishes the repetition count, timing information, and vision feedback through ROS 2 topics.
+A repetition is counted when both wrists are detected above the shoulders and subsequently return to the lowered position.
+
+The node publishes repetition counts, timing information, and vision feedback through ROS 2 topics. It also supports an optional camera preview.
 
 ### Training Logic
 
-`training_logic_node.py` listens for completed-repetition events and the detector's vision feedback. It tracks progress toward a configurable repetition target and publishes basic training feedback and status information.
+`training_logic_node.py` listens for completed-repetition events and vision feedback from the exercise detection node.
 
-### Launch File
-
-`training_assistant.launch.py` defines a launch configuration for starting the Exercise Counter and Training Logic nodes together in a ROS 2 package environment.
+It tracks progress toward a configurable repetition target and publishes training feedback and status information.
 
 ## ROS 2 Communication
 
-The current prototype uses ROS 2 topics to exchange camera images, exercise measurements, and training feedback between nodes. The topic names, message types, and final communication interfaces are still under development and have not yet been defined.
+The nodes communicate through ROS 2 topics to exchange camera images, exercise measurements, repetition events, and training feedback.
+
+The main communication flow is:
+
+1. The TurtleBot USB camera publishes image frames.
+2. The Exercise Counter subscribes to the camera topic and processes the images using MediaPipe.
+3. The Exercise Counter publishes repetition events and exercise metrics.
+4. The Training Logic node receives these events and tracks the training progress.
+5. The Training Logic node publishes feedback and training status.
 
 ## Requirements
 
 - Ubuntu 24.04
 - ROS 2 Jazzy
 - Python 3.12
-- A TurtleBot camera publishing a `sensor_msgs/msg/Image` topic visible to the ROS 2 environment
-- The Python dependencies listed in `requirements.txt`
+- TurtleBot3 Burger with Raspberry Pi 4
+- USB webcam connected to the TurtleBot
+- `usb_cam` ROS 2 package installed on the TurtleBot
+- Python dependencies listed in `requirements.txt`
 - ROS 2 networking configured so the computer and TurtleBot can discover each other
+- Pixi environment configured for the project
 
-Create and activate a virtual environment that can access the ROS 2 Python packages, then install the project dependencies:
+## Running the Robot
+
+The following instructions describe the current workflow for running the prototype.
+
+### 1. Connect to the TurtleBot
+
+Connect to the Raspberry Pi onboard the TurtleBot through SSH:
 
 ```bash
-source /opt/ros/jazzy/setup.bash
+ssh ubuntu@192.168.1.102
+```
+
+### 2. Launch the USB Camera
+
+On the TurtleBot, start the USB camera node:
+
+```bash
+ros2 run usb_cam usb_cam_node_exe --ros-args -p pixel_format:="mjpeg2rgb"
+```
+
+This starts the USB camera and publishes image frames to the ROS 2 environment.
+
+Keep this terminal running.
+
+### 3. Set Up the Python Environment
+
+In the project root directory, create and activate a Python virtual environment:
+
+```bash
 python3 -m venv --system-site-packages .venv
 source .venv/bin/activate
+```
+
+Upgrade pip and install the project dependencies:
+
+```bash
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-The dependencies currently listed in `requirements.txt` are:
+### 4. Run the Exercise Counter Node
 
-- `mediapipe==1.1.1`
-- `numpy==1.26.4`
-- `opencv-contrib-python==4.11.0.86`
-
-## Running the Nodes
-
-Make sure the TurtleBot camera is running and its image stream is available in the ROS 2 environment. Use the same `ROS_DOMAIN_ID` on the computer and the TurtleBot. The following examples use `102`; change it if your setup uses a different value.
-
-Run Exercise Detection in one terminal:
+From the project root, run:
 
 ```bash
-source /opt/ros/jazzy/setup.bash
-source .venv/bin/activate
-export ROS_DOMAIN_ID=102
-python src/exercise_detection/exercise_counter_node.py
+pixi run python src/exercise_counter_node.py \
+  --ros-args \
+  -p show_preview:=true
 ```
 
-Run Training Logic in a second terminal:
+The Exercise Counter subscribes to the TurtleBot camera stream, detects body landmarks using MediaPipe, and counts arm-raise repetitions.
+
+The `show_preview` parameter enables the camera preview.
+
+### 5. Run the Training Logic Node
+
+Open a second terminal in the project root and run:
 
 ```bash
-source /opt/ros/jazzy/setup.bash
-source .venv/bin/activate
-export ROS_DOMAIN_ID=102
-python src/exercise_detection/training_logic_node.py
+pixi run python src/training_logic_node.py \
+  --ros-args \
+  -p target_repetitions:=15
 ```
 
-The first start downloads the MediaPipe pose model automatically and stores it in the user's cache directory. Internet access is needed for this initial download unless a model file is supplied through the `model_path` ROS parameter.
+The `target_repetitions` parameter defines the number of repetitions required to complete a training set.
 
-The launch file is included for use after the ROS 2 package has been configured, built, and its `exercise_counter` and `training_logic` executables have been registered. The repository files shown above do not, by themselves, define that package installation setup.
+In this example, the training target is 15 repetitions.
 
 ## Documentation
 
@@ -104,3 +139,5 @@ The launch file is included for use after the ROS 2 package has been configured,
 
 - The current detector recognizes both-arm raises; it is not a general exercise classifier.
 - The repetition duration measures the detected raised phase, not the full movement cycle.
+- Exercise detection depends on the visibility and quality of the camera stream.
+- The prototype currently provides basic training feedback and repetition tracking.
