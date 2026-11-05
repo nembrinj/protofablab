@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 90 1600 630" width="1600" height="630" font-family="Inter, Helvetica, Arial, sans-serif">
+  <title>Physical setup: robot parked beside the walking path</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"/>
+    </marker>
+    <marker id="dim" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M5,0 L5,10" stroke="#6b7280" stroke-width="1.5"/>
+    </marker>
+    <style>
+      .t { font-size: 20px; fill: #111827; }
+      .b { font-size: 22px; font-weight: 700; fill: #111827; }
+      .s { font-size: 17px; fill: #4b5563; }
+      .dimline { stroke: #6b7280; stroke-width: 1.5; }
+    </style>
+  </defs>
+  <rect y="90" width="1600" height="630" fill="#ffffff"/>
+
+  <!-- Camera field of view and camera zone -->
+  <polygon points="800,440 625,220 975,220" fill="#2563eb" fill-opacity="0.10" stroke="#2563eb" stroke-opacity="0.5" stroke-dasharray="6 5"/>
+  <rect x="625" y="205" width="350" height="30" rx="4" fill="#2563eb" fill-opacity="0.25"/>
+
+  <!-- Walking path -->
+  <line x1="250" y1="220" x2="1350" y2="220" stroke="#9ca3af" stroke-width="3" stroke-dasharray="14 10"/>
+  <path d="M300,205 L1290,205" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M1290,235 L300,235" stroke="#374151" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M1300,205 A15,15 0 0 1 1300,235" stroke="#374151" stroke-width="2" fill="none"/>
+  <path d="M290,235 A15,15 0 0 1 290,205" stroke="#374151" stroke-width="2" fill="none"/>
+  <text class="b" x="250" y="140">Walking path · about 10 m · patient walks back and forth</text>
+
+  <!-- Patient -->
+  <circle cx="500" cy="220" r="20" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <text class="s" x="500" y="275" text-anchor="middle">patient</text>
+
+  <!-- Camera zone dimension -->
+  <line class="dimline" x1="625" y1="180" x2="975" y2="180" marker-start="url(#dim)" marker-end="url(#dim)"/>
+  <rect x="685" y="168" width="230" height="24" fill="#ffffff"/>
+  <text class="t" x="800" y="187" text-anchor="middle" font-weight="700" fill="#1d4ed8">camera zone ≈ 3–4 m</text>
+
+  <!-- Distance dimension -->
+  <line class="dimline" x1="1040" y1="220" x2="1040" y2="440" marker-start="url(#dim)" marker-end="url(#dim)"/>
+  <text class="t" x="1055" y="337">≈ 2.5 m</text>
+
+  <!-- Robot -->
+  <circle cx="800" cy="465" r="32" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5"/>
+  <rect x="788" y="425" width="24" height="16" rx="3" fill="#2563eb"/>
+  <text class="b" x="800" y="535" text-anchor="middle">Robot's spot</text>
+  <text class="s" x="800" y="562" text-anchor="middle">camera on mast · beat + spoken cues</text>
+  <text class="s" x="800" y="586" text-anchor="middle">stationary while the patient walks</text>
+
+  <!-- Dock and Nav2 route -->
+  <rect x="1330" y="560" width="70" height="50" rx="6" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.5"/>
+  <text class="s" x="1365" y="640" text-anchor="middle">start / dock</text>
+  <path d="M1330,585 C1150,600 950,560 840,480" stroke="#6b7280" stroke-width="2" stroke-dasharray="8 6" fill="none" marker-end="url(#arrow)"/>
+  <text class="s" x="1120" y="620" text-anchor="middle">drives here before the session, back after</text>
+
+  <text class="s" x="250" y="690" font-style="italic">Each walk through the camera zone is one measurement. Distances approximate; robot not to scale.</text>
+</svg>

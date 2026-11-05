@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 960" width="1600" height="960" font-family="Inter, Helvetica, Arial, sans-serif">
+  <title>System architecture: robot, laptop and dashboard stack</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"/>
+    </marker>
+    <style>
+      .group { stroke: #d1d5db; stroke-width: 1.5; }
+      .title { font-size: 20px; font-weight: 700; fill: #111827; }
+      .ours { fill: #ffffff; stroke: #2563eb; stroke-width: 2.5; }
+      .matin { fill: #ffffff; stroke: #9333ea; stroke-width: 2.5; }
+      .existing { fill: #ffffff; stroke: #9ca3af; stroke-width: 1.5; }
+      .person { fill: #fef3c7; stroke: #d97706; stroke-width: 1.5; }
+      .name { font-family: Menlo, Consolas, monospace; font-size: 18px; font-weight: 700; fill: #111827; }
+      .plain { font-size: 18px; font-weight: 700; fill: #111827; }
+      .sub { font-size: 14px; fill: #4b5563; }
+      .edge { stroke: #374151; stroke-width: 2; fill: none; }
+      .label { font-family: Menlo, Consolas, monospace; font-size: 13px; fill: #1f2937; }
+      .note { font-size: 15px; fill: #6b7280; font-style: italic; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="960" fill="#ffffff"/>
+
+  <!-- Groups -->
+  <rect class="group" x="40" y="150" width="400" height="580" rx="14" fill="#eff6ff"/>
+  <text class="title" x="60" y="185">Robot · Raspberry Pi</text>
+  <rect class="group" x="640" y="150" width="560" height="580" rx="14" fill="#f9fafb"/>
+  <text class="title" x="660" y="185">Laptop · ROS 2 Jazzy</text>
+  <rect class="group" x="1260" y="150" width="300" height="470" rx="14" fill="#f0fdf4"/>
+  <text class="title" x="1280" y="185">Docker Compose · laptop</text>
+  <text class="note" x="540" y="140" text-anchor="middle">Wi-Fi · ROS 2</text>
+  <line x1="540" y1="150" x2="540" y2="730" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="6 6"/>
+
+  <!-- People -->
+  <rect class="person" x="70" y="40" width="340" height="56" rx="28"/>
+  <text class="plain" x="240" y="75" text-anchor="middle">Patient walks back and forth</text>
+  <rect class="person" x="1290" y="660" width="240" height="56" rx="28"/>
+  <text class="plain" x="1410" y="695" text-anchor="middle">Physio</text>
+
+  <!-- Robot nodes -->
+  <rect class="existing" x="70" y="230" width="340" height="80" rx="10"/>
+  <text class="name" x="90" y="263">usb_cam</text>
+  <text class="sub" x="90" y="290">USB webcam on 3D-printed mast</text>
+
+  <rect class="matin" x="70" y="420" width="340" height="80" rx="10"/>
+  <text class="name" x="90" y="453">audio_cues</text>
+  <text class="sub" x="90" y="480">USB speaker · beat + speech</text>
+
+  <rect class="existing" x="70" y="610" width="340" height="80" rx="10"/>
+  <text class="name" x="90" y="643">turtlebot3_bringup</text>
+  <text class="sub" x="90" y="670">LiDAR · motors · odometry</text>
+
+  <!-- Laptop nodes -->
+  <rect class="matin" x="670" y="230" width="240" height="80" rx="10"/>
+  <text class="name" x="690" y="263">gait_monitor</text>
+  <text class="sub" x="690" y="290">MediaPipe Pose → heel strikes</text>
+
+  <rect class="ours" x="670" y="420" width="240" height="80" rx="10"/>
+  <text class="name" x="690" y="453">walk_session</text>
+  <text class="sub" x="690" y="480">session flow · cue rules</text>
+
+  <rect class="existing" x="670" y="610" width="240" height="80" rx="10"/>
+  <text class="name" x="690" y="643">Nav2</text>
+  <text class="sub" x="690" y="670">map · AMCL · path planning</text>
+
+  <rect class="ours" x="950" y="420" width="220" height="80" rx="10"/>
+  <text class="name" x="970" y="453">session_reporter</text>
+  <text class="sub" x="970" y="480">ROS 2 → MQTT JSON</text>
+
+  <rect class="ours" x="950" y="610" width="235" height="80" rx="10"/>
+  <text class="name" x="964" y="643" font-size="15">lidar_person_tracker</text>
+  <text class="sub" x="964" y="670">legs → position, speed</text>
+
+  <!-- Dashboard nodes -->
+  <rect class="existing" x="1290" y="215" width="240" height="64" rx="10"/>
+  <text class="plain" x="1310" y="244">Mosquitto</text>
+  <text class="sub" x="1310" y="266">MQTT broker</text>
+  <rect class="existing" x="1290" y="315" width="240" height="64" rx="10"/>
+  <text class="plain" x="1310" y="344">Telegraf</text>
+  <text class="sub" x="1310" y="366">MQTT → database</text>
+  <rect class="existing" x="1290" y="415" width="240" height="64" rx="10"/>
+  <text class="plain" x="1310" y="444">InfluxDB</text>
+  <text class="sub" x="1310" y="466">time series per walk</text>
+  <rect class="existing" x="1290" y="515" width="240" height="64" rx="10"/>
+  <text class="plain" x="1310" y="544">Grafana</text>
+  <text class="sub" x="1310" y="566">dashboard for the physio</text>
+
+  <!-- Edges: patient and robot -->
+  <path class="edge" d="M380,96 L380,230" marker-end="url(#arrow)"/>
+  <text class="sub" x="372" y="130" text-anchor="end">filmed</text>
+  <path class="edge" d="M70,460 L55,460 L55,68 L70,68" marker-end="url(#arrow)"/>
+  <text class="sub" x="62" y="125">hears</text>
+
+  <!-- Edges: robot ↔ laptop -->
+  <path class="edge" d="M410,270 L670,270" marker-end="url(#arrow)"/>
+  <rect x="425" y="245" width="230" height="18" fill="#ffffff"/>
+  <text class="label" x="540" y="259" text-anchor="middle">/camera/image_raw/compressed</text>
+
+  <path class="edge" d="M670,460 L410,460" marker-end="url(#arrow)"/>
+  <rect x="418" y="420" width="244" height="36" fill="#ffffff"/>
+  <text class="label" x="540" y="434" text-anchor="middle">/session/beat_bpm</text>
+  <text class="label" x="540" y="451" text-anchor="middle">/session/cue</text>
+
+  <path class="edge" d="M670,650 L410,650" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <rect x="425" y="625" width="230" height="18" fill="#ffffff"/>
+  <text class="label" x="540" y="639" text-anchor="middle">/scan · /odom · /cmd_vel</text>
+
+  <!-- Edges: inside laptop -->
+  <path class="edge" d="M790,310 L790,420" marker-end="url(#arrow)"/>
+  <text class="label" x="802" y="358">/gait/steps</text>
+  <text class="label" x="802" y="376">/gait/state</text>
+
+  <path class="edge" d="M790,500 L790,610" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text class="label" x="780" y="560" text-anchor="end">navigate_to_pose</text>
+
+  <path class="edge" d="M910,460 L950,460" marker-end="url(#arrow)"/>
+  <text class="label" x="955" y="408">/session/walk_summary</text>
+
+  <path class="edge" d="M240,690 L240,712 L1060,712 L1060,690" marker-end="url(#arrow)"/>
+  <text class="label" x="1070" y="710">/scan</text>
+  <path class="edge" d="M950,640 L930,640 L930,485 L910,485" marker-end="url(#arrow)"/>
+  <text class="label" x="940" y="585">/person/state</text>
+
+  <!-- Edges: laptop → dashboard -->
+  <path class="edge" d="M1170,460 L1230,460 L1230,247 L1290,247" marker-end="url(#arrow)"/>
+  <rect x="1208" y="335" width="44" height="18" fill="#ffffff"/>
+  <text class="label" x="1230" y="349" text-anchor="middle">MQTT</text>
+  <path class="edge" d="M1410,279 L1410,315" marker-end="url(#arrow)"/>
+  <path class="edge" d="M1410,379 L1410,415" marker-end="url(#arrow)"/>
+  <path class="edge" d="M1410,479 L1410,515" marker-end="url(#arrow)"/>
+  <path class="edge" d="M1410,579 L1410,660" marker-end="url(#arrow)"/>
+
+  <!-- Legend -->
+  <rect class="ours" x="440" y="790" width="36" height="24" rx="5"/>
+  <text class="sub" x="488" y="808" font-size="16">Leonid: LiDAR, session logic, dashboard</text>
+  <rect class="matin" x="830" y="790" width="36" height="24" rx="5"/>
+  <text class="sub" x="878" y="808" font-size="16">Matin: camera, audio</text>
+  <rect class="existing" x="1080" y="790" width="36" height="24" rx="5"/>
+  <text class="sub" x="1128" y="808" font-size="16">existing software</text>
+  <circle cx="885" cy="632" r="17" fill="#111827"/><text x="885" y="638" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">1</text><circle cx="440" cy="482" r="17" fill="#111827"/><text x="440" y="488" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">2</text><circle cx="1230" cy="405" r="17" fill="#111827"/><text x="1230" y="411" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">3</text>
+  <!-- Slide key -->
+  <circle cx="460" cy="862" r="17" fill="#111827"/><text x="460" y="868" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">1</text><text x="488" y="868" font-size="18" fill="#111827"><tspan font-weight="700">Getting to its spot:</tspan> a map of the room and standard ROS 2 navigation</text>
+  <circle cx="460" cy="898" r="17" fill="#111827"/><text x="460" y="904" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">2</text><text x="488" y="904" font-size="18" fill="#111827"><tspan font-weight="700">Talking to the patient:</tspan> the beat is generated on the robot itself, so Wi-Fi delays can't disturb it</text>
+  <circle cx="460" cy="934" r="17" fill="#111827"/><text x="460" y="940" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">3</text><text x="488" y="940" font-size="18" fill="#111827"><tspan font-weight="700">Reporting to the physio:</tspan> after each walk, a short message goes to the dashboard</text>
+</svg>
