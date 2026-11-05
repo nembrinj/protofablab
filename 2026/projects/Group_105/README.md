@@ -14,7 +14,7 @@ Group 105 project for the Prototyping and Fabrication course.
 | Presentation | Slides                                               |
 | ------------ | ---------------------------------------------------- |
 | Initial      | [presentation_initial.pdf](presentation_initial.pdf) |
-| Mid-term     | To be added                                          |
+| Mid-term     | [presentation_midterm.pdf](presentation_midterm.pdf) |
 | Final        | To be added                                          |
 
 ## Problem
@@ -74,6 +74,7 @@ To be added.
 ├── README.md                    # This page
 ├── required-equipment.md        # Hardware we use or borrow from the lab
 ├── presentation_initial.pdf     # Initial idea presentation
+├── presentation_midterm.pdf     # Mid-term presentation
 ├── docs/
 │   ├── architecture.md          # System architecture and interfaces
 │   ├── decisions/               # Design decision records
