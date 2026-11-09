@@ -1,20 +1,14 @@
-# Project Deliverables & Timeline
+## Project Deliverables & Timeline
 
-**Project:** Adaptive Training Assistant  
-**Status:** Work in Progress
+**Project:** Adaptive Training Assistant
 
-The following table outlines the planned development stages, tasks, responsibilities, and expected outcomes. This is an internal team timeline and may be adjusted as development progresses.
-
-## Development Timeline
-
-| Period | Workstream | Tasks | Expected Outcome | Owner |
-|---|---|---|---|---|
-| **November 5** | Core Exercise Detection | - Connect the TurtleBot camera with MediaPipe.<br>- Implement exercise detection and repetition counting.<br>- Calculate exercise duration and pace. | Functional initial Exercise Detection flow. | Andriana |
-| **November 5** | Camera Holder | - Design and 3D print the camera holder with the motor. | Printed Camera Holder ready for assembly. | Chandu |
-| **November 12** | Speaker & Voice Feedback | - Connect and test the speaker.<br>- Implement voice feedback.<br>- Connect voice feedback to the Training Logic.<br>- Design and print the speaker holder. | Functional Spoken Feedback and Printed Speaker Holder ready for assembly. | Andriana |
-| **November 12** | Hardware Assembly & Robot Setup | - Design and 3D print the camera holder with the motor.<br>- Mount the camera, camera holder, motor, and speaker onto the TurtleBot.<br>- Connect and check the hardware setup. | Camera, motor, and speaker installed on the robot and ready for testing. | Chandu |
-| **November 19** | Face Detection & Camera Positioning | - Implement face detection to locate the user.<br>- Control camera positioning using the motor.<br>- Test the camera positioning mechanism. | The system can locate the user and adjust the camera direction. | Andriana |
-| **November 19** | Heart-rate Integration | - Connect the heart-rate sensor to the Raspberry Pi.<br>- Implement Bluetooth connectivity.<br>- Receive and process heart-rate data.<br>- Integrate heart-rate information into the Training Logic. | Heart-rate data integrated into the Training Logic, depending on sensor availability and compatibility. | Chandu |
-| **November 26** | User Interface | - Develop the user interface/dashboard.<br>- Display repetitions, duration, pace, and heart rate.<br>- Present relevant training statistics. | Functional dashboard displaying training information. | Andriana & Chandu (Joint Work) |
-| **December 3** | Full System Integration | - Connect Exercise Detection, Training Logic, voice feedback, heart-rate monitoring, and the user interface.<br>- Test communication between components.<br>- Resolve integration issues. | Integrated prototype with a complete training workflow. | Andriana & Chandu (Joint Work) |
-| **By December 10** | Final Preparation & Presentation | - Test the prototype.<br>- Ensure the basic Exercise Detection flow is functional.<br>- Prepare the final demonstration.<br>- Finalize the project presentation. | Working prototype demonstration and final presentation. | Andriana & Chandu (Joint Work) |
+| Deadline | Tasks & Expected Deliverables | Owner |
+|---|---|---|
+| November 12 | **Camera & Robot Positioning:** Design and 3D print the camera and servo holders. Implement person detection and robot positioning to ensure the user's upper body is visible in the camera frame. Monitor exercise repetitions and pace, and publish the corresponding ROS topics. **Deliverable:** Printed and mountedcamera and servo holders, functional person detection and robot positioning, and ROS topics publishing repetition and pace data. | Andriana |
+| November 12 | **Camera Holder Assembly:** Mount the camera holder onto the TurtleBot and secure the camera in place. **Deliverable:** Camera holder installed on the TurtleBot. | Chandu |
+| November 19 | **Heart-rate Sensor Connectivity:** Connect the heart-rate sensor to the Raspberry Pi, implement Bluetooth connectivity, and receive heart-rate data. **Deliverable:** Successful Bluetooth connection and heart-rate data reception. | Chandu |
+| November 19 | **User Interface:** Develop the dashboard displaying repetitions, duration, pace, heart rate, and relevant training statistics. **Deliverable:** Functional training dashboard. | Andriana |
+| November 26 | **Speaker & Voice Feedback:** Connect and test the speaker, implement voice feedback, integrate spoken feedback with the Training Logic, and design and 3D print the speaker holder. **Deliverable:** Functional spoken feedback integrated with Training Logic and a printed speaker holder ready for assembly. | Andriana |
+| November 26 | **Heart-rate Data Integration:** Process the received heart-rate data and integrate it into the Training Logic. **Deliverable:** Heart-rate data successfully processed and integrated into the Training Logic. | Chandu |
+| December 3 | **Full System Integration:** Connect Exercise Detection, Training Logic, voice feedback, heart-rate monitoring, and the dashboard. Test communication and resolve integration issues. **Deliverable:** Integrated prototype with a complete training workflow. | Both |
+| December 10 | **Final Preparation & Presentation:** Test the prototype, ensure the basic exercise detection flow works, prepare the final demonstration, and finalize the presentation. **Deliverable:** Working prototype demonstration and final presentation. | Both |
