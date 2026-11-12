@@ -21,8 +21,10 @@ BINS = 360  # one direction per degree, all around the robot
 class TrackerConfig:
     """Settings of the tracker; lengths in metres, times in seconds."""
 
-    path_distance_m: float = 2.5
-    corridor_half_width_m: float = 0.75
+    # Watch the floor from 0.5 m to 3.5 m in front of the robot, so that the
+    # exact distance of the walking line does not have to be set for each room.
+    path_distance_m: float = 2.0
+    corridor_half_width_m: float = 1.5
     zone_half_length_m: float = 2.5
     facing_angle_rad: float = 0.0
     background_scans: int = 15

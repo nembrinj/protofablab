@@ -1,13 +1,14 @@
 lidar_person_tracker:
   ros__parameters:
-    # Where the walking line is, seen from the LiDAR.
-    path_distance_m: 2.5        # from the robot to the walking line
-    corridor_half_width_m: 0.75 # how far from the line a person may walk
+    # The strip of floor that is watched, seen from the LiDAR.
+    # The defaults watch from 0.5 m to 3.5 m in front of the robot.
+    path_distance_m: 2.0        # from the robot to the middle of the strip
+    corridor_half_width_m: 1.5  # from the middle of the strip to its near and far edge
     zone_half_length_m: 2.5     # how far along the line, each side of the robot
     facing_angle_rad: 0.0       # direction of the path in the scan; 0 is the robot's front
 
     # Learning the empty room.
-    background_scans: 15        # scans to learn from (3 s at 5 scans per second)
+    background_scans: 15        # scans to learn from (about 2 s at 9 scans per second)
     background_margin_m: 0.2    # how much nearer than the empty room counts as new
 
     # Grouping points into people.

@@ -158,11 +158,20 @@ def test_object_present_while_learning_is_ignored():
     assert estimate.position_m == pytest.approx(-1.0, abs=0.1)
 
 
-@pytest.mark.parametrize('across_m', [1.0, 3.29])
+@pytest.mark.parametrize('across_m', [0.3, 3.29])
 def test_person_off_the_path_is_ignored(across_m):
     robot = Robot()
     robot.learn()
     assert robot.scan(legs(0.0, across_m=across_m)).people_count == 0
+
+
+@pytest.mark.parametrize('across_m', [0.7, 1.2, 2.5, 3.0])
+def test_person_is_found_at_any_distance_in_the_strip(across_m):
+    robot = Robot()
+    robot.learn()
+    estimate = robot.scan(legs(0.5, across_m=across_m))
+    assert estimate.people_count == 1
+    assert estimate.position_m == pytest.approx(0.5, abs=0.1)
 
 
 def test_person_beyond_the_zone_is_ignored():

@@ -21,7 +21,7 @@ ros2 launch lidar_person_tracker tracker.launch.py
 ros2 topic echo /person/state
 ```
 
-The robot must face the walking path, and the path must be clear for the first 3 seconds. If the camera does not point the same way as the robot's front, set `facing_angle_rad`.
+The robot must face the walking path, and the path must be clear for the first 2 seconds. The node watches the floor from 0.5 m to 3.5 m in front of the robot, and 2.5 m to each side. If the camera does not point the same way as the robot's front, set `facing_angle_rad`.
 
 ## Tests
 
@@ -43,28 +43,28 @@ It prints what the tracker would have said every half second, and how many scans
 
 ## Manual test on the real robot
 
-Setup: robot parked about 2.5 m from a straight walking line of at least 5 m, facing it; `turtlebot3_bringup` running on the robot; the launch command above running on the laptop.
+Setup: robot parked 1 to 3 m from a straight walking line of at least 5 m, facing it; `turtlebot3_bringup` running on the robot; the launch command above running on the laptop.
 
-1. Keep the path clear and start the node. Expected: "Empty room learned" after about 3 seconds, then `detected: false` on `/person/state`.
+1. Keep the path clear and start the node. Expected: "Empty room learned" after about 2 seconds, then `detected: false` on `/person/state`.
 2. Stand on the line in front of the robot. Expected: `people_count: 1`, `position_m` near 0, `speed_mps` near 0.
 3. Stand 1 m to the robot's left, then 1 m to its right (measured with tape). Expected: `position_m` near +1, then near -1, within 0.15 m.
 4. Walk a taped 4 m along the line, timed with a stopwatch, in both directions. Expected: `people_count` stays 1; `speed_mps` is within 0.2 m/s of distance ÷ time, positive towards the robot's left.
 5. Walk with a second person 1.5 m behind. Expected: `people_count: 2`, position and speed `NaN`.
-6. Stand between the robot and the line, about 1 m from the robot. Expected: `detected: false`.
-7. Put a chair on the line. Expected: it counts as a person. Call `ros2 service call /lidar_person_tracker/relearn_background std_srvs/srv/Trigger`. Expected: after 3 seconds, `detected: false`.
+6. Stand right next to the robot, closer than 0.5 m. Expected: `detected: false`.
+7. Put a chair on the line. Expected: it counts as a person. Call `ros2 service call /lidar_person_tracker/relearn_background std_srvs/srv/Trigger`. Expected: after 2 seconds, `detected: false`.
 8. Unplug the LiDAR or stop the bringup. Expected: a "No LiDAR scan" warning within a few seconds.
 9. Record `ros2 bag record /scan` during steps 2 to 5, to set the parameters and to build the rough step count later.
 
 ### First results (2026-11-12)
 
-A first, informal test in the lab, without tape marks or stopwatch. Robot: LDS-02 LiDAR, about 9 scans per second, 240 beams (1.5° apart). The lab spot had a wall about 1.9 m in front of the robot, so the person walked about 1.0–1.4 m from it, not 2.5 m. The results below come from replaying the recordings with the walking line moved to that distance (`path_distance_m` 1.05–1.2, `corridor_half_width_m` 0.45, `zone_half_length_m` 2.0–2.2; `facing_angle_rad` 3.14159 for the third recording, where the robot faced away from the path).
+A first, informal test in the lab, without tape marks or stopwatch: four recordings of 43 to 118 s. Robot: LDS-02 LiDAR, about 9 scans per second, 240 beams (1.5° apart). The person walked 1.0–1.9 m from the robot. The results below come from replaying the recordings with the default settings (`facing_angle_rad` 3.14159 for the third recording, where the robot faced away from the path).
 
 - One person walking back and forth: tracked through every pass, never lost in the middle of the zone. Position moves smoothly from one end of the zone to the other.
 - Standing still: position steady within ±0.01 m, speed 0.00 m/s.
 - Walking speed: 0.6–0.95 m/s on the straight part, near 0 at the turns. Plausible, but not yet checked with a stopwatch.
 - Empty room: no person reported in any scan.
-- At 1.2 m a leg gives 5–14 points. How many it gives at 2.5 m is still unknown.
-- With the default settings (line at 2.5 m), the tracker correctly reported nobody, because nobody walked there.
-- In the third recording, 130 of 1100 scans reported two people. In most of them, a second group of points stood about 1.7 m along the path, and the person was turning or standing. To check: was a second person there, or does one person sometimes split into two?
+- At 1–2 m a person gives 4–14 points. How many at 2.5–3.5 m is still unknown; the beams are 6.5 cm apart at 2.5 m and 9 cm apart at 3.5 m.
+- A second person walked in by accident during the third recording. The tracker reported two people for those scans (134 of about 1100), and one person in the other three recordings throughout.
+- During the test itself the node watched only 1.75–3.25 m in front of the robot, so it reported nobody. The default strip was widened to 0.5–3.5 m because of this.
 
-Still to do: steps 1–9 above at 2.5 m, in a place with at least 3 m of free floor in front of the robot.
+Still to do: steps 1–9 above with tape marks and a stopwatch, including one walk at 2.5–3 m.

@@ -19,7 +19,7 @@ The robot measures walking from a spot it reaches by itself. Before a session it
 
 ## Session flow
 
-1. **Position**: the robot drives to its spot (a pose on a map built beforehand with SLAM), using Nav2 `NavigateToPose`. Once parked, it learns the scan of the empty room for about 3 seconds; the walking path must be clear during that time.
+1. **Position**: the robot drives to its spot (a pose on a map built beforehand with SLAM), using Nav2 `NavigateToPose`. Once parked, it learns the scan of the empty room for about 2 seconds; the walking path must be clear during that time.
 2. **Wait**: the robot says it is ready and starts the beat at the target cadence once a person is in view.
 3. **Walk**: the patient walks through the zone. The camera counts steps; the LiDAR tracks where the person is and how fast they move, and decides when the camera's steps count.
 4. **Between walks**: the robot gives a cue or the walk count, based on the last walk.
