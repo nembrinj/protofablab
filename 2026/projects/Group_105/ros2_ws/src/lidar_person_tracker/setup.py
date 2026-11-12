@@ -24,6 +24,7 @@ setup(
     entry_points={
         'console_scripts': [
             'tracker_node = lidar_person_tracker.tracker_node:main',
+            'replay_bag = lidar_person_tracker.replay:main',
         ],
     },
 )
