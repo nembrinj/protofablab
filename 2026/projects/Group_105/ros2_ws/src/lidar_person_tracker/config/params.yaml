@@ -1,0 +1,22 @@
+lidar_person_tracker:
+  ros__parameters:
+    # Where the walking line is, seen from the LiDAR.
+    path_distance_m: 2.5        # from the robot to the walking line
+    corridor_half_width_m: 0.75 # how far from the line a person may walk
+    zone_half_length_m: 2.5     # how far along the line, each side of the robot
+    facing_angle_rad: 0.0       # direction of the path in the scan; 0 is the robot's front
+
+    # Learning the empty room.
+    background_scans: 15        # scans to learn from (3 s at 5 scans per second)
+    background_margin_m: 0.2    # how much nearer than the empty room counts as new
+
+    # Grouping points into people.
+    person_gap_m: 0.8           # a wider gap along the path means two people
+    min_points: 2               # fewer points than this is noise
+
+    # Walking speed.
+    speed_window_s: 1.0         # the speed is fitted over this much time
+    min_speed_span_s: 0.4       # no speed before this much time is covered
+    max_jump_m: 1.0             # a bigger jump between two scans restarts the speed
+
+    scan_timeout_s: 2.0         # warn when no scan arrives for this long

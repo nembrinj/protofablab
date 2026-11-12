@@ -58,6 +58,19 @@ The TurtleBot3 drives itself to a spot beside a walking path and stays still whi
 
 A webcam on the robot streams video to a laptop, which detects steps with pose estimation. The robot's LiDAR tracks where the walker is and how fast they walk. The laptop runs the session logic and sends the beat and spoken cues back to a speaker on the robot. Session summaries go over MQTT to a Grafana dashboard. See [docs/architecture.md](docs/architecture.md) for the components and interfaces, and [docs/decisions/](docs/decisions/) for the design decisions.
 
+## Build and test
+
+The ROS 2 packages are in [`ros2_ws/`](ros2_ws/) and need ROS 2 Jazzy on Ubuntu 24.04.
+
+```bash
+cd ros2_ws
+colcon build --symlink-install
+source install/setup.bash
+colcon test && colcon test-result --verbose   # tests and lint
+```
+
+How to run each package, and the test steps for the real robot, are in the package READMEs: [`lidar_person_tracker`](ros2_ws/src/lidar_person_tracker/README.md). The offline video prototype has its own [README](walk_analysis_with_camera/README.md).
+
 ## Hardware
 
 - TurtleBot3 Burger
@@ -79,5 +92,8 @@ To be added.
 │   ├── architecture.md          # System architecture and interfaces
 │   ├── decisions/               # Design decision records
 │   └── img/                     # Diagrams
+├── ros2_ws/src/
+│   ├── gait_interfaces/         # Messages shared by our nodes
+│   └── lidar_person_tracker/    # Finds the walker in the LiDAR scan
 └── walk_analysis_with_camera/   # Gait and cadence analysis from video
 ```

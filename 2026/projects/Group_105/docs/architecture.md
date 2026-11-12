@@ -1,6 +1,6 @@
 # Architecture
 
-Status: target design for the final proof of concept, as presented at the mid-term. Only the offline gait prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/) exists so far. Decisions are recorded in [`decisions/`](decisions/).
+Status: target design for the final proof of concept, as presented at the mid-term. Built so far: the offline gait prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/), and the LiDAR person tracker in [`ros2_ws/`](../ros2_ws/), without the rough step count. Decisions are recorded in [`decisions/`](decisions/).
 
 ## Overview
 
@@ -19,7 +19,7 @@ The robot measures walking from a spot it reaches by itself. Before a session it
 
 ## Session flow
 
-1. **Position**: the robot drives to its spot (a pose on a map built beforehand with SLAM), using Nav2 `NavigateToPose`.
+1. **Position**: the robot drives to its spot (a pose on a map built beforehand with SLAM), using Nav2 `NavigateToPose`. Once parked, it learns the scan of the empty room for about 3 seconds; the walking path must be clear during that time.
 2. **Wait**: the robot says it is ready and starts the beat at the target cadence once a person is in view.
 3. **Walk**: the patient walks through the zone. The camera counts steps; the LiDAR tracks where the person is and how fast they move, and decides when the camera's steps count.
 4. **Between walks**: the robot gives a cue or the walk count, based on the last walk.
@@ -40,7 +40,7 @@ The robot measures walking from a spot it reaches by itself. Before a session it
 | Component | Package | Role |
 | --- | --- | --- |
 | Gait monitor | `gait_monitor` (ours) | Pose estimation per frame; a step is the moment the feet are furthest apart. Reuses `walk_analysis` ([ADR 1](decisions/0001-how-we-measure-walking.md), [ADR 3](decisions/0003-what-runs-on-robot-and-laptop.md)) |
-| LiDAR person tracker | `lidar_person_tracker` (ours) | Finds the walker's legs in the scan: presence, position along the path, walking speed; a rough step count for the accuracy comparison |
+| LiDAR person tracker | `lidar_person_tracker` (ours) | Finds the walker by comparing each scan with the empty room ([ADR 5](decisions/0005-find-the-walker-against-the-empty-room.md)): presence, position along the path, walking speed; a rough step count for the accuracy comparison |
 | Session manager | `walk_session` (ours) | State machine for the session flow; counts camera steps only when the LiDAR says the person is walking through the middle of the zone; cue rules, walk summaries, Nav2 goals |
 | Navigation | `turtlebot3_navigation2` (existing) | Map, AMCL localisation, path to the spot and back |
 | MQTT bridge | `session_reporter` (ours) | Converts walk and session summaries to JSON on MQTT |
@@ -57,6 +57,7 @@ Custom message types live in a separate `gait_interfaces` package.
 | `/gait/state` | `gait_interfaces/GaitState` | `gait_monitor` → `walk_session` | Person in view, rolling cadence (steps/min), time since last step |
 | `/scan` | `sensor_msgs/LaserScan` | `turtlebot3_bringup` → `lidar_person_tracker`, Nav2 | LiDAR ranges |
 | `/person/state` | `gait_interfaces/PersonState` | `lidar_person_tracker` → `walk_session` | Person detected, number of people, position along the path, walking speed, rough step count |
+| `/lidar_person_tracker/relearn_background` | `std_srvs/srv/Trigger` | `walk_session` → `lidar_person_tracker` | Learn the empty room again; called after the robot has parked |
 | `/session/beat_bpm` | `std_msgs/Float32` | `walk_session` → `audio_cues` | Beat tempo; 0 stops the beat |
 | `/session/cue` | `std_msgs/String` | `walk_session` → `audio_cues` | Text to speak |
 | `/session/walk_summary` | `gait_interfaces/WalkSummary` | `walk_session` → `session_reporter` | Per walk: measured or not, duration, counted steps, mean cadence, stops, average speed |

@@ -1,0 +1,36 @@
+# 5. The LiDAR finds the walker by comparing with the empty room
+
+- Status: accepted
+- Date: 2026-11-12
+
+## Context
+
+`lidar_person_tracker` must report where the walker is along the path and how fast they move ([ADR 1](0001-how-we-measure-walking.md)). The LiDAR gives one distance per degree. From the robot's spot, about 2.5 m from the walking line, two neighbouring beams land about 4.4 cm apart, so a shin is only 2 or 3 points. That is too few to recognise a leg by its round shape.
+
+The robot is parked while the person walks ([ADR 2](0002-robot-parks-beside-path.md)), so the room around it gives the same scan every time.
+
+## Decision
+
+After parking, the tracker remembers the scan of the empty room for about 3 seconds. From then on, a point belongs to a person when it is:
+
+- clearly nearer than the empty room in that direction (by a margin, 0.2 m to start with), and
+- on the walking path: within a band around the walking line and within the zone the camera sees.
+
+Points that are close together along the path are one person; a gap wider than a long step means two people. The position is the middle between the outermost points. The speed is the slope of a line fitted to the positions of the last second.
+
+Each scan is first put on a fixed grid of one distance per degree, so the same code works for LiDAR models with a different number of beams.
+
+## Consequences
+
+- No model of a leg is needed, and furniture that stays in place is ignored.
+- The walking path must be clear while the empty room is learned. `walk_session` asks the tracker to learn again each time the robot has parked.
+- Anything new on the path counts as a person: a pet, a moved chair, a second person. Two people standing closer together than the gap count as one.
+- If the robot is moved or bumped, the remembered scan no longer fits, and the room must be learned again.
+- The margin, the band and the gap are parameters, to be set from recordings of the real LiDAR.
+- The rough step count for the accuracy comparison is not part of this decision. It is added after the first recordings.
+
+## Alternatives considered
+
+- **Recognise legs by shape** (round clusters of a leg's width, as the common leg detectors do): needs more points per leg than we get at 2.5 m, and a trained model.
+- **Only keep points on the walking path, without the empty-room scan**: simpler, but a chair or a table leg near the path would count as a person.
+- **Park the robot closer to get more points per leg**: the camera then sees a shorter part of the path. Can be revisited if the real scans are too noisy.
