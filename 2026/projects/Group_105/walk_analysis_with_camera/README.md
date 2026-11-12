@@ -1,8 +1,22 @@
 # Walking video experiment
 
-An offline Python experiment that tracks a person's pose, estimates step candidates
-and cadence, and exports a video showing exactly which movements were counted.
-Use the notebook to explore results and the Python scripts to repeat an analysis.
+A Python experiment for walking analysis and lower-body pose model comparison.
+The offline workflow estimates step candidates and cadence and exports an annotated
+video. The live workflow streams a USB webcam through your computer's browser to
+Python in the devcontainer and compares eight pretrained pose model options.
+
+Start with [the model guide](docs/MODELS.md) for intended uses, exact download
+sources, checkpoint hashes, score definitions, and preliminary camera results.
+
+| Workflow | Notebook | Models | Results |
+| --- | --- | --- | --- |
+| Saved-video walking analysis | [01_walk_experiment](notebooks/01_walk_experiment.ipynb) | MediaPipe task bundles; Lite by default | Candidate steps, cadence, plots, debug video/CSV |
+| Live camera comparison | [02_live_webcam_pose](notebooks/02_live_webcam_pose.ipynb) | MediaPipe Lite/Full/Heavy, YOLOv8n, YOLO11n, MoveNet Thunder, RTMPose-m, RTMO-m | Skeleton overlay and per-frame text logs |
+
+The five additional options are a practical comparison set, not a measured
+popularity ranking. All include hips, knees and ankles; only the MediaPipe options
+used here include heels and foot tips. None has yet been validated for legs-only
+camera framing.
 
 **Status:** useful experimental baseline. Step-count accuracy has not been validated
 against manually labeled recordings. A visible pose is not proof that a counted
@@ -67,6 +81,47 @@ Use one person, a fixed side-view camera, the full body in frame, good lighting,
 and visible feet. The code analyzes one pose and does not maintain person identity
 when multiple people appear.
 
+## Download pose models
+
+```sh
+python -m walk_analysis download-model --model all
+```
+
+Downloads all eight pose options plus the RTMPose person detector to `models/`.
+Use `--model mediapipe` for only the Lite, Full, and Heavy float16 v1 bundles.
+Use `--model full` or `--model heavy` for one model. With no arguments the
+command still downloads Lite. `--output PATH` selects a single output file;
+`--output-dir DIR` selects the directory for any model selection.
+
+The five alternative test options need additional CPU backends:
+
+```sh
+python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r requirements-pose.txt
+python -m pip install --no-deps rtmlib==0.0.16
+python -m walk_analysis download-model --model alternatives
+```
+
+RTMLib's dependencies are supplied separately to retain headless OpenCV. Restart
+the notebook kernel after installation. Native confidence/visibility scores differ
+between model families and should not be interpreted as equal accuracy measures.
+COCO models supply hips, knees and ankles, but no heels/toes. The notebook describes
+person selection and the application threshold used to reject weak predictions.
+
+## Live USB webcam test
+
+Open [notebooks/02_live_webcam_pose.ipynb](notebooks/02_live_webcam_pose.ipynb)
+and run the cells one at a time. The notebook serves a browser camera preview on
+port 8765: forward that port privately in VS Code and open it in your computer's
+external browser. Enable the camera, select the Logitech USB device, and start the
+pose test. Frames are sent to the selected local pose model in
+the devcontainer; USB passthrough is not required. The page shows a skeleton,
+pose coverage, and native ankle scores. Choose MediaPipe, YOLOv8n Pose, YOLO11n
+Pose, MoveNet Thunder, RTMPose-m, or RTMO-m in the browser (download models before
+running the notebook). Each detection log line records
+the selected model. Stop the camera and run the cleanup cell
+when finished. This tests human pose detection, not general object detection.
+
 ## Command-line analysis
 
 Run these commands from the project root:
@@ -76,7 +131,9 @@ python -m walk_analysis analyze data/walk.mp4
 python -m walk_analysis debug
 ```
 
-Both analysis and debug commands accept a video path and `--model PATH`.
+Both analysis and debug commands accept a video path and `--model PATH` for a
+MediaPipe `.task` bundle. These offline commands do not use the optional YOLO,
+MoveNet, RTMPose, or RTMO adapters; those are currently live-notebook only.
 The debug command also accepts `--output-dir PATH`. Defaults point to this source
 checkout, so the installed commands can run from another working directory.
 The notebook defaults to `data/walk.mp4`.
@@ -101,7 +158,10 @@ context; keep recordings you want to preserve in separate storage.
 
 ## Model and counting algorithm
 
-**Model:** MediaPipe Pose Landmarker Lite, downloaded by the `download-model` command. It
+**Offline default model:** MediaPipe Pose Landmarker Lite, downloaded by the
+`download-model` command with no arguments. Full and Heavy `.task` bundles can also
+be selected for offline analysis. The live notebook supports all eight options
+described in [the model guide](docs/MODELS.md). MediaPipe
 returns body landmarks per frame, including normalized ankle coordinates and
 visibility scores. Image y increases downward, so the counter inverts ankle height
 to turn foot lifts into peaks. L/R refer to the person's anatomical left and right.
@@ -166,29 +226,33 @@ behavior; they do not measure accuracy on people.
 ```text
 .
 ├── pyproject.toml             # Package metadata, editable install, CLI entry point
-├── requirements.txt           # Runtime dependency specifications
+├── requirements.txt           # Base workflow dependencies
+├── requirements-pose.txt      # Optional live comparison backends
+├── docs/MODELS.md             # Model purposes, sources, logs, comparison protocol
 ├── src/walk_analysis/
 │   ├── __main__.py            # Command dispatcher
 │   ├── paths.py               # Default input, model, and output locations
-│   ├── tracking.py            # Shared metadata and pose extraction
+│   ├── tracking.py            # Offline MediaPipe extraction
+│   ├── pose_models.py         # Live model catalog and adapters
 │   ├── cadence.py             # Candidate detection and metrics
 │   ├── analysis.py            # Analysis command
 │   ├── debug.py               # Annotated video and candidate CSV export
-│   ├── download_model.py      # Official model download
+│   ├── download_model.py      # All model/checkpoint downloads
 │   ├── download_video.py      # YouTube MP4 download
 │   └── environment.py         # Dependency and native-library checks
 ├── notebooks/                # Interactive exploration and evaluation
 ├── tests/                    # Automated regression tests
 ├── data/                     # Current input recording: walk.mp4 (local)
-├── models/                   # Downloaded pose model (local)
-├── outputs/                  # Generated previews and CSVs (local)
+├── models/                   # Downloaded pose models and YOLOX companion (local)
+├── outputs/                  # Previews, candidate CSVs, webcam text logs (local)
 ├── old videos/               # Archived experiments (local; see below)
 └── .devcontainer/             # Reproducible development setup
 ```
 
 The `src` layout keeps reusable code separate from notebooks, tests, and recordings.
-`tracking.py` is the single pose-extraction implementation; `cadence.py` is the
-single counting implementation. The CLI and notebook call these same modules.
+`tracking.py` supplies offline MediaPipe extraction and `cadence.py` supplies
+counting for the offline CLI and notebook. The live notebook uses the separate
+`pose_models.py` adapters and does not calculate walking metrics.
 Only debug export retains full poses in memory for rendering overlays. Longer
 recordings may require a streaming export implementation.
 
@@ -256,28 +320,49 @@ record installed versions when comparing experiments across machines.
 - **No useful poses:** try a clearer full-body video. Metrics require at least
   three pose-detected frames; candidate counting may still reject all ankle samples.
 
-## Camera access
+## Camera access and live troubleshooting
 
-This workflow uses saved files. Docker Desktop on macOS does not automatically
-forward the Mac webcam into a Linux container. Capture locally and copy the file,
-or use a network stream in a future capture implementation. On Linux, direct
-capture requires explicitly forwarding the camera device. Desktop preview windows
-also need display access; the current outputs are notebook plots and MP4 files.
+The live notebook uses your Mac/PC browser to capture video; Docker does not need
+direct USB passthrough. Use an external browser on the computer connected to the
+camera, at localhost or a private HTTPS forwarded URL. The server processes frames
+in memory; video is not recorded. Text logs contain timestamps and pose diagnostics.
+
+- **Nothing at localhost:** forward port 8765 and run the notebook through step 4.
+  Port forwarding alone does not start a server. Do not Run All; the cleanup cell
+  stops the server immediately. Use VS Code's actual forwarded address if it maps
+  to a different local port.
+- **USB camera missing:** quit QuickTime/other camera apps, allow the browser in
+  macOS System Settings → Privacy & Security → Camera, and allow the page's camera
+  permission. Reload and click Enable camera to rebuild the device list.
+- **No text log:** step 4 should print both “Server running” and “Detection text
+  log”. If the latter is missing, reopen the updated notebook and restart the
+  kernel. A header-only file means no successful frames were logged; check browser
+  errors and whether the server started successfully.
+- **Model disabled:** install its optional backend/download weights, rerun step 1
+  and step 4, and reload the page. Installation is not automatic on container rebuild.
+- **Skeleton disappears:** NO POSE means no accepted candidate; a partial skeleton
+  can mean low joint scores or points outside the image. Keep the whole body and
+  feet visible for the baseline. Lowering the drawing threshold only exposes weak
+  predictions.
+- **Port in use:** stop the other notebook server or choose and forward another
+  PORT. Restarting the current kernel does not stop another kernel's server.
+
+See [the model guide](docs/MODELS.md) for score meanings, timing, log fields,
+checkpoint provenance, known package metadata limitations, and comparison results.
 
 ## Next steps
 
-- Try the current workflow with video recorded from a camera instead of relying
-  on YouTube videos.
-- Record and test videos with different body framings, including the whole body
-  in frame and only the upper or lower half of the body.
-- Test other pose-detection models to determine which works best with videos
-  showing only the lower body.
-- Try processing a live video stream instead of saved video files.
-- Test how video size and compression affect pose tracking, step detection,
-  processing speed, and output quality.
+- Compare every model on identical recorded frames with manually checked joints.
+- Label full-body, lower-body crop, empty-scene and occlusion intervals separately.
+- Measure leg-joint correctness, tracking gaps and observed FPS alongside scores.
+- Evaluate camera resolution, compression, distance and viewpoint consistently.
+- Extend offline extraction to the live adapters before comparing step counts
+  across families; validate candidate steps against manual labels.
+- Add synchronized video and complete joint-coordinate export for later review.
 
 ## References
 
+- [Model guide: all model sources and implementation details](docs/MODELS.md)
 - [MediaPipe Pose Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker)
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - [yt-dlp JavaScript runtime setup](https://github.com/yt-dlp/yt-dlp/wiki/EJS)
