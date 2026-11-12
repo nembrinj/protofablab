@@ -1,143 +1,260 @@
-# Adaptive Training Assistant
+# Adaptive Training Assistant --- Run Guide
 
-> **Work in Progress:** This project is under active development. Features, interfaces, and documentation may change as the prototype evolves.
+This guide describes the ROS 2 nodes in the Adaptive Training Assistant,
+how they connect, and how to start the system.
 
-A ROS 2 prototype that uses a TurtleBot USB camera and MediaPipe Pose Landmarker to detect arm-raise exercises, count repetitions, and provide basic training feedback.
 
-## Repository Structure
+## 1. System architecture
 
-```text
-Group_102/
-├── README.md
-├── requirements.txt
-├── docs/
-│   ├── journal.csv
-│   ├── materials-needed.md
-│   └── presentations/
-│       ├── project_proposal.pptx
-│       └── midterm.pptx
-└── src/
-    ├── exercise_counter_node.py
-    └── training_logic_node.py
+``` mermaid
+flowchart TD
+    CAM["USB camera"] -->|/image_raw/compressed| PD["person_detection"]
+    PD -->|/person/preview/compressed| DASH["training_dashboard"]
+    PD -->|person position / readiness| POS["positioning_controller"]
+    POS -->|search controller| SEARCH["robot_search_controller"]
+    SEARCH -->|/cmd_vel| ROBOT["TurtleBot3 Burger"]
+    ODOM["TurtleBot3 odometry /odom"] --> SEARCH
+    POS -->|servo commands| SERVO["servo_driver"]
+    SERVO -->|UDP commands| ESP["ESP32 servo controller"]
+    PD -->|person readiness| LOGIC["training_logic"]
+    LOGIC -->|/exercise/enable| EX["exercise_counter"]
+    CAM -->|/image_raw/compressed| EX
+    EX -->|/exercise/rep_event| LOGIC
+    LOGIC -->|training status / feedback| DASH
+    EX -->|exercise metrics / feedback| DASH
 ```
 
-## Current Implementation
+The graph shows the main data flow. Exact topic names for every
+connection can depend on the topic names configured in the source files.
 
-### Exercise Detection
+## 2. What each node does
 
-`exercise_counter_node.py` receives camera images from the TurtleBot and uses MediaPipe Pose Landmarker to detect arm raises.
+  -----------------------------------------------------------------------
+  Node                                Purpose
+  ----------------------------------- -----------------------------------
+  `person_detection`                  Reads the compressed camera stream,
+                                      detects the person, and publishes
+                                      person-position/readiness
+                                      information plus an annotated
+                                      camera preview.
 
-A repetition is counted when both wrists are detected above the shoulders and subsequently return to the lowered position.
+  `positioning_controller`            Coordinates person positioning and
+                                      servo behavior. It also starts the
+                                      robot search controller internally.
 
-The node publishes repetition counts, timing information, and vision feedback through ROS 2 topics. It also supports an optional camera preview.
+  `robot_search_controller`           Searches for the person and
+                                      commands the robot through
+                                      `/cmd_vel`. It needs `/odom`; it
+                                      stops the robot if odometry times
+                                      out. Do not launch it separately
+                                      when using the main launch file.
 
-### Training Logic
+  `servo_driver`                      Sends servo commands to the ESP32
+                                      over UDP. The current configuration
+                                      in the latest log is
+                                      `172.20.10.4:4210`.
 
-`training_logic_node.py` listens for completed-repetition events and vision feedback from the exercise detection node.
+  `exercise_counter`                  Uses the camera and pose model to
+                                      detect and count bilateral arm
+                                      raises. It starts disabled and
+                                      waits for `/exercise/enable`.
 
-It tracks progress toward a configurable repetition target and publishes training feedback and status information.
+  `training_logic`                    Waits for stable person readiness,
+                                      enables the exercise, tracks the
+                                      target of 10 arm raises, and
+                                      publishes training state/feedback.
 
-## ROS 2 Communication
+  `training_dashboard`                Displays the annotated camera
+                                      preview and training/exercise
+                                      information. It subscribes to
+                                      `/person/preview/compressed`.
 
-The nodes communicate through ROS 2 topics to exchange camera images, exercise measurements, repetition events, and training feedback.
+  -----------------------------------------------------------------------
 
-The main communication flow is:
+## 3. Before starting
 
-1. The TurtleBot USB camera publishes image frames.
-2. The Exercise Counter subscribes to the camera topic and processes the images using MediaPipe.
-3. The Exercise Counter publishes repetition events and exercise metrics.
-4. The Training Logic node receives these events and tracks the training progress.
-5. The Training Logic node publishes feedback and training status.
+You need: - The TurtleBot3 Burger powered on. - The Raspberry Pi and Mac
+connected to the same network. - The USB camera connected to the
+robot. - The ESP32 servo controller powered and reachable at the
+configured IP/port. - ROS 2 Jazzy installed/configured in the Pixi
+environment on the Mac and on the robot.
 
-## Requirements
+Use the same ROS domain on both computers:
 
-- Ubuntu 24.04
-- ROS 2 Jazzy
-- Python 3.12
-- TurtleBot3 Burger with Raspberry Pi 4
-- USB webcam connected to the TurtleBot
-- `usb_cam` ROS 2 package installed on the TurtleBot
-- Python dependencies listed in `requirements.txt`
-- ROS 2 networking configured so the computer and TurtleBot can discover each other
-- Pixi environment configured for the project
-
-## Running the Robot
-
-The following instructions describe the current workflow for running the prototype.
-
-### 1. Connect to the TurtleBot
-
-Connect to the Raspberry Pi onboard the TurtleBot through SSH:
-
-```bash
-ssh ubuntu@192.168.1.102
+``` bash
+export ROS_DOMAIN_ID=102
 ```
 
-### 2. Launch the USB Camera
 
-On the TurtleBot, start the USB camera node:
+Only use that example if Cyclone DDS is installed and is the
+configuration you have chosen.
 
-```bash
+## 4. Start the Robot and Camera --- Raspberry Pi
+
+Connect to the Raspberry Pi:
+
+``` bash
+ssh ubuntu@127.168.1.102
+```
+
+Choose one of the following options:
+
+### Option A --- Combined launch file (if configured)
+
+If you have created and built the `usbcam_robot.launch.py` file, start
+both the TurtleBot3 and USB camera with one command:
+
+``` bash
+ros2 launch turtlebot3_bringup usbcam_robot.launch.py
+```
+
+### Option B --- Start them separately
+
+If you have not created the combined launch file, open two separate
+terminals on the Raspberry Pi.
+
+**Terminal 1 --- Start the TurtleBot3:**
+
+``` bash
+ros2 launch turtlebot3_bringup robot.launch.py
+```
+
+**Terminal 2 --- Start the USB camera:**
+
+``` bash
 ros2 run usb_cam usb_cam_node_exe --ros-args -p pixel_format:="mjpeg2rgb"
 ```
 
-This starts the USB camera and publishes image frames to the ROS 2 environment.
+Keep both terminals running while using the robot.
 
-Keep this terminal running.
+You should see a publishing rate. If `/odom` is missing or has no
+messages, fix the robot bringup/odometry first. Do not proceed to robot
+movement tests until this works.
 
-### 3. Set Up the Python Environment
+## 5. Build and start the application --- Mac terminal
 
-In the project root directory, create and activate a Python virtual environment:
+Open a terminal on the Mac and enter the workspace:
 
-```bash
-python3 -m venv --system-site-packages .venv
-source .venv/bin/activate
+``` bash
+cd ~/ros_ws
 ```
 
-Upgrade pip and install the project dependencies:
+Activate the Pixi environment using the method you normally use for this
+workspace. If you use the Pixi shell:
 
-```bash
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+``` bash
+pixi shell
 ```
 
-### 4. Run the Exercise Counter Node
+Set the ROS environment:
 
-From the project root, run:
-
-```bash
-pixi run python src/exercise_counter_node.py \
-  --ros-args \
-  -p show_preview:=true
+``` bash
+export ROS_DOMAIN_ID=102
 ```
 
-The Exercise Counter subscribes to the TurtleBot camera stream, detects body landmarks using MediaPipe, and counts arm-raise repetitions.
+Build the application package. The ROS package name contains the
+existing spelling `trainning`:
 
-The `show_preview` parameter enables the camera preview.
-
-### 5. Run the Training Logic Node
-
-Open a second terminal in the project root and run:
-
-```bash
-pixi run python src/training_logic_node.py \
-  --ros-args \
-  -p target_repetitions:=15
+``` bash
+colcon build --merge-install --packages-select adaptive-trainning-assistance
 ```
 
-The `target_repetitions` parameter defines the number of repetitions required to complete a training set.
+Source the merged workspace for Zsh:
 
-In this example, the training target is 15 repetitions.
+``` bash
+source install/setup.zsh
+```
 
-## Documentation
+Then launch the complete application:
 
-- `docs/presentations/` contains the project proposal and midterm presentations.
-- `docs/journal.csv` records the team's project work.
-- `docs/materials-needed.md` lists the materials required for the prototype.
+``` bash
+ros2 launch adaptive-trainning-assistance training_assistant.launch.py
+```
 
-## Current Scope and Limitations
+Keep this terminal open while the application is running.
 
-- The current detector recognizes both-arm raises; it is not a general exercise classifier.
-- The repetition duration measures the detected raised phase, not the full movement cycle.
-- Exercise detection depends on the visibility and quality of the camera stream.
-- The prototype currently provides basic training feedback and repetition tracking.
+The launch file starts these six application nodes: 1.
+`person_detection` 2. `positioning_controller` 3. `servo_driver` 4.
+`exercise_counter` 5. `training_logic` 6. `training_dashboard`
+
+`robot_search_controller` is started internally by
+`positioning_controller`; do not start a second copy manually.
+
+## 6. Verify the system --- another Mac terminal
+
+Open a second Mac terminal. Enter the Pixi environment and source the
+workspace in that terminal too:
+
+``` bash
+cd ~/ros_ws
+pixi shell
+export ROS_DOMAIN_ID=102
+source install/setup.zsh
+```
+
+Check that the main topics are visible:
+
+``` bash
+ros2 topic list
+```
+
+Check odometry specifically:
+
+``` bash
+ros2 topic info /odom
+ros2 topic hz /odom
+```
+
+Check the camera stream:
+
+``` bash
+ros2 topic info /image_raw/compressed
+ros2 topic hz /image_raw/compressed
+```
+
+Check the annotated preview:
+
+``` bash
+ros2 topic info /person/preview/compressed
+ros2 topic hz /person/preview/compressed
+```
+
+Check exercise and training topics:
+
+``` bash
+ros2 topic list | grep -E 'person|exercise|training'
+```
+
+## 7. Important troubleshooting
+
+### `Odometry timeout: robot stopped and waiting`
+
+This is the current known blocker. The search controller is not
+receiving odometry, so it stops the robot for safety.
+
+1.  On the Raspberry Pi, check `ros2 topic hz /odom`.
+2.  On the Mac, check `ros2 topic hz /odom`.
+3.  Confirm `ROS_DOMAIN_ID=102` on both machines.
+4.  Confirm the TurtleBot3 bringup is running on the Raspberry Pi.
+5.  Do not launch another bringup if one is already active.
+
+### Camera preview is missing
+
+Check that `/image_raw/compressed` is publishing on the robot and
+visible from the Mac. Then check `/person/preview/compressed`. The
+dashboard subscribes to the annotated preview, not directly to the raw
+camera topic.
+
+### Exercise counter is disabled
+
+This is expected at startup. The training logic enables it after stable
+person readiness is detected. Check that person detection is receiving
+camera frames and that the readiness topic is being published.
+
+### Servo does not move
+
+The startup message only confirms the driver initialized with the
+configured IP and port. It does not prove the ESP32 received a valid
+command. Confirm the ESP32 IP, UDP port, network connection, and the
+exact command format expected by the ESP32 firmware before testing
+movement.

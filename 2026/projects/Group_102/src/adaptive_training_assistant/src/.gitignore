@@ -1,0 +1,26 @@
+# ROS 2
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Environments
+.venv/
+venv/
+.pixi/
+
+# IDE
+.idea/
+.vscode/
+
+# macOS
+.DS_Store
+
+# Secrets
+.env
+.env.*
+!.env.example

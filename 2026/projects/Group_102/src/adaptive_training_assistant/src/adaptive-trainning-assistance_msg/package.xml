@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>adaptive_training_assistant_msgs</name>
+  <version>0.1.0</version>
+  <description>Custom messages for the adaptive training assistant.</description>
+  <maintainer email="andrianasma@gmail.com">Andriana Sima</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <build_depend>rosidl_default_generators</build_depend>
+  <depend>std_msgs</depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+
+  <member_of_group>rosidl_interface_packages</member_of_group>
+</package>
