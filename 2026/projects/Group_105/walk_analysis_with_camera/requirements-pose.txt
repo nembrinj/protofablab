@@ -1,0 +1,7 @@
+# Optional live comparison backends. Install CPU torch/torchvision first (README).
+ultralytics-opencv-headless==8.4.211
+onnxruntime>=1.20,<2
+ai-edge-litert==2.3.0
+tqdm>=4.66
+requests>=2.32
+# RTMLib is installed separately with --no-deps to retain headless OpenCV.
