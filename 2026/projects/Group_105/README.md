@@ -23,40 +23,43 @@ Gait rehabilitation depends on walking exercises that patients do at home, alone
 
 ## Solution
 
-A robot that supervises the walking exercise between appointments. It:
+A robot that films and watches the walking exercise at home, between appointments. It:
 
-- **guides**: positions itself beside the walking path and sets the rhythm of the walk with an audible beat;
-- **measures**: cadence (steps per minute). A camera counts the steps; the LiDAR tells when the count can be trusted, and measures walking speed;
-- **cues**: speaks a correction when the patient drifts off the rhythm or stops;
-- **reports**: publishes a session summary to a dashboard the physiotherapist can act on.
+- **follows**: drives beside the patient, a little ahead, and keeps their legs in the camera picture;
+- **measures**: steps per minute, walking speed and stops, with its LiDAR and the camera;
+- **gives feedback**: speaks to the patient when they stop or slow down;
+- **reports**: flags the moments that matter, cuts a short clip of each, and sends it to the physiotherapist's dashboard with the numbers that triggered it and a short note.
 
 ## Proof of concept
 
-The proof of concept shows that a robot can count a walker's steps reliably by itself and correct them in the moment.
+The proof of concept shows that a robot can film a walking exercise by itself, notice the moments that matter, and give the physiotherapist a short clip of each, with the numbers.
 
-The TurtleBot3 drives itself to a spot beside a walking path and stays still while a person walks back and forth past it. During the session it plays a beat at the target cadence, measures each walk past it, and speaks a correction when the person stops or drifts off the beat. After each walk it sends a summary to the physiotherapist's dashboard.
+One healthy volunteer walks back and forth on a flat path of about 10 m. We build it in two stages:
 
-- One healthy volunteer, one walking exercise, on a flat walking path of about 10 m.
-- Camera zone of about 3–4 m, set by the camera's field of view.
-- Stretch goals: step-time symmetry, step length, and rotating in place to keep the walker in view.
+1. **Parked**: the robot stands beside the walking path. It measures each walk, speaks to the person, flags moments, cuts the clips, and sends everything to the dashboard.
+2. **Driving**: the robot drives beside the person, a little ahead, and keeps the legs in the picture during the whole walk.
+
+Later, outside the proof of concept: heart rate from a chest strap, noticing a scream or a fall, and a beat to walk to.
 
 ### Evaluation
 
-- **Detection latency**: how quickly the robot notices that the person has stopped.
-- **Measurement accuracy**: measured cadence compared with a manual step count. First goal: within ±5%, adjusted after the first recordings. The same walks are compared three ways: camera alone, LiDAR alone, and both together.
-- **Cue reliability**: whether the right cue fires, across repeated walks.
+- **Step accuracy**: steps per minute compared with a manual step count, for the LiDAR and the camera. First goal: within ±5%.
+- **Flagged moments**: in walks with planned stops and slow parts, how many are flagged, missed, or flagged wrongly.
+- **Framing** (stage 2): how much of the walking time both legs are fully in the picture.
+- **Reaction time**: how quickly the robot notices that the person has stopped, and speaks.
 
 ### Limitations
 
 - Not a clinical device, and not tested with patients.
 - Provides no physical support.
 - Complements physiotherapy sessions and does not replace them.
+- Tested on a flat lab floor only.
 
 ## Architecture
 
 ![System architecture](docs/img/architecture.svg)
 
-A webcam on the robot streams video to a laptop, which detects steps with pose estimation. The robot's LiDAR tracks where the walker is and how fast they walk. The laptop runs the session logic and sends the beat and spoken cues back to a speaker on the robot. Session summaries go over MQTT to a Grafana dashboard. See [docs/architecture.md](docs/architecture.md) for the components and interfaces, and [docs/decisions/](docs/decisions/) for the design decisions.
+A webcam on the robot streams video to a laptop. The robot's LiDAR finds where the walker is and how fast they walk. The laptop counts the steps, runs the session logic, sends spoken feedback to a speaker on the robot, records the video, and cuts the clips of flagged moments. In stage 2 it also drives the robot beside the walker. Results and clips go to a Grafana dashboard over MQTT. See [docs/architecture.md](docs/architecture.md) for the components and interfaces, and [docs/decisions/](docs/decisions/) for the design decisions.
 
 ## Build and test
 

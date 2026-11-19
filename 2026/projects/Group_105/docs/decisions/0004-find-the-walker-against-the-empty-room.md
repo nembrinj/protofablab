@@ -1,13 +1,13 @@
-# 5. The LiDAR finds the walker by comparing with the empty room
+# 4. The LiDAR finds the walker by comparing with the empty room
 
 - Status: accepted
-- Date: 2026-11-12
+- Date: 2026-11-12, updated 2026-11-19
 
 ## Context
 
-`lidar_person_tracker` must report where the walker is along the path and how fast they move ([ADR 1](0001-how-we-measure-walking.md)). The LiDAR gives one distance per degree. From the robot's spot, about 2.5 m from the walking line, two neighbouring beams land about 4.4 cm apart, so a shin is only 2 or 3 points. That is too few to recognise a leg by its round shape.
+`lidar_person_tracker` must report where the walker is along the path and how fast they move. The session logic uses this to flag moments, and in stage 2 the robot drives by it ([ADR 1](0001-robot-drives-beside-the-walker.md)). The robot's LDS-02 LiDAR gives 240 distances per turn, 1.5° apart, about 9 times per second. At 2.5 m from the robot, two neighbouring beams land about 6.5 cm apart, so a shin is only 1 or 2 points. That is too few to recognise a leg by its round shape.
 
-The robot is parked while the person walks ([ADR 2](0002-robot-parks-beside-path.md)), so the room around it gives the same scan every time.
+In stage 1 the robot is parked while the person walks, so the room around it gives the same scan every time.
 
 ## Decision
 
@@ -23,12 +23,13 @@ Each scan is first put on a fixed grid of one distance per degree, so the same c
 ## Consequences
 
 - No model of a leg is needed, and furniture that stays in place is ignored.
+- It works only while the robot stands still. When the robot drives (stage 2), the room moves in the scan and walls would look like people. The tracker then needs another reference, such as the SLAM map.
 - The walking path must be clear while the empty room is learned. `walk_session` asks the tracker to learn again each time the robot has parked.
 - Anything new on the path counts as a person: a pet, a moved chair, a second person. Two people standing closer together than the gap count as one.
 - If the robot is moved or bumped, the remembered scan no longer fits, and the room must be learned again.
 - The strip is wide on purpose, so the distance to the walking line does not have to be set for each room. In the first lab test a narrow strip around a fixed 2.5 m line missed a person who walked at 1.2 m. The price: anything new in the strip counts as a person, also off the walking line.
 - The margin, the strip and the gap are parameters, to be set from recordings of the real LiDAR.
-- The rough step count for the accuracy comparison is not part of this decision. It is added after the first recordings.
+- Counting steps from the LiDAR is not part of this decision. It is added after comparing with a hand count.
 
 ## Alternatives considered
 

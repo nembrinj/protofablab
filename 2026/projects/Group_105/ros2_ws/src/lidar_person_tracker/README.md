@@ -1,6 +1,6 @@
 # lidar_person_tracker
 
-Finds a walking person in the LiDAR scans of the parked robot and publishes where they are along the walking path and how fast they move. How it works and why: [ADR 5](../../../docs/decisions/0005-find-the-walker-against-the-empty-room.md).
+Finds a walking person in the LiDAR scans of the parked robot and publishes where they are along the walking path and how fast they move. How it works and why: [ADR 4](../../../docs/decisions/0004-find-the-walker-against-the-empty-room.md).
 
 | | Name | Type |
 | --- | --- | --- |
