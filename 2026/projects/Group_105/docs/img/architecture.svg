@@ -79,7 +79,7 @@
 
   <rect class="existing" x="670" y="700" width="240" height="80" rx="10"/>
   <text class="name" x="690" y="733">Nav2 · SLAM</text>
-  <text class="sub" x="690" y="760">stage 2 · map, drive to start</text>
+  <text class="sub" x="690" y="760">later · map, drive to start</text>
 
   <!-- Dashboard nodes -->
   <rect class="existing" x="1290" y="228" width="240" height="64" rx="10"/>
@@ -164,5 +164,5 @@
   <text class="sub" x="1038" y="868" font-size="16">to agree</text>
   <rect class="existing" x="1150" y="850" width="36" height="24" rx="5"/>
   <text class="sub" x="1198" y="868" font-size="16">existing software</text>
-  <text class="note" x="800" y="905" text-anchor="middle">Stage 1: the robot is parked, so walker_follower and Nav2 are not used. Built so far: lidar_person_tracker (position, speed).</text>
+  <text class="note" x="800" y="905" text-anchor="middle">Stage 1: the robot is parked, so walker_follower is not used. Nav2 comes later. Built so far: lidar_person_tracker (position, speed).</text>
 </svg>
