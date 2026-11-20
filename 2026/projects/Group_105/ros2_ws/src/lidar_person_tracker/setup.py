@@ -18,7 +18,7 @@ setup(
     zip_safe=True,
     maintainer='Leonid Pomortsev',
     maintainer_email='pomortu3@gmail.com',
-    description='Finds a walking person in the LiDAR scans of a parked robot',
+    description='Finds a walking person in the LiDAR scans, with the robot parked or driving',
     license='Apache-2.0',
     extras_require={'test': ['pytest']},
     entry_points={

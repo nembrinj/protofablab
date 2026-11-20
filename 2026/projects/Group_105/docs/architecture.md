@@ -1,6 +1,6 @@
 # Architecture
 
-Status: target design for the final proof of concept, revised on 2026-11-19 after a project session with the professors. Built so far, in [`ros2_ws/`](../ros2_ws/) and [`dashboard/`](../dashboard/): the LiDAR person tracker (position, speed and steps of the walker, for a parked robot), and a first session loop with the LiDAR only (walks, stops, the spoken stop cue, and each walk's numbers on the dashboard). Also the offline camera prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/). Everything else is planned. Decisions are recorded in [`decisions/`](decisions/).
+Status: target design for the final proof of concept, revised on 2026-11-19 after a project session with the professors. Built so far, in [`ros2_ws/`](../ros2_ws/) and [`dashboard/`](../dashboard/): the LiDAR person tracker (position, speed and steps of the walker; for a driving robot so far only tested on made-up scans), and a first session loop with the LiDAR only (walks, stops, the spoken stop cue, and each walk's numbers on the dashboard). Also the offline camera prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/). Everything else is planned. Decisions are recorded in [`decisions/`](decisions/).
 
 ## Overview
 
@@ -56,7 +56,7 @@ The robot gives two outputs:
 
 | Component | Package | Role |
 | --- | --- | --- |
-| LiDAR person tracker | `lidar_person_tracker` (ours, built) | Number of people, position along the path, walking speed, steps. Two modes: static, robot parked, compares each scan with the empty room ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)), built; dynamic, robot driving, follows the walker's points from scan to scan with the odometry, planned |
+| LiDAR person tracker | `lidar_person_tracker` (ours, built) | Number of people, position along the path, walking speed, steps. Two modes, chosen by hand: static, robot parked, compares each scan with the empty room ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)); driving, follows the walker's points from scan to scan with the odometry ([ADR 5](decisions/0005-follow-the-walker-with-the-odometry.md)), tested on made-up scans |
 | Gait monitor | `gait_monitor` (ours, planned) | Pose estimation per frame: are the legs in the picture, and steps from the video as a second opinion. Reuses `walk_analysis` |
 | Session manager | `walk_session` (ours, built with the LiDAR only) | Session flow, feedback rules, flagged moments, walk summaries. Built: walks, stops, the stop cue, walk summaries |
 | Cue speaker | `walk_session` (ours, built, stand-in) | Speaks the cues on the laptop until `audio_cues` speaks them on the robot |
@@ -70,12 +70,13 @@ Our message types live in the `gait_interfaces` package.
 
 ## ROS 2 interfaces
 
-Built: `/scan`, `/person/state`, the relearn service, `/session/walk_summary` and `/session/cue`. The rest is planned; the topics marked *to agree* connect to Matin's part and are agreed with him first.
+Built: `/scan`, `/odom`, `/person/state`, the relearn service, `/session/walk_summary` and `/session/cue`. The rest is planned; the topics marked *to agree* connect to Matin's part and are agreed with him first.
 
 | Topic / action | Type | From → to | Content |
 | --- | --- | --- | --- |
 | `/scan` | `sensor_msgs/LaserScan` | `turtlebot3_bringup` → `lidar_person_tracker`, Nav2 | LiDAR distances |
-| `/person/state` | `gait_interfaces/PersonState` | `lidar_person_tracker` → `walk_session`, `walker_follower` | Person detected, number of people, position along the path, walking speed, steps |
+| `/odom` | `nav_msgs/Odometry` | `turtlebot3_bringup` → `lidar_person_tracker`, `walker_follower` | Where the robot is, from its wheel turns |
+| `/person/state` | `gait_interfaces/PersonState` | `lidar_person_tracker` → `walk_session`, `walker_follower` | Person detected, number of people, position along the path from the robot, walking speed over the floor, steps |
 | `/lidar_person_tracker/relearn_background` | `std_srvs/srv/Trigger` | `walk_session` → `lidar_person_tracker` | Learn the empty room again; called after the robot has parked |
 | `/camera/image_raw/compressed` | `sensor_msgs/CompressedImage` | `usb_cam` → `gait_monitor`, `clip_recorder` | MJPEG frames, camera timestamps |
 | `/gait/steps` | `gait_interfaces/StepEvent` | `gait_monitor` → `walk_session` | *To agree*: time and confidence of each step seen by the camera |
@@ -102,8 +103,8 @@ Built: the walk messages. Each walk is stored at the time it reaches the broker,
 
 | Measurement | Sensor | How | Status |
 | --- | --- | --- | --- |
-| Position along the path | LiDAR | Points nearer than the empty room, inside the watched strip ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)) | Built, stage 1 |
-| Walking speed | LiDAR | Slope of a line fitted to the positions of the last second | Built, stage 1 |
+| Position along the path | LiDAR, odometry while driving | Parked: points nearer than the empty room, inside the watched strip ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)). Driving: the points near where the walker should be, in the odom frame ([ADR 5](decisions/0005-follow-the-walker-with-the-odometry.md)) | Built, stage 1; driving on made-up scans |
+| Walking speed | LiDAR, odometry while driving | Slope of a line fitted to the positions of the last second, over the floor | Built, stage 1; driving on made-up scans |
 | Steps, steps per minute | LiDAR; camera as a second opinion | LiDAR: each time the person's points spread out (feet apart) and close up again (legs passing), while the person moves on along the path ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)). Camera: the moment the feet are furthest apart | Built (LiDAR), stage 1; camera planned |
 | Stop | LiDAR, camera | During a walk, slower than 0.15 m/s and no new step for 3 s | Built (LiDAR), stage 1 |
 
@@ -145,7 +146,7 @@ The work is split by sensor so that both team members can work independently. Th
 
 - The robot drives only beside the walking path, never in the walking line, and keeps its distance to the person.
 - The TurtleBot3 speed limits are not raised without a separate decision. Once Nav2 is added, it avoids obstacles on the way to the start of the path.
-- The robot stops when it loses the person, sees two people, or when anything comes closer than a safety distance, to be set in tests.
+- The robot stops when it loses the person, sees two people, or when anything comes closer than a safety distance, to be set in tests. While driving, the tracker cannot tell a second person right next to the walker apart ([ADR 5](decisions/0005-follow-the-walker-with-the-odometry.md)); the safety distance has to cover that.
 - The robot stops by itself when speed commands from the laptop stop arriving, for example when Wi-Fi drops. To be checked on the real robot.
 - The robot gives no physical support and is not a clinical device.
 - Video stays on the laptop, on the local network. Messages carry an anonymised ID, never a name.

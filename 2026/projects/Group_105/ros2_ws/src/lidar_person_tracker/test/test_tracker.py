@@ -1,8 +1,9 @@
 """
 Checks of the tracker on made-up scans.
 
-The scans come from a simple model: a wall behind the walking path and round
-legs. They show that the logic works, not how accurate it is on a real LiDAR.
+The scans come from a simple model: a wall behind the walking path, round
+legs, and for a driving robot some posts beside the path. They show that the
+logic works, not how accurate it is on a real LiDAR.
 """
 
 import math
@@ -19,14 +20,16 @@ WALL_M = 3.3
 LEG_RADIUS_M = 0.05
 
 
-def fake_scan(circles=(), beams=360, noise_m=0.0, rng=None):
-    """Return the ranges a LiDAR at the origin would measure; circles are (x, y, radius)."""
+def fake_scan(circles=(), beams=360, noise_m=0.0, rng=None, pose=(0.0, 0.0, 0.0)):
+    """Return the ranges a LiDAR at pose (x, y, heading) measures; circles are (x, y, radius)."""
+    robot_x, robot_y, heading = pose
     angles = 2 * math.pi * np.arange(beams) / beams
-    cos, sin = np.cos(angles), np.sin(angles)
+    cos, sin = np.cos(heading + angles), np.sin(heading + angles)
     ranges = np.full(beams, np.inf)
     facing_wall = cos > 1e-6
-    ranges[facing_wall] = WALL_M / cos[facing_wall]
+    ranges[facing_wall] = (WALL_M - robot_x) / cos[facing_wall]
     for x, y, radius in circles:
+        x, y = x - robot_x, y - robot_y
         towards = cos * x + sin * y
         inside_root = towards ** 2 - (x * x + y * y - radius * radius)
         hit = (inside_root >= 0) & (towards > 0)
@@ -49,15 +52,21 @@ def legs(position_m, time_s=0.0, steps_per_s=1.8, across_m=PATH_M):
 class Robot:
     """Feeds scans to a tracker, one every scan period."""
 
-    def __init__(self, config=None, beams=360, noise_m=0.0):
+    def __init__(self, config=None, beams=360, noise_m=0.0, furniture=(), odometry=False):
         self.tracker = PersonTracker(config)
         self.beams = beams
         self.noise_m = noise_m
         self.rng = np.random.default_rng(1)
         self.time_s = 0.0
+        self.pose = (0.0, 0.0, 0.0)  # x, y, heading, in the room
+        self.furniture = list(furniture)
+        self.odometry = odometry  # exact odometry
 
     def scan(self, circles=()):
-        ranges, increment = fake_scan(circles, self.beams, self.noise_m, self.rng)
+        if self.odometry:
+            self.tracker.add_odometry(self.time_s, *self.pose)
+        ranges, increment = fake_scan(list(circles) + self.furniture, self.beams, self.noise_m,
+                                      self.rng, self.pose)
         estimate = self.tracker.update(
             self.time_s, ranges, 0.0, increment, RANGE_MIN, RANGE_MAX)
         self.time_s += SCAN_PERIOD_S
@@ -292,3 +301,148 @@ def test_bad_scans_are_rejected():
 def test_bad_settings_are_rejected(settings):
     with pytest.raises(ValueError):
         TrackerConfig(**settings)
+
+
+# Driving mode. The robot drives along the walking path, which runs along the
+# room's y axis at x = PATH_M. It heads along the path, and the path is on
+# its right, where the camera points.
+
+RIGHT_RAD = -math.pi / 2
+POSTS = [(3.22, 1.0, 0.05), (3.22, -2.5, 0.05), (3.22, 3.5, 0.05)]  # behind the path
+
+
+def driving_robot(mode='driving'):
+    robot = Robot(TrackerConfig(facing_angle_rad=RIGHT_RAD), noise_m=0.02, furniture=POSTS,
+                  odometry=True)
+    robot.tracker.set_mode(mode)
+    robot.pose = (0.0, 0.0, math.pi / 2)
+    robot.learn()
+    return robot
+
+
+def walk_beside(robot, start_m, speed_mps, duration_s, robot_speed_mps=None, walker=True):
+    """Let the walker walk along the path while the robot drives beside it (by default as fast)."""
+    robot_speed_mps = speed_mps if robot_speed_mps is None else robot_speed_mps
+    x_m, y_m, heading = robot.pose
+    start_s = robot.time_s
+    estimates = []
+    while robot.time_s - start_s < duration_s:
+        elapsed_s = robot.time_s - start_s
+        robot.pose = (x_m, y_m + robot_speed_mps * elapsed_s, heading)
+        circles = legs(start_m + speed_mps * elapsed_s, elapsed_s) if walker else []
+        estimates.append(robot.scan(circles))
+    return estimates
+
+
+def known_speeds(estimates):
+    return [estimate.speed_mps for estimate in estimates if not math.isnan(estimate.speed_mps)]
+
+
+def followed(estimates):
+    """Check that the walker was seen and followed in every scan; return the scans."""
+    assert all(estimate.following and estimate.people_count == 1 for estimate in estimates)
+    return estimates
+
+
+def test_static_mode_stops_using_the_room_once_the_robot_drives():
+    robot = driving_robot(mode='static')
+    estimates = walk_beside(robot, start_m=-1.0, speed_mps=0.8, duration_s=2.0)
+    assert estimates[0].people_count == 1
+    # Otherwise everything that moves in the scan as the robot drives would look like a person.
+    assert all(estimate.people_count == 0 and estimate.moved for estimate in estimates[5:])
+
+
+@pytest.mark.parametrize('speed_mps', [0.8, -0.8])
+def test_driving_mode_follows_the_walker_forward_and_backward(speed_mps):
+    robot = driving_robot()
+    estimates = walk_beside(robot, start_m=-1.0, speed_mps=speed_mps, duration_s=4.0)
+    seen = followed(estimates)
+    # From the robot, the walker stays where they were; over the floor they walk.
+    assert all(abs(estimate.position_m + 1.0) < 0.15 for estimate in seen)
+    assert np.mean(known_speeds(seen)) == pytest.approx(speed_mps, abs=0.1)
+    assert estimates[-1].steps == pytest.approx(steps_taken(1.8, 4.0), abs=1)
+
+
+def test_driving_mode_reports_the_gap_when_the_robot_is_slower():
+    robot = driving_robot()
+    estimates = walk_beside(robot, start_m=0.5, speed_mps=0.8, duration_s=3.0,
+                            robot_speed_mps=0.4)
+    seen = followed(estimates)
+    assert seen[-1].position_m == pytest.approx(0.5 + 0.4 * 3.0, abs=0.2)
+    assert np.mean(known_speeds(seen)[-10:]) == pytest.approx(0.8, abs=0.1)
+
+
+def test_a_short_gap_keeps_following():
+    robot = driving_robot()
+    walk_beside(robot, start_m=-1.0, speed_mps=0.8, duration_s=2.0)
+    gap = walk_beside(robot, start_m=0.6, speed_mps=0.8, duration_s=0.3, walker=False)
+    assert all(estimate.following and estimate.people_count == 0 for estimate in gap)
+    after = followed(walk_beside(robot, start_m=0.84, speed_mps=0.8, duration_s=1.0))
+    assert not math.isnan(after[0].speed_mps)
+
+
+def test_a_lost_walker_is_not_found_again_once_the_robot_has_moved():
+    robot = driving_robot()
+    walk_beside(robot, start_m=-1.0, speed_mps=0.8, duration_s=2.0)
+    gone = walk_beside(robot, start_m=0.6, speed_mps=0.8, duration_s=1.5, walker=False)
+    assert not gone[-1].following
+    assert gone[-1].moved
+    back = walk_beside(robot, start_m=1.8, speed_mps=0.8, duration_s=1.0)
+    assert all(estimate.people_count == 0 and estimate.moved for estimate in back)
+    robot.tracker.relearn()
+    robot.learn()
+    assert robot.scan(legs(robot.pose[1] + 1.0)).people_count == 1
+
+
+def test_a_parked_robot_in_driving_mode_finds_the_walker_again():
+    robot = driving_robot()
+    walk_beside(robot, start_m=-1.5, speed_mps=0.8, duration_s=2.0, robot_speed_mps=0.0)
+    gone = walk_beside(robot, start_m=0.1, speed_mps=0.8, duration_s=1.5, robot_speed_mps=0.0,
+                       walker=False)
+    assert not gone[-1].following and not gone[-1].moved
+    back = walk_beside(robot, start_m=1.0, speed_mps=-0.8, duration_s=1.0, robot_speed_mps=0.0)
+    assert all(estimate.people_count == 1 and estimate.following for estimate in back)
+
+
+def test_the_walker_must_be_found_before_the_robot_drives():
+    robot = driving_robot()
+    walk_beside(robot, start_m=0.0, speed_mps=0.8, duration_s=1.0, walker=False)
+    estimates = walk_beside(robot, start_m=0.8, speed_mps=0.8, duration_s=1.0)
+    assert all(estimate.people_count == 0 and estimate.moved for estimate in estimates)
+
+
+def test_switching_modes():
+    robot = driving_robot(mode='static')
+    assert not robot.scan(legs(0.5)).following
+    robot.tracker.set_mode('driving')
+    assert robot.scan(legs(0.5)).following
+    robot.tracker.set_mode('static')
+    estimate = robot.scan(legs(0.5))
+    assert estimate.people_count == 1
+    assert not estimate.following
+
+
+def test_late_odometry_does_not_stop_the_static_mode():
+    robot = driving_robot(mode='static')
+    assert robot.scan(legs(0.5)).people_count == 1
+    robot.odometry = False  # the robot's last pose is still where it learned the room
+    for _ in range(5):
+        estimate = robot.scan(legs(0.5))
+    assert estimate.people_count == 1
+    assert not estimate.moved
+
+
+@pytest.mark.parametrize('turn_rad, moved', [(0.05, False), (0.2, True)])
+def test_a_small_drift_of_the_heading_is_not_a_move(turn_rad, moved):
+    robot = driving_robot(mode='static')
+    robot.odometry = False
+    robot.tracker.add_odometry(robot.time_s, 0.0, 0.0, math.pi / 2 + turn_rad)
+    assert robot.scan(legs(0.5)).moved == moved
+
+
+def test_bad_mode_and_odometry_are_rejected():
+    tracker = PersonTracker()
+    with pytest.raises(ValueError):
+        tracker.set_mode('flying')
+    with pytest.raises(ValueError):
+        tracker.add_odometry(0.0, math.nan, 0.0, 0.0)

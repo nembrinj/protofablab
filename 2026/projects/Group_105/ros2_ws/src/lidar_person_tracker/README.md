@@ -1,10 +1,11 @@
 # lidar_person_tracker
 
-Finds a walking person in the LiDAR scans of the parked robot and publishes where they are along the walking path, how fast they move, and how many steps they took. How it works and why: [ADR 4](../../../docs/decisions/0004-find-the-walker-against-the-empty-room.md).
+Finds a walking person in the LiDAR scans and publishes where they are along the walking path, how fast they move, and how many steps they took. It works with the robot parked, and while it drives beside the walker. How it works and why: [ADR 4](../../../docs/decisions/0004-find-the-walker-against-the-empty-room.md) (parked) and [ADR 5](../../../docs/decisions/0005-follow-the-walker-with-the-odometry.md) (driving).
 
 | | Name | Type |
 | --- | --- | --- |
 | Reads | `/scan` | `sensor_msgs/LaserScan` |
+| Reads | `/odom` | `nav_msgs/Odometry` |
 | Publishes | `/person/state` | `gait_interfaces/PersonState` |
 | Service | `/lidar_person_tracker/relearn_background` | `std_srvs/srv/Trigger` |
 
@@ -14,6 +15,7 @@ The node publishes nothing while it learns the empty room: for the first 15 scan
 
 - `lidar_person_tracker/tracker.py`: the logic, without ROS.
 - `lidar_person_tracker/steps.py`: the step count, without ROS.
+- `lidar_person_tracker/odometry.py`: where the robot was when a scan was taken, without ROS.
 - `lidar_person_tracker/tracker_node.py`: the ROS 2 node around it.
 - `config/params.yaml`: all parameters, with their meaning.
 
@@ -26,23 +28,36 @@ ros2 topic echo /person/state
 
 The robot must face the walking path, and the path must be clear for the first 2 seconds. The node watches the floor from 0.5 m to 3.5 m in front of the robot, and 2.5 m to each side. If the camera does not point the same way as the robot's front, set `facing_angle_rad`.
 
+## Modes
+
+The `mode` setting chooses how the walker is found. It can also be changed while the node runs: `ros2 param set /lidar_person_tracker mode driving`. The other settings are read at start-up only; the node refuses to change them while it runs.
+
+| Mode | Robot | How the walker is found |
+| --- | --- | --- |
+| `static` (default) | Parked | In every scan, against the empty room |
+| `driving` | Parked until the walker is found, then driving | Found against the empty room, then followed: in each scan, only the points within 0.6 m of where the walker should be, placed in the odom frame with the odometry |
+
+In driving mode, `position_m` is from the robot and `speed_mps` is over the floor, so the walker's speed does not change when the robot drives. When the walker is not seen for 1 s, they are lost.
+
+In both modes, the empty room is only used while `/odom` shows the robot within 5 cm and about 6° of where it learned it (the heading in the odometry can drift a little while the robot stands still). Once it has moved, the node reports nobody and warns until the room is learned again (robot parked, path clear, `relearn_background`). Without any `/odom`, the robot is taken to be parked.
+
 ## Tests
 
 `colcon test --packages-select lidar_person_tracker` runs the tests and the lint. The tests use made-up scans; they check the logic, not the accuracy on the real LiDAR.
 
-Without ROS, from this folder: `PYTHONPATH=. python3 -m pytest test/test_tracker.py test/test_steps.py` (needs `numpy` and `pytest`).
+Without ROS, from this folder: `PYTHONPATH=. python3 -m pytest test/test_tracker.py test/test_steps.py test/test_odometry.py` (needs `numpy` and `pytest`).
 
 If `colcon test` fails with a `pytest` plugin error, a newer `pytest` installed with `pip --user` is clashing with the one of ROS. Run `PYTHONNOUSERSITE=1 colcon test`, or remove it with `pip uninstall pytest`.
 
 ## Replay a recording
 
-Record `ros2 bag record -o walk_test /scan /person/state` on the robot, then try other settings at home:
+Record `ros2 bag record -o walk_test /scan /odom /person/state` on the robot, then try other settings at home:
 
 ```bash
 ros2 run lidar_person_tracker replay_bag ~/walk_test path_distance_m=1.2 facing_angle_rad=3.14159
 ```
 
-It prints what the tracker would have said every half second, how many scans showed 0, 1, 2 ... people, and how many steps it counted. Add `--csv walk_test.csv` to also write every scan (people, position, speed, spread of the feet, steps) to a file, for plots.
+It prints what the tracker would have said every half second, how many scans showed 0, 1, 2 ... people, and how many steps it counted. Add `--csv walk_test.csv` to also write every scan (people, position, speed, spread of the feet, steps, following, robot moved) to a file, for plots. Add `--mode driving` to try the driving mode on a recording with `/odom`.
 
 ## Manual test on the real robot
 
@@ -56,7 +71,19 @@ Setup: robot parked 1 to 3 m from a straight walking line of at least 5 m, facin
 6. Stand right next to the robot, closer than 0.5 m. Expected: `detected: false`.
 7. Put a chair on the line. Expected: it counts as a person. Call `ros2 service call /lidar_person_tracker/relearn_background std_srvs/srv/Trigger`. Expected: after 2 seconds, `detected: false`.
 8. Unplug the LiDAR or stop the bringup. Expected: a "No LiDAR scan" warning within a few seconds.
-9. Record `ros2 bag record /scan` during steps 2 to 5, and during a few walks past the robot where a second person counts the steps by hand and times the walk with a phone. The hand counts check the step count. Compare steps per minute, not the number of steps: the tracker only sees the part of the walk inside the watched zone.
+9. Leave the robot parked for 10 minutes with the node running. Expected: no "robot has moved" warning. If it comes, the heading in the odometry drifted: note how much (`ros2 topic echo /odom`) and raise `parked_rad`.
+10. Record `ros2 bag record /scan` during steps 2 to 5, and during a few walks past the robot where a second person counts the steps by hand and times the walk with a phone. The hand counts check the step count. Compare steps per minute, not the number of steps: the tracker only sees the part of the walk inside the watched zone.
+
+### Driving mode
+
+Setup: as above, with the camera side of the robot towards the path (`facing_angle_rad`), the mode switched with `ros2 param set /lidar_person_tracker mode driving` while the robot is parked, and `ros2 run turtlebot3_teleop teleop_keyboard` to drive the robot slowly along the path, beside the walker, with the default speed limits.
+
+1. Before the walker comes, drive the robot 20 cm forward. Expected: a warning that the robot has moved, and `detected: false`. Call `relearn_background` with the path clear.
+2. With the robot parked, let the walker walk in front of it. Expected: "Following the walker".
+3. Drive beside the walker at about their speed, forward, then backward on the walk back. Expected: `people_count: 1` all along; `position_m` changes only as much as the gap between the robot and the walker; `speed_mps` is the walker's speed, not the difference to the robot's.
+4. Stop the robot while the walker walks on. Expected: `position_m` grows; `speed_mps` stays the walker's speed.
+5. Let the walker step out of the LiDAR's view while the robot drives. Expected: within about 1 s "Walker lost", then the robot-moved warning.
+6. Record `ros2 bag record /scan /odom` during steps 3 and 4, and replay it with `--mode driving` to set `follow_radius_m` and `follow_lost_s`.
 
 ### First results (2026-11-12)
 

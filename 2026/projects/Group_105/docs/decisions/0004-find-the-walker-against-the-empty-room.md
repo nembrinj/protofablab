@@ -25,10 +25,10 @@ Each scan is first put on a fixed grid of one distance per degree, so the same c
 ## Consequences
 
 - No model of a leg is needed, and furniture that stays in place is ignored.
-- It works only while the robot stands still: this is the tracker's static mode. When the robot drives (stage 2), the room moves in the scan and walls would look like people. A dynamic mode then follows the walker's points from one scan to the next instead, using the odometry ([ADR 1](0001-robot-drives-beside-the-walker.md)). It is described here once it is built.
+- It works only while the robot stands still: this is the tracker's static mode. When the robot drives (stage 2), the room moves in the scan and walls would look like people. The driving mode then follows the walker's points from one scan to the next instead, using the odometry ([ADR 5](0005-follow-the-walker-with-the-odometry.md)).
 - The walking path must be clear while the empty room is learned. `walk_session` asks the tracker to learn again each time the robot has parked.
 - Anything new on the path counts as a person: a pet, a moved chair, a second person. Two people standing closer together than the gap count as one.
-- If the robot is moved or bumped, the remembered scan no longer fits, and the room must be learned again.
+- If the robot is moved or bumped, the remembered scan no longer fits, and the room must be learned again. When the odometry shows that the robot has moved, the tracker reports nobody and asks for it.
 - The strip is wide on purpose, so the distance to the walking line does not have to be set for each room. In the first lab test a narrow strip around a fixed 2.5 m line missed a person who walked at 1.2 m. The price: anything new in the strip counts as a person, also off the walking line.
 - The margin, the strip and the gap are parameters, to be set from recordings of the real LiDAR.
 - Steps taken while turning on the spot are mostly not counted, because the person does not move along the path.

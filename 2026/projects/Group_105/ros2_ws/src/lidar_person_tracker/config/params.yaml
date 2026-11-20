@@ -1,5 +1,10 @@
 lidar_person_tracker:
   ros__parameters:
+    # static: the robot stays parked. driving: the walker is found while the
+    # robot is parked, then followed with the odometry while it drives.
+    # Can be changed while the node runs: ros2 param set /lidar_person_tracker mode driving
+    mode: "static"
+
     # The strip of floor that is watched, seen from the LiDAR.
     # The defaults watch from 0.5 m to 3.5 m in front of the robot.
     path_distance_m: 2.0        # from the robot to the middle of the strip
@@ -25,4 +30,12 @@ lidar_person_tracker:
     step_min_move_m: 0.15       # how far the walker must have moved on since the feet were last apart
     step_max_spread_m: 1.0      # points spread wider than this are not two feet; the scan is skipped
 
-    scan_timeout_s: 2.0         # warn when no scan arrives for this long
+    # Driving mode.
+    follow_radius_m: 0.6        # the walker's points are looked for this close to where the walker should be
+    follow_lost_s: 1.0          # no points there for this long, and the walker is lost
+    # The empty room is only used while the robot is this close to where it learned it.
+    # The heading in the odometry can drift a little while the robot stands still.
+    parked_m: 0.05
+    parked_rad: 0.1             # about 6 degrees
+
+    scan_timeout_s: 2.0         # warn when no scan or, in driving mode, no odometry arrives for this long
