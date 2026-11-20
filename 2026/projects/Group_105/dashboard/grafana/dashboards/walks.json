@@ -1,0 +1,888 @@
+{
+  "uid": "rehab-walks",
+  "title": "Walking exercise",
+  "editable": false,
+  "description": "Results of each walk, sent by session_reporter over MQTT, grouped by session.",
+  "tags": [
+    "rehab"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 3,
+  "refresh": "10s",
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "patient",
+        "label": "Patient",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "rehab-influxdb"
+        },
+        "definition": "SHOW TAG VALUES FROM \"walk\" WITH KEY = \"patient_id\"",
+        "query": "SHOW TAG VALUES FROM \"walk\" WITH KEY = \"patient_id\"",
+        "refresh": 1,
+        "sort": 1,
+        "multi": false,
+        "includeAll": false,
+        "hide": 0,
+        "options": [],
+        "current": {}
+      },
+      {
+        "name": "session",
+        "label": "Session",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "rehab-influxdb"
+        },
+        "definition": "SHOW TAG VALUES FROM \"walk\" WITH KEY = \"session_id\" WHERE \"patient_id\" = '$patient'",
+        "query": "SHOW TAG VALUES FROM \"walk\" WITH KEY = \"session_id\" WHERE \"patient_id\" = '$patient'",
+        "refresh": 2,
+        "sort": 2,
+        "multi": false,
+        "includeAll": false,
+        "hide": 0,
+        "options": [],
+        "current": {}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "All sessions of the patient, in the time range",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 2,
+      "type": "table",
+      "title": "Sessions",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "rehab-influxdb"
+      },
+      "description": "One row per session, newest first. Steps per minute and speed are the means over the measured walks.",
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          },
+          "noValue": "0"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Steps per minute"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Speed (m/s)"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "sortBy": [
+          {
+            "displayName": "Session",
+            "desc": true
+          }
+        ]
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "rehab-influxdb"
+          },
+          "rawQuery": true,
+          "resultFormat": "table",
+          "query": "SELECT count(\"walk\") AS \"Walks\", sum(\"stops\") AS \"Stops\" FROM \"walk\" WHERE \"patient_id\" = '$patient' AND $timeFilter GROUP BY \"session_id\""
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "rehab-influxdb"
+          },
+          "rawQuery": true,
+          "resultFormat": "table",
+          "query": "SELECT count(\"walk\") AS \"Measured\", mean(\"cadence_spm\") AS \"Steps per minute\", mean(\"speed_mps\") AS \"Speed (m/s)\" FROM \"walk\" WHERE \"measured\" = true AND \"patient_id\" = '$patient' AND $timeFilter GROUP BY \"session_id\""
+        }
+      ],
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "session_id",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "pattern": "^(?!Time).*"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "renameByName": {
+              "session_id": "Session"
+            },
+            "indexByName": {
+              "session_id": 0,
+              "Walks": 1,
+              "Measured": 2,
+              "Stops": 3,
+              "Steps per minute": 4,
+              "Speed (m/s)": 5
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "barchart",
+      "title": "Steps per minute, each session",
+      "description": "Mean over the measured walks of each session, stops left out.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "rehab-influxdb"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 1
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "session_id"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Session"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "xField": "session_id",
+        "orientation": "vertical",
+        "showValue": "always",
+        "barWidth": 0.6,
+        "groupWidth": 0.7,
+        "stacking": "none",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "rehab-influxdb"
+          },
+          "rawQuery": true,
+          "resultFormat": "table",
+          "query": "SELECT mean(\"cadence_spm\") AS \"steps per minute\" FROM \"walk\" WHERE \"measured\" = true AND \"patient_id\" = '$patient' AND $timeFilter GROUP BY \"session_id\""
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "pattern": "^(?!Time).*"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "barchart",
+      "title": "Walking speed, each session",
+      "description": "Mean over the measured walks of each session, stops left out.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "rehab-influxdb"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "velocityms",
+          "decimals": 2,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 1
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "session_id"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Session"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "xField": "session_id",
+        "orientation": "vertical",
+        "showValue": "always",
+        "barWidth": 0.6,
+        "groupWidth": 0.7,
+        "stacking": "none",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "rehab-influxdb"
+          },
+          "rawQuery": true,
+          "resultFormat": "table",
+          "query": "SELECT mean(\"speed_mps\") AS \"walking speed\" FROM \"walk\" WHERE \"measured\" = true AND \"patient_id\" = '$patient' AND $timeFilter GROUP BY \"session_id\""
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "pattern": "^(?!Time).*"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "row",
+      "title": "Session $session",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Walks",
+      "description": "Walks in this session",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "rehab-influxdb"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 17
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "0",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "rehab-influxdb"
+          },
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT count(\"walk\") FROM \"walk\" WHERE \"patient_id\" = '$patient' AND \"session_id\" = '$session'"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Walks not measured",
+      "description": "Two people seen, or the walker lost in the middle of the zone",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "rehab-influxdb"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 17
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "0",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "rehab-influxdb"
+          },
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT count(\"walk\") FROM \"walk\" WHERE \"measured\" = false AND \"patient_id\" = '$patient' AND \"session_id\" = '$session'"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Stops",
+      "description": "Times the walker stopped during a walk",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "rehab-influxdb"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 17
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "0",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "rehab-influxdb"
+          },
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT sum(\"stops\") FROM \"walk\" WHERE \"patient_id\" = '$patient' AND \"session_id\" = '$session'"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "Steps per minute",
+      "description": "Mean over the measured walks, stops left out",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "rehab-influxdb"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 17
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "0",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "rehab-influxdb"
+          },
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT mean(\"cadence_spm\") FROM \"walk\" WHERE \"measured\" = true AND \"patient_id\" = '$patient' AND \"session_id\" = '$session'"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "barchart",
+      "title": "Steps per minute, each walk",
+      "description": "Measured walks only, stops left out. Walk 1 is the first of the session.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "rehab-influxdb"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 1
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "walk"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "displayName",
+                "value": "Walk"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "xField": "walk",
+        "orientation": "vertical",
+        "showValue": "always",
+        "barWidth": 0.6,
+        "groupWidth": 0.7,
+        "stacking": "none",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "rehab-influxdb"
+          },
+          "rawQuery": true,
+          "resultFormat": "table",
+          "query": "SELECT \"walk\", \"cadence_spm\" AS \"steps per minute\" FROM \"walk\" WHERE \"measured\" = true AND \"patient_id\" = '$patient' AND \"session_id\" = '$session'"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "pattern": "^(?!Time).*"
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "fields": {},
+            "conversions": [
+              {
+                "targetField": "walk",
+                "destinationType": "string"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "barchart",
+      "title": "Walking speed, each walk",
+      "description": "Measured walks only, stops left out.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "rehab-influxdb"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "velocityms",
+          "decimals": 2,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 1
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "walk"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "displayName",
+                "value": "Walk"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "xField": "walk",
+        "orientation": "vertical",
+        "showValue": "always",
+        "barWidth": 0.6,
+        "groupWidth": 0.7,
+        "stacking": "none",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "rehab-influxdb"
+          },
+          "rawQuery": true,
+          "resultFormat": "table",
+          "query": "SELECT \"walk\", \"speed_mps\" AS \"walking speed\" FROM \"walk\" WHERE \"measured\" = true AND \"patient_id\" = '$patient' AND \"session_id\" = '$session'"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "pattern": "^(?!Time).*"
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "fields": {},
+            "conversions": [
+              {
+                "targetField": "walk",
+                "destinationType": "string"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "type": "table",
+      "title": "Walks in session $session",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "rehab-influxdb"
+      },
+      "description": "One row per walk (one way along the path). A walk is not measured when two people were seen, or the walker was lost in the middle of the zone.",
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 29
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time:HH:mm:ss"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Duration (s)"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Steps per minute"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Speed (m/s)"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "rehab-influxdb"
+          },
+          "rawQuery": true,
+          "resultFormat": "table",
+          "query": "SELECT \"walk\", \"measured\", \"duration_s\", \"steps\", \"cadence_spm\", \"speed_mps\", \"stops\" FROM \"walk\" WHERE \"patient_id\" = '$patient' AND \"session_id\" = '$session'"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "renameByName": {
+              "walk": "Walk",
+              "measured": "Measured",
+              "duration_s": "Duration (s)",
+              "steps": "Steps",
+              "cadence_spm": "Steps per minute",
+              "speed_mps": "Speed (m/s)",
+              "stops": "Stops"
+            },
+            "indexByName": {}
+          }
+        }
+      ]
+    }
+  ]
+}

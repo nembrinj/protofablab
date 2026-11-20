@@ -67,12 +67,13 @@ The ROS 2 packages are in [`ros2_ws/`](ros2_ws/) and need ROS 2 Jazzy on Ubuntu 
 
 ```bash
 cd ros2_ws
+rosdep install --from-paths src --ignore-src -y   # once, after rosdep update: libraries the packages need
 colcon build --symlink-install
 source install/setup.bash
 colcon test && colcon test-result --verbose   # tests and lint
 ```
 
-How to run each package, and the test steps for the real robot, are in the package READMEs: [`lidar_person_tracker`](ros2_ws/src/lidar_person_tracker/README.md). The offline video prototype has its own [README](walk_analysis_with_camera/README.md).
+How to run each package, and the test steps for the real robot, are in the package READMEs: [`lidar_person_tracker`](ros2_ws/src/lidar_person_tracker/README.md), [`walk_session`](ros2_ws/src/walk_session/README.md) (also starts a whole session) and [`session_reporter`](ros2_ws/src/session_reporter/README.md). The dashboard runs in Docker: see [`dashboard/`](dashboard/README.md). The offline video prototype has its own [README](walk_analysis_with_camera/README.md).
 
 ## Hardware
 
@@ -95,8 +96,11 @@ To be added.
 │   ├── architecture.md          # System architecture and interfaces
 │   ├── decisions/               # Design decision records
 │   └── img/                     # Diagrams
+├── dashboard/                   # Physiotherapist dashboard (Docker Compose)
 ├── ros2_ws/src/
 │   ├── gait_interfaces/         # Messages shared by our nodes
-│   └── lidar_person_tracker/    # Finds the walker in the LiDAR scan
+│   ├── lidar_person_tracker/    # Finds the walker in the LiDAR scan
+│   ├── walk_session/            # Walks, stops and spoken cues
+│   └── session_reporter/        # Sends the results to the dashboard
 └── walk_analysis_with_camera/   # Gait and cadence analysis from video
 ```

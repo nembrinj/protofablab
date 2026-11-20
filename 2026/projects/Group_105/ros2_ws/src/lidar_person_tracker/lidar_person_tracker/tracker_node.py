@@ -5,6 +5,7 @@ from dataclasses import fields
 from gait_interfaces.msg import PersonState
 from lidar_person_tracker.tracker import PersonTracker, TrackerConfig
 import rclpy
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import LaserScan
@@ -79,8 +80,8 @@ def main(args=None):
     node = TrackerNode()
     try:
         rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
+    except (KeyboardInterrupt, ExternalShutdownException):
+        pass  # stopped with Ctrl+C, or by the launch file
     finally:
         node.destroy_node()
         rclpy.try_shutdown()

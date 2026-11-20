@@ -1,0 +1,22 @@
+walk_session:
+  ros__parameters:
+    # A walk starts when the person moves faster than walk_speed_mps the same
+    # way for walk_start_s, and ends when they move the other way for as long.
+    walk_speed_mps: 0.3
+    walk_start_s: 1.0
+
+    # A stop: slower than stop_speed_mps, and no new step, for stop_s.
+    stop_speed_mps: 0.15
+    stop_s: 3.0
+    stop_cue: "Take your time, start again when ready"
+
+    # Not seen for lost_s ends the walk. Lost nearer than zone_edge_m to the
+    # middle of the zone: the walker was lost, and the walk is not measured.
+    lost_s: 2.0
+    zone_edge_m: 1.8
+
+    state_timeout_s: 2.0        # warn when no walker state arrives for this long
+
+cue_speaker:
+  ros__parameters:
+    speech_command: "spd-say"   # the cue's text is added at the end

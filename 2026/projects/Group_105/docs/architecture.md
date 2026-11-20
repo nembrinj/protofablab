@@ -1,6 +1,6 @@
 # Architecture
 
-Status: target design for the final proof of concept, revised on 2026-11-19 after a project session with the professors. Built so far: the LiDAR person tracker in [`ros2_ws/`](../ros2_ws/) (position, speed and steps of the walker, for a parked robot), and the offline camera prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/). Everything else is planned. Decisions are recorded in [`decisions/`](decisions/).
+Status: target design for the final proof of concept, revised on 2026-11-19 after a project session with the professors. Built so far, in [`ros2_ws/`](../ros2_ws/) and [`dashboard/`](../dashboard/): the LiDAR person tracker (position, speed and steps of the walker, for a parked robot), and a first session loop with the LiDAR only (walks, stops, the spoken stop cue, and each walk's numbers on the dashboard). Also the offline camera prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/). Everything else is planned. Decisions are recorded in [`decisions/`](decisions/).
 
 ## Overview
 
@@ -38,7 +38,7 @@ The robot gives two outputs:
 ## Session flow
 
 1. **Start**: the robot is placed at the start of the path by hand. Driving there by itself, with Nav2 on a SLAM map, comes later. With the robot parked, the tracker learns the scan of the empty room for about 2 seconds; the path must be clear during that time.
-2. **Walks**: the patient walks back and forth. The robot records the video, measures each walk, and speaks when the patient stops or slows down. In stage 2 it drives along.
+2. **Walks**: the patient walks back and forth. The robot records the video, measures each walk, and speaks when the patient stops or slows down. In stage 2 it drives along. How a walk's start, end and stops are noticed: [`walk_session`](../ros2_ws/src/walk_session/README.md#walks-and-stops). With the robot parked, a walk is the part of one way that the LiDAR sees, about 5 m.
 3. **Flagged moment**: when a rule below fires, the moment is saved with its time and numbers, and a clip from a few seconds before to a few seconds after is cut from the recording.
 4. **End**: after the set number of walks, the session summary and the flagged moments go to the dashboard.
 
@@ -58,18 +58,19 @@ The robot gives two outputs:
 | --- | --- | --- |
 | LiDAR person tracker | `lidar_person_tracker` (ours, built) | Number of people, position along the path, walking speed, steps. Two modes: static, robot parked, compares each scan with the empty room ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)), built; dynamic, robot driving, follows the walker's points from scan to scan with the odometry, planned |
 | Gait monitor | `gait_monitor` (ours, planned) | Pose estimation per frame: are the legs in the picture, and steps from the video as a second opinion. Reuses `walk_analysis` |
-| Session manager | `walk_session` (ours, planned) | Session flow, feedback rules, flagged moments, walk summaries |
+| Session manager | `walk_session` (ours, built with the LiDAR only) | Session flow, feedback rules, flagged moments, walk summaries. Built: walks, stops, the stop cue, walk summaries |
+| Cue speaker | `walk_session` (ours, built, stand-in) | Speaks the cues on the laptop until `audio_cues` speaks them on the robot |
 | Clip recorder | `clip_recorder` (ours, planned) | Records the camera stream during the session and cuts a clip for each flagged moment |
 | Walker follower | `walker_follower` (ours, planned, stage 2) | Drives beside the walker: matches their speed, keeps the gap and the side distance, stops when the walker is lost |
 | Navigation | `turtlebot3_navigation2`, SLAM (existing, later) | Map of the room, driving to the start of the path |
-| MQTT bridge | `session_reporter` (ours, planned) | Walk, moment and session summaries as JSON on MQTT |
-| Dashboard stack | Docker Compose (planned) | Mosquitto, Telegraf, InfluxDB, Grafana, and a web server for the clips ([ADR 3](decisions/0003-mqtt-and-grafana-dashboard.md)) |
+| MQTT bridge | `session_reporter` (ours, built for walks) | Walk, moment and session summaries as JSON on MQTT |
+| Dashboard stack | Docker Compose in [`dashboard/`](../dashboard/) (built; clip web server planned) | Mosquitto, Telegraf, InfluxDB, Grafana, and a web server for the clips ([ADR 3](decisions/0003-mqtt-and-grafana-dashboard.md)) |
 
 Our message types live in the `gait_interfaces` package.
 
 ## ROS 2 interfaces
 
-Built: `/scan`, `/person/state` and the relearn service. The rest is planned; the topics marked *to agree* connect to Matin's part and are agreed with him first.
+Built: `/scan`, `/person/state`, the relearn service, `/session/walk_summary` and `/session/cue`. The rest is planned; the topics marked *to agree* connect to Matin's part and are agreed with him first.
 
 | Topic / action | Type | From → to | Content |
 | --- | --- | --- | --- |
@@ -81,7 +82,7 @@ Built: `/scan`, `/person/state` and the relearn service. The rest is planned; th
 | `/gait/state` | `gait_interfaces/GaitState` | `gait_monitor` → `walk_session` | *To agree*: legs in the picture, steps per minute |
 | `/session/moment` | `gait_interfaces/Moment` | `walk_session` → `clip_recorder`, `session_reporter` | Time, what happened, the numbers, the note |
 | `/session/walk_summary` | `gait_interfaces/WalkSummary` | `walk_session` → `session_reporter` | Per walk: measured or not, duration, steps, steps per minute, stops, speed |
-| `/session/cue` | `std_msgs/String` | `walk_session` → `audio_cues` | *To agree*: text to speak |
+| `/session/cue` | `std_msgs/String` | `walk_session` → `audio_cues`; for now the stand-in `cue_speaker` | *To agree*: text to speak |
 | `/cmd_vel` | `geometry_msgs/Twist` | `walker_follower` → `turtlebot3_bringup` | Speed commands while following (stage 2) |
 | `navigate_to_pose` | `nav2_msgs/action/NavigateToPose` | `walk_session` → Nav2 | Start of the path, and back (later) |
 
@@ -95,7 +96,7 @@ Broker: Mosquitto on the laptop, port 1883, local network only. Payloads are JSO
 | `rehab/<patient_id>/moment` | At each flagged moment | `session_id`, `walk`, `time`, `kind`, `values`, `note`, `clip` (file name) |
 | `rehab/<patient_id>/session` | End of session | `session_id`, `walks`, `mean_cadence_spm`, `cadence_drift_spm` (last walk minus first), `total_stops`, `moments` |
 
-`patient_id` is an anonymised ID, never a name.
+Built: the walk messages. Each walk is stored at the time it reaches the broker, on the laptop's clock. `patient_id` is an anonymised ID, never a name.
 
 ## Measurements
 
@@ -104,7 +105,7 @@ Broker: Mosquitto on the laptop, port 1883, local network only. Payloads are JSO
 | Position along the path | LiDAR | Points nearer than the empty room, inside the watched strip ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)) | Built, stage 1 |
 | Walking speed | LiDAR | Slope of a line fitted to the positions of the last second | Built, stage 1 |
 | Steps, steps per minute | LiDAR; camera as a second opinion | LiDAR: each time the person's points spread out (feet apart) and close up again (legs passing), while the person moves on along the path ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)). Camera: the moment the feet are furthest apart | Built (LiDAR), stage 1; camera planned |
-| Stop | LiDAR, camera | No movement and no steps for N seconds | Planned |
+| Stop | LiDAR, camera | During a walk, slower than 0.15 m/s and no new step for 3 s | Built (LiDAR), stage 1 |
 
 The LiDAR counts the steps: in the replays of the first recordings, each step is visible in the scan, so the step count does not have to wait for the camera. The camera count is a second opinion. Both are checked against a hand count on the same walks. First goal: steps per minute within ±5% of the hand count.
 

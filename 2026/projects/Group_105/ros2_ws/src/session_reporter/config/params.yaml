@@ -1,0 +1,5 @@
+session_reporter:
+  ros__parameters:
+    broker_host: "localhost"    # computer that runs the dashboard; set by the launch file
+    broker_port: 1883
+    patient_id: "p01"           # an anonymised ID, never a name; part of the MQTT topic
