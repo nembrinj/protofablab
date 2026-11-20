@@ -20,4 +20,9 @@ lidar_person_tracker:
     min_speed_span_s: 0.4       # no speed before this much time is covered
     max_jump_m: 1.0             # a bigger jump between two scans restarts the speed
 
+    # Steps: the walker's feet are apart, then close up again.
+    step_drop_m: 0.12           # how much the feet must close up after being apart
+    step_min_move_m: 0.15       # how far the walker must have moved on since the feet were last apart
+    step_max_spread_m: 1.0      # points spread wider than this are not two feet; the scan is skipped
+
     scan_timeout_s: 2.0         # warn when no scan arrives for this long

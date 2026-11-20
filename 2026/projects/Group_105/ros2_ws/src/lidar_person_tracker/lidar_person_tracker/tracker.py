@@ -4,6 +4,7 @@ Find a walking person in the LiDAR scans of a parked robot.
 The robot does not move, so the empty room always gives the same scan. The
 tracker first remembers that scan. After that, a point that is clearly nearer
 than the empty room, and lies on the walking path, belongs to a person.
+The steps are counted from the same points (see steps.py).
 
 This module has no ROS imports, so it can be tested without ROS.
 """
@@ -12,6 +13,7 @@ from collections import deque
 from dataclasses import dataclass
 import math
 
+from lidar_person_tracker.steps import StepCounter
 import numpy as np
 
 BINS = 360  # one direction per degree, all around the robot
@@ -34,12 +36,19 @@ class TrackerConfig:
     speed_window_s: float = 1.0
     min_speed_span_s: float = 0.4
     max_jump_m: float = 1.0
+    # A step: the walker's feet close up by step_drop_m after being apart,
+    # and the walker has moved on by step_min_move_m since the feet were last
+    # apart. A spread wider than step_max_spread_m is not two feet.
+    step_drop_m: float = 0.12
+    step_min_move_m: float = 0.15
+    step_max_spread_m: float = 1.0
 
     def __post_init__(self):
         positive = [
             'path_distance_m', 'corridor_half_width_m', 'zone_half_length_m',
             'background_margin_m', 'person_gap_m', 'speed_window_s',
-            'min_speed_span_s', 'max_jump_m',
+            'min_speed_span_s', 'max_jump_m', 'step_drop_m', 'step_min_move_m',
+            'step_max_spread_m',
         ]
         for name in positive:
             value = getattr(self, name)
@@ -53,6 +62,8 @@ class TrackerConfig:
                 raise ValueError(f'{name} must be a whole number of at least 1, got {value}')
         if self.min_speed_span_s > self.speed_window_s:
             raise ValueError('min_speed_span_s must not be longer than speed_window_s')
+        if self.step_drop_m >= self.step_max_spread_m:
+            raise ValueError('step_drop_m must be smaller than step_max_spread_m')
 
 
 @dataclass(frozen=True)
@@ -63,6 +74,8 @@ class PersonEstimate:
     people_count: int
     position_m: float  # along the path; NaN unless exactly one person
     speed_mps: float  # along the path; NaN until enough scans of one person
+    steps: int  # counted since the room was learned
+    spread_m: float  # along the path, between the person's outermost points; NaN unless one person
 
     @property
     def detected(self):
@@ -102,9 +115,12 @@ class PersonTracker:
 
     def relearn(self):
         """Forget the empty room and learn it again from the next scans."""
+        config = self._config
         self._background = None
         self._learning = []
         self._history.clear()
+        self._steps = StepCounter(config.step_drop_m, config.step_max_spread_m,
+                                  config.step_min_move_m)
 
     def update(self, stamp_s, ranges, angle_min, angle_increment, range_min, range_max):
         """Take one scan and return a PersonEstimate; raise ValueError on a bad scan."""
@@ -113,14 +129,18 @@ class PersonTracker:
         binned = bin_scan(ranges, angle_min, angle_increment, range_min, range_max)
         if self._background is None:
             self._learn(binned)
-            return PersonEstimate(False, 0, math.nan, math.nan)
+            return PersonEstimate(False, 0, math.nan, math.nan, 0, math.nan)
 
-        positions = self._find_people(binned)
-        if len(positions) != 1:
+        people = self._find_people(binned)
+        if len(people) != 1:
             self._history.clear()
-            return PersonEstimate(True, len(positions), math.nan, math.nan)
-        position = positions[0]
-        return PersonEstimate(True, 1, position, self._speed(stamp_s, position))
+            self._steps.lose_walker()
+            return PersonEstimate(True, len(people), math.nan, math.nan, self._steps.steps,
+                                  math.nan)
+        position, spread = people[0]
+        speed = self._speed(stamp_s, position)
+        self._steps.update(spread, position)
+        return PersonEstimate(True, 1, position, speed, self._steps.steps, spread)
 
     def _learn(self, binned):
         self._learning.append(binned)
@@ -135,7 +155,7 @@ class PersonTracker:
         self._learning = []
 
     def _find_people(self, binned):
-        """Return the position along the path of each person, in order."""
+        """Return (position, spread) along the path of each person, in order."""
         config = self._config
         new = binned < self._background - config.background_margin_m
         across = binned[new] * np.cos(self._angles[new])
@@ -149,8 +169,8 @@ class PersonTracker:
         groups = np.split(along, np.flatnonzero(np.diff(along) > config.person_gap_m) + 1)
         # The middle between the outermost points is the middle between the
         # feet when they are apart, and the one visible leg when they cross.
-        return [float(group[0] + group[-1]) / 2 for group in groups
-                if group.size >= config.min_points]
+        return [(float(group[0] + group[-1]) / 2, float(group[-1] - group[0]))
+                for group in groups if group.size >= config.min_points]
 
     def _speed(self, stamp_s, position):
         """Fit a line to the recent positions; its slope is the speed."""

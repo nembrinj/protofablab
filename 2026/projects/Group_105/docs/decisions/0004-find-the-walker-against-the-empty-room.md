@@ -1,7 +1,7 @@
 # 4. The LiDAR finds the walker by comparing with the empty room
 
 - Status: accepted
-- Date: 2026-11-12, updated 2026-11-19
+- Date: 2026-11-12, updated 2026-11-20
 
 ## Context
 
@@ -18,6 +18,8 @@ After parking, the tracker remembers the scan of the empty room for about 2 seco
 
 Points that are close together along the path are one person; a gap wider than a long step means two people. The position is the middle between the outermost points. The speed is the slope of a line fitted to the positions of the last second.
 
+The steps come from the same points. The spread is the distance along the path between the person's outermost points: wide when the feet are apart, narrow when one leg passes the other. A step is counted each time the spread has opened up and then closes again by at least 0.12 m, but only if the person has moved on along the path by at least 0.15 m since the feet were last apart. Someone standing with the feet apart makes the spread wobble as well, but stays in place. A spread wider than 1 m is not two feet, and that scan is skipped.
+
 Each scan is first put on a fixed grid of one distance per degree, so the same code works for LiDAR models with a different number of beams.
 
 ## Consequences
@@ -29,10 +31,12 @@ Each scan is first put on a fixed grid of one distance per degree, so the same c
 - If the robot is moved or bumped, the remembered scan no longer fits, and the room must be learned again.
 - The strip is wide on purpose, so the distance to the walking line does not have to be set for each room. In the first lab test a narrow strip around a fixed 2.5 m line missed a person who walked at 1.2 m. The price: anything new in the strip counts as a person, also off the walking line.
 - The margin, the strip and the gap are parameters, to be set from recordings of the real LiDAR.
-- The steps are counted from the same points: they spread out when the feet are apart and close up when the legs pass each other. How exactly is added here once it is built.
+- Steps taken while turning on the spot are mostly not counted, because the person does not move along the path.
+- A step is counted a moment after the feet were furthest apart, once they close up again.
 
 ## Alternatives considered
 
 - **Recognise legs by shape** (round clusters of a leg's width, as the common leg detectors do): needs more points per leg than we get at 2.5 m, and a trained model.
 - **Only keep points on the walking path, without the empty-room scan**: simpler, but a chair or a table leg near the path would count as a person.
+- **Count the moments the legs pass each other, below a fixed spread**: in the recordings, that moment sometimes falls between two scans, and the spread then stays above any fixed limit, so steps would be missed. Counting how much the spread closes up works for shallow and deep closings alike.
 - **Park the robot closer to get more points per leg**: the camera then sees a shorter part of the path. Can be revisited if the real scans are too noisy.

@@ -13,7 +13,7 @@ import pytest
 
 RANGE_MIN = 0.12
 RANGE_MAX = 3.5
-SCAN_PERIOD_S = 0.2
+SCAN_PERIOD_S = 0.11  # about 9 scans per second, like the robot's LiDAR
 PATH_M = 2.5
 WALL_M = 3.3
 LEG_RADIUS_M = 0.05
@@ -68,14 +68,20 @@ class Robot:
             estimate = self.scan(circles)
         return estimate
 
-    def walk(self, start_m, speed_mps, duration_s):
+    def walk(self, start_m, speed_mps, duration_s, steps_per_s=1.8):
         """Let a person walk and return the estimate of every scan."""
         start_s = self.time_s
         estimates = []
         while self.time_s - start_s < duration_s:
             elapsed_s = self.time_s - start_s
-            estimates.append(self.scan(legs(start_m + speed_mps * elapsed_s, elapsed_s)))
+            estimates.append(self.scan(legs(start_m + speed_mps * elapsed_s, elapsed_s,
+                                            steps_per_s)))
         return estimates
+
+
+def steps_taken(steps_per_s, duration_s):
+    """How many times the feet of legs() are furthest apart within the duration."""
+    return math.floor(steps_per_s * duration_s + 0.5)
 
 
 def test_not_ready_while_learning():
@@ -119,7 +125,9 @@ def test_walking_speed_and_direction(speed_mps):
                            duration_s=3.0)
     assert all(estimate.people_count == 1 for estimate in estimates)
     speeds = [estimate.speed_mps for estimate in estimates if not math.isnan(estimate.speed_mps)]
-    assert len(speeds) >= len(estimates) - 3
+    # No speed only while the first min_speed_span_s is covered.
+    no_speed_scans = math.ceil(TrackerConfig().min_speed_span_s / SCAN_PERIOD_S)
+    assert len(speeds) >= len(estimates) - no_speed_scans
     assert np.mean(speeds) == pytest.approx(speed_mps, abs=0.1)
     assert np.max(np.abs(np.array(speeds) - speed_mps)) < 0.5
 
@@ -146,6 +154,46 @@ def test_speed_restarts_after_two_people():
     robot.walk(start_m=-1.0, speed_mps=1.0, duration_s=1.0)
     robot.scan(legs(0.0) + legs(1.5))
     assert math.isnan(robot.scan(legs(0.2)).speed_mps)
+
+
+@pytest.mark.parametrize('steps_per_s', [1.4, 1.8, 2.2])
+def test_steps_are_counted_while_walking(steps_per_s):
+    robot = Robot(noise_m=0.02)
+    robot.learn()
+    estimates = robot.walk(start_m=-1.5, speed_mps=1.0, duration_s=3.0, steps_per_s=steps_per_s)
+    assert estimates[-1].steps == pytest.approx(steps_taken(steps_per_s, 3.0), abs=1)
+
+
+def test_standing_with_the_feet_apart_counts_no_steps():
+    robot = Robot(noise_m=0.02)
+    robot.learn()
+    for _ in range(50):
+        # The weight shifts from foot to foot, so the feet seem to move a little.
+        half_m = 0.25 + 0.08 * math.sin(4 * robot.time_s)
+        estimate = robot.scan([(PATH_M - 0.08, 0.5 + half_m, LEG_RADIUS_M),
+                               (PATH_M + 0.08, 0.5 - half_m, LEG_RADIUS_M)])
+        assert estimate.spread_m > 0.3
+    assert estimate.steps == 0
+
+
+def test_steps_are_kept_when_the_walker_is_lost():
+    robot = Robot()
+    robot.learn()
+    before = robot.walk(start_m=-1.5, speed_mps=1.0, duration_s=1.5)[-1].steps
+    assert before > 0
+    assert robot.scan(legs(0.0) + legs(1.5)).steps == before
+    assert robot.scan().steps == before
+    after = robot.walk(start_m=0.0, speed_mps=1.0, duration_s=1.5)[-1].steps
+    assert after > before
+
+
+def test_relearn_starts_the_steps_again():
+    robot = Robot()
+    robot.learn()
+    assert robot.walk(start_m=-1.5, speed_mps=1.0, duration_s=1.5)[-1].steps > 0
+    robot.tracker.relearn()
+    robot.learn()
+    assert robot.scan().steps == 0
 
 
 def test_object_present_while_learning_is_ignored():
@@ -238,6 +286,8 @@ def test_bad_scans_are_rejected():
     {'background_scans': 0},
     {'min_points': 1.5},
     {'min_speed_span_s': 2.0, 'speed_window_s': 1.0},
+    {'step_drop_m': 0.0},
+    {'step_drop_m': 1.0, 'step_max_spread_m': 1.0},
 ])
 def test_bad_settings_are_rejected(settings):
     with pytest.raises(ValueError):

@@ -55,6 +55,7 @@ class TrackerNode(Node):
         state.people_count = min(estimate.people_count, 255)
         state.position_m = estimate.position_m
         state.speed_mps = estimate.speed_mps
+        state.steps = estimate.steps
         self._publisher.publish(state)
 
     def _on_relearn(self, request, response):

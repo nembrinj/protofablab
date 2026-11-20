@@ -5,11 +5,14 @@ Used to tune the settings at home from recordings made with the robot:
 
     ros2 run lidar_person_tracker replay_bag ~/walk_test3 facing_angle_rad=3.14159
 
-It prints what the tracker would have said every half second, and how many
-scans showed 0, 1, 2 ... people.
+It prints what the tracker would have said every half second, how many scans
+showed 0, 1, 2 ... people, and how many steps it counted. With --csv it also
+writes every scan to a file, for plots.
 """
 
 import argparse
+from contextlib import nullcontext
+import csv
 from dataclasses import fields
 import sys
 
@@ -34,21 +37,33 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
     parser.add_argument('bag', help='folder of the recording')
     parser.add_argument('settings', nargs='*', help='name=value, for example path_distance_m=1.2')
+    parser.add_argument('--csv', metavar='FILE', help='also write every scan to this file')
     args = parser.parse_args(argv)
     try:
         tracker = PersonTracker(TrackerConfig(**parse_settings(args.settings)))
     except ValueError as error:
         parser.error(str(error))
+    try:
+        csv_file = open(args.csv, 'w', newline='') if args.csv else nullcontext()
+    except OSError as error:
+        parser.error(f'cannot write {args.csv}: {error}')
+    with csv_file:
+        replay(args.bag, tracker, csv.writer(csv_file) if args.csv else None)
 
+
+def replay(bag, tracker, rows):
+    """Feed every /scan of the bag to the tracker and print what it says."""
     # Imported here so that parse_settings can be tested without ROS.
     from rclpy.serialization import deserialize_message
     import rosbag2_py
     from sensor_msgs.msg import LaserScan
 
     reader = rosbag2_py.SequentialReader()
-    reader.open(rosbag2_py.StorageOptions(uri=args.bag, storage_id=''),
+    reader.open(rosbag2_py.StorageOptions(uri=bag, storage_id=''),
                 rosbag2_py.ConverterOptions('', ''))
-    start_s, last_print_s, counts = None, None, {}
+    if rows:
+        rows.writerow(['time_s', 'people', 'position_m', 'speed_mps', 'spread_m', 'steps'])
+    start_s, last_print_s, counts, steps = None, None, {}, 0
     while reader.has_next():
         topic, data, _ = reader.read_next()
         if topic != '/scan':
@@ -65,13 +80,20 @@ def main(argv=None):
         if not estimate.ready:
             continue
         counts[estimate.people_count] = counts.get(estimate.people_count, 0) + 1
+        steps = estimate.steps
+        if rows:
+            rows.writerow([f'{stamp_s - start_s:.3f}', estimate.people_count,
+                           f'{estimate.position_m:.3f}', f'{estimate.speed_mps:.3f}',
+                           f'{estimate.spread_m:.3f}', estimate.steps])
         if last_print_s is None or stamp_s - last_print_s >= PRINT_EVERY_S:
             last_print_s = stamp_s
             print(f'{stamp_s - start_s:6.1f} s  people={estimate.people_count}  '
-                  f'position={estimate.position_m:6.2f} m  speed={estimate.speed_mps:6.2f} m/s')
+                  f'position={estimate.position_m:6.2f} m  speed={estimate.speed_mps:6.2f} m/s  '
+                  f'steps={estimate.steps}')
     if start_s is None:
-        sys.exit(f'no /scan messages in {args.bag}')
+        sys.exit(f'no /scan messages in {bag}')
     print('scans with 0, 1, 2 ... people:', dict(sorted(counts.items())))
+    print('steps:', steps)
 
 
 if __name__ == '__main__':

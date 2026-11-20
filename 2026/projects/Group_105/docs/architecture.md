@@ -1,6 +1,6 @@
 # Architecture
 
-Status: target design for the final proof of concept, revised on 2026-11-19 after a project session with the professors. Built so far: the LiDAR person tracker in [`ros2_ws/`](../ros2_ws/) (position and speed of the walker, for a parked robot), and the offline camera prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/). Everything else is planned. Decisions are recorded in [`decisions/`](decisions/).
+Status: target design for the final proof of concept, revised on 2026-11-19 after a project session with the professors. Built so far: the LiDAR person tracker in [`ros2_ws/`](../ros2_ws/) (position, speed and steps of the walker, for a parked robot), and the offline camera prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/). Everything else is planned. Decisions are recorded in [`decisions/`](decisions/).
 
 ## Overview
 
@@ -56,7 +56,7 @@ The robot gives two outputs:
 
 | Component | Package | Role |
 | --- | --- | --- |
-| LiDAR person tracker | `lidar_person_tracker` (ours, built) | Number of people, position along the path, walking speed; next: the steps. Two modes: static, robot parked, compares each scan with the empty room ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)), built; dynamic, robot driving, follows the walker's points from scan to scan with the odometry, planned |
+| LiDAR person tracker | `lidar_person_tracker` (ours, built) | Number of people, position along the path, walking speed, steps. Two modes: static, robot parked, compares each scan with the empty room ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)), built; dynamic, robot driving, follows the walker's points from scan to scan with the odometry, planned |
 | Gait monitor | `gait_monitor` (ours, planned) | Pose estimation per frame: are the legs in the picture, and steps from the video as a second opinion. Reuses `walk_analysis` |
 | Session manager | `walk_session` (ours, planned) | Session flow, feedback rules, flagged moments, walk summaries |
 | Clip recorder | `clip_recorder` (ours, planned) | Records the camera stream during the session and cuts a clip for each flagged moment |
@@ -74,7 +74,7 @@ Built: `/scan`, `/person/state` and the relearn service. The rest is planned; th
 | Topic / action | Type | From → to | Content |
 | --- | --- | --- | --- |
 | `/scan` | `sensor_msgs/LaserScan` | `turtlebot3_bringup` → `lidar_person_tracker`, Nav2 | LiDAR distances |
-| `/person/state` | `gait_interfaces/PersonState` | `lidar_person_tracker` → `walk_session`, `walker_follower` | Person detected, number of people, position along the path, walking speed. Planned: steps |
+| `/person/state` | `gait_interfaces/PersonState` | `lidar_person_tracker` → `walk_session`, `walker_follower` | Person detected, number of people, position along the path, walking speed, steps |
 | `/lidar_person_tracker/relearn_background` | `std_srvs/srv/Trigger` | `walk_session` → `lidar_person_tracker` | Learn the empty room again; called after the robot has parked |
 | `/camera/image_raw/compressed` | `sensor_msgs/CompressedImage` | `usb_cam` → `gait_monitor`, `clip_recorder` | MJPEG frames, camera timestamps |
 | `/gait/steps` | `gait_interfaces/StepEvent` | `gait_monitor` → `walk_session` | *To agree*: time and confidence of each step seen by the camera |
@@ -103,7 +103,7 @@ Broker: Mosquitto on the laptop, port 1883, local network only. Payloads are JSO
 | --- | --- | --- | --- |
 | Position along the path | LiDAR | Points nearer than the empty room, inside the watched strip ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)) | Built, stage 1 |
 | Walking speed | LiDAR | Slope of a line fitted to the positions of the last second | Built, stage 1 |
-| Steps, steps per minute | LiDAR; camera as a second opinion | LiDAR: the person's points spread out when the feet are apart and close up when the legs pass each other, about 5 scans per step. Camera: the moment the feet are furthest apart | Next to build (LiDAR) |
+| Steps, steps per minute | LiDAR; camera as a second opinion | LiDAR: each time the person's points spread out (feet apart) and close up again (legs passing), while the person moves on along the path ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)). Camera: the moment the feet are furthest apart | Built (LiDAR), stage 1; camera planned |
 | Stop | LiDAR, camera | No movement and no steps for N seconds | Planned |
 
 The LiDAR counts the steps: in the replays of the first recordings, each step is visible in the scan, so the step count does not have to wait for the camera. The camera count is a second opinion. Both are checked against a hand count on the same walks. First goal: steps per minute within ±5% of the hand count.
