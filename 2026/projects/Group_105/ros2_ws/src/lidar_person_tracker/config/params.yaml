@@ -10,7 +10,8 @@ lidar_person_tracker:
     path_distance_m: 2.0        # from the robot to the middle of the strip
     corridor_half_width_m: 1.5  # from the middle of the strip to its near and far edge
     zone_half_length_m: 2.5     # how far along the line, each side of the robot
-    facing_angle_rad: 0.0       # direction of the path in the scan; 0 is the robot's front
+    # facing_angle_rad, the direction of the path in the scan (0 is the robot's
+    # front), is set with the launch argument: facing_angle_rad:=3.14159
 
     # Learning the empty room.
     background_scans: 15        # scans to learn from (about 2 s at 9 scans per second)

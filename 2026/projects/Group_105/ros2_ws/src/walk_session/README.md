@@ -45,9 +45,9 @@ On the laptop, in a terminal of the desktop (the speech needs the desktop's soun
 ros2 launch walk_session session.launch.py broker_host:=<IP of the computer with the dashboard>
 ```
 
-`broker_host` defaults to `localhost`. When `audio_cues` speaks the cues on the robot, add `speak_on_laptop:=false`. `cue_speaker` uses `spd-say` from Ubuntu Desktop; set `speech_command` to use another program.
+`broker_host` defaults to `localhost`. When the path is not in front of the robot, add its direction for the tracker, `facing_angle_rad:=<radians>` ([tracker README](../lidar_person_tracker/README.md#run)). When `audio_cues` speaks the cues on the robot, add `speak_on_laptop:=false`. `cue_speaker` uses `spd-say` from Ubuntu Desktop; set `speech_command` to use another program.
 
-To try it without the robot, start the launch command, then replay a recording in a second terminal: `ros2 bag play ~/walk_test2 --topics /scan`. The tracker learns the empty room from the first 2 s of the recording.
+To try it without the robot, start the launch command, then replay a recording in a second terminal: `ros2 bag play ~/walk_test2 --topics /scan`. The tracker learns the empty room from the first 2 s of the recording. `walk_test3` was recorded with the path behind the robot: add `facing_angle_rad:=3.14159` to the launch command.
 
 ### In RViz
 

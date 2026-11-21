@@ -30,7 +30,7 @@ ros2 launch lidar_person_tracker tracker.launch.py
 ros2 topic echo /person/state
 ```
 
-The robot must face the walking path, and the path must be clear for the first 2 seconds. The node watches the floor from 0.5 m to 3.5 m in front of the robot, and 2.5 m to each side. If the camera does not point the same way as the robot's front, set `facing_angle_rad`.
+The robot must face the walking path, and the path must be clear for the first 2 seconds. The node watches the floor from 0.5 m to 3.5 m in front of the robot, and 2.5 m to each side. If the path is not in front of the robot, give its direction with `facing_angle_rad:=<radians>` on the launch command, counter-clockwise from the robot's front: `1.5708` when the path is on its left, `-1.5708` on its right, `3.14159` behind it.
 
 ## Modes
 

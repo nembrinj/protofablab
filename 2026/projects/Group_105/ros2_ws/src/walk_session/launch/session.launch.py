@@ -33,8 +33,14 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'rviz', default_value='false',
             description='show the scan, the tracker and the session in RViz'),
-        IncludeLaunchDescription(PythonLaunchDescriptionSource(
-            str(share('lidar_person_tracker') / 'launch' / 'tracker.launch.py'))),
+        DeclareLaunchArgument(
+            'facing_angle_rad', default_value='0.0',
+            description='direction of the walking path in the scan, for the tracker'),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                str(share('lidar_person_tracker') / 'launch' / 'tracker.launch.py')),
+            launch_arguments={
+                'facing_angle_rad': LaunchConfiguration('facing_angle_rad')}.items()),
         Node(
             package='walk_session',
             executable='session_node',
