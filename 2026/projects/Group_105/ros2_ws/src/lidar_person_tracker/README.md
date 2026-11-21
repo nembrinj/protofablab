@@ -7,15 +7,18 @@ Finds a walking person in the LiDAR scans and publishes where they are along the
 | Reads | `/scan` | `sensor_msgs/LaserScan` |
 | Reads | `/odom` | `nav_msgs/Odometry` |
 | Publishes | `/person/state` | `gait_interfaces/PersonState` |
+| Publishes | `/lidar_person_tracker/markers` | `visualization_msgs/MarkerArray`, for RViz |
+| Publishes | `/tf_static`: the scan's frame → `walking_path` | `tf2_msgs/TFMessage`, for RViz |
 | Service | `/lidar_person_tracker/relearn_background` | `std_srvs/srv/Trigger` |
 
-The node publishes nothing while it learns the empty room: for the first 15 scans (about 2 s) it remembers how far away the walls and furniture are in each direction. This is not a map of the room (no SLAM), only one remembered scan to compare with. Position and speed are `NaN` unless exactly one person is on the path.
+The node publishes nothing on `/person/state` while it learns the empty room: for the first 15 scans (about 2 s) it remembers how far away the walls and furniture are in each direction. This is not a map of the room (no SLAM), only one remembered scan to compare with. Position and speed are `NaN` unless exactly one person is on the path.
 
 `steps` counts the walker's steps since the empty room was learned. Take the difference between two messages to get the steps in between. It does not go up while nobody or two people are on the path, and steps while turning on the spot are mostly not counted.
 
 - `lidar_person_tracker/tracker.py`: the logic, without ROS.
 - `lidar_person_tracker/steps.py`: the step count, without ROS.
 - `lidar_person_tracker/odometry.py`: where the robot was when a scan was taken, without ROS.
+- `lidar_person_tracker/view.py`: what the node draws in RViz, without ROS.
 - `lidar_person_tracker/tracker_node.py`: the ROS 2 node around it.
 - `config/params.yaml`: all parameters, with their meaning.
 
@@ -41,11 +44,23 @@ In driving mode, `position_m` is from the robot and `speed_mps` is over the floo
 
 In both modes, the empty room is only used while `/odom` shows the robot within 5 cm and about 6° of where it learned it (the heading in the odometry can drift a little while the robot stands still). Once it has moved, the node reports nobody and warns until the room is learned again (robot parked, path clear, `relearn_background`). Without any `/odom`, the robot is taken to be parked.
 
+## In RViz
+
+While RViz (or anything else) listens to `/lidar_person_tracker/markers`, the node draws what it sees in each scan:
+
+- the watched strip, in blue;
+- the points it found people from: green for one person, orange when there are more (not measured);
+- a status line under the strip: where the walker is, how fast, the steps, and the mode. Or what it is waiting for: learning the empty room, nobody on the path, the robot has moved.
+
+It draws in the `walking_path` frame, which it places on the scan's frame (`base_scan` on the TurtleBot3): the same point, turned so that x runs along the path, the same way as `position_m`, and y points away from the path. Seen from above, the path then lies across the screen below the robot, whichever way the robot faces it.
+
+The RViz layout comes with `walk_session`, together with the session's panel: `ros2 launch walk_session session.launch.py rviz:=true`. For the tracker alone: `rviz2 -d $(ros2 pkg prefix walk_session)/share/walk_session/rviz/session.rviz`.
+
 ## Tests
 
 `colcon test --packages-select lidar_person_tracker` runs the tests and the lint. The tests use made-up scans; they check the logic, not the accuracy on the real LiDAR.
 
-Without ROS, from this folder: `PYTHONPATH=. python3 -m pytest test/test_tracker.py test/test_steps.py test/test_odometry.py` (needs `numpy` and `pytest`).
+Without ROS, from this folder: `PYTHONPATH=. python3 -m pytest test/test_tracker.py test/test_steps.py test/test_odometry.py test/test_view.py` (needs `numpy` and `pytest`).
 
 If `colcon test` fails with a `pytest` plugin error, a newer `pytest` installed with `pip --user` is clashing with the one of ROS. Run `PYTHONNOUSERSITE=1 colcon test`, or remove it with `pip uninstall pytest`.
 

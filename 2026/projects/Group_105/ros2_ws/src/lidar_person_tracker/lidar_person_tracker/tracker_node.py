@@ -1,9 +1,15 @@
-"""ROS 2 node: LiDAR scans and odometry in, the state of the person on the walking path out."""
+"""
+ROS 2 node: LiDAR scans and odometry in, the state of the person on the walking path out.
+
+Also draws what it sees for RViz, in the walking_path frame (see view.py).
+"""
 
 from dataclasses import fields
 import math
 
 from gait_interfaces.msg import PersonState
+from geometry_msgs.msg import Point, TransformStamped
+from lidar_person_tracker import view
 from lidar_person_tracker.tracker import MODES, PersonTracker, TrackerConfig
 from nav_msgs.msg import Odometry
 from rcl_interfaces.msg import ParameterDescriptor, SetParametersResult
@@ -12,7 +18,10 @@ from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import LaserScan
+from std_msgs.msg import ColorRGBA
 from std_srvs.srv import Trigger
+from tf2_ros.static_transform_broadcaster import StaticTransformBroadcaster
+from visualization_msgs.msg import Marker, MarkerArray
 
 
 def stamp_seconds(header):
@@ -35,6 +44,7 @@ class TrackerNode(Node):
             for field in fields(TrackerConfig)
         })
         self._scan_timeout_s = self.declare_parameter('scan_timeout_s', 2.0).value
+        self._config = config
         self._tracker = PersonTracker(config)
         self._tracker.set_mode(self.declare_parameter(
             'mode', 'static', ParameterDescriptor(
@@ -44,8 +54,11 @@ class TrackerNode(Node):
         self._following = False
         self._last_scan = self.get_clock().now()
         self._last_odometry = None
+        self._scan_frame = None  # the frame walking_path was published in
 
         self._publisher = self.create_publisher(PersonState, '/person/state', 10)
+        self._markers = self.create_publisher(MarkerArray, '~/markers', 10)
+        self._frames = StaticTransformBroadcaster(self)
         self.create_subscription(LaserScan, '/scan', self._on_scan, qos_profile_sensor_data)
         self.create_subscription(Odometry, '/odom', self._on_odometry, qos_profile_sensor_data)
         self.create_service(Trigger, '~/relearn_background', self._on_relearn)
@@ -87,6 +100,9 @@ class TrackerNode(Node):
         except ValueError as error:
             self.get_logger().error(f'Scan ignored: {error}', throttle_duration_sec=5.0)
             return
+        self._publish_frame(scan.header.frame_id)
+        if self._markers.get_subscription_count() > 0:
+            self._markers.publish(self._draw(scan.header.stamp, estimate))
         if not estimate.ready:
             self.get_logger().info(
                 'Learning the empty room, keep the walking path clear',
@@ -113,6 +129,46 @@ class TrackerNode(Node):
         state.speed_mps = estimate.speed_mps
         state.steps = estimate.steps
         self._publisher.publish(state)
+
+    def _publish_frame(self, scan_frame):
+        """Place the walking_path frame on the LiDAR's frame, once per LiDAR frame."""
+        if scan_frame == self._scan_frame:
+            return
+        self._scan_frame = scan_frame
+        transform = TransformStamped()
+        transform.header.stamp = self.get_clock().now().to_msg()
+        transform.header.frame_id = scan_frame
+        transform.child_frame_id = view.FRAME
+        yaw = view.frame_yaw(self._config.facing_angle_rad)
+        transform.transform.rotation.z = math.sin(yaw / 2)
+        transform.transform.rotation.w = math.cos(yaw / 2)
+        self._frames.sendTransform(transform)
+
+    def _draw(self, stamp, estimate):
+        """Return the markers that show what the tracker sees in this scan."""
+        strip = self._marker(stamp, 'strip', Marker.LINE_STRIP, view.STRIP_RGB)
+        strip.scale.x = 0.02
+        strip.points = [Point(x=x, y=y) for x, y in view.strip_outline(self._config)]
+        people = self._marker(stamp, 'people', Marker.POINTS, view.people_rgb(estimate))
+        people.scale.x = people.scale.y = 0.07
+        people.points = [Point(x=float(x), y=float(y))
+                         for x, y in view.to_frame(estimate.points_m)]
+        if not people.points:
+            people.action = Marker.DELETE
+        status = self._marker(stamp, 'status', Marker.TEXT_VIEW_FACING, view.TEXT_RGB)
+        status.scale.z = view.TEXT_HEIGHT_M
+        status.pose.position.x, status.pose.position.y = view.status_position(self._config)
+        status.text = view.status_text(estimate, self._tracker.mode)
+        return MarkerArray(markers=[strip, people, status])
+
+    @staticmethod
+    def _marker(stamp, name, kind, rgb):
+        marker = Marker(ns=name, type=kind, action=Marker.ADD)
+        marker.header.stamp = stamp
+        marker.header.frame_id = view.FRAME
+        marker.pose.orientation.w = 1.0
+        marker.color = ColorRGBA(r=rgb[0], g=rgb[1], b=rgb[2], a=1.0)
+        return marker
 
     def _on_relearn(self, request, response):
         self._tracker.relearn()

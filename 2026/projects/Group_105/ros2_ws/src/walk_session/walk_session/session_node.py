@@ -1,4 +1,8 @@
-"""ROS 2 node: the walker's state in, walk summaries and spoken cues out."""
+"""
+ROS 2 node: the walker's state in, walk summaries and spoken cues out.
+
+Also draws a panel of the session for RViz (see view.py).
+"""
 
 from dataclasses import fields
 import time
@@ -7,7 +11,9 @@ from gait_interfaces.msg import PersonState, WalkSummary
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import ColorRGBA, String
+from visualization_msgs.msg import Marker, MarkerArray
+from walk_session import view
 from walk_session.session import Seen, SessionConfig, WalkSession
 
 
@@ -27,9 +33,11 @@ class SessionNode(Node):
         # The laptop's clock: the robot's clock may be wrong.
         self._session_id = time.strftime('%Y%m%d-%H%M%S')
         self._last_state = self.get_clock().now()
+        self._last_walk = None
 
         self._summaries = self.create_publisher(WalkSummary, '/session/walk_summary', 10)
         self._cues = self.create_publisher(String, '/session/cue', 10)
+        self._panel = self.create_publisher(MarkerArray, '~/markers', 10)
         self.create_subscription(PersonState, '/person/state', self._on_state, 10)
         self.create_timer(1.0, self._check_states)
         self.get_logger().info(f'Session {self._session_id} started, waiting for the walker')
@@ -51,8 +59,25 @@ class SessionNode(Node):
         if update.stopped:
             self.get_logger().info(f'Walk {self._session.walks}: the walker stopped')
             self._cues.publish(String(data=self._stop_cue))
+        if self._panel.get_subscription_count() > 0:
+            self._panel.publish(self._draw(state.header.stamp))
+
+    def _draw(self, stamp):
+        """Return the panel with the walk in progress and the last walk."""
+        panel = Marker(ns='panel', type=Marker.TEXT_VIEW_FACING, action=Marker.ADD)
+        panel.header.stamp = stamp
+        panel.header.frame_id = view.FRAME
+        panel.pose.position.x, panel.pose.position.y = view.POSITION_M
+        panel.pose.orientation.w = 1.0
+        panel.scale.z = view.TEXT_HEIGHT_M
+        red, green, blue = view.TEXT_RGB
+        panel.color = ColorRGBA(r=red, g=green, b=blue, a=1.0)
+        panel.text = view.panel_text(self._session_id, self._session.progress, self._last_walk,
+                                     self._stop_cue)
+        return MarkerArray(markers=[panel])
 
     def _publish_walk(self, walk, header):
+        self._last_walk = walk
         summary = WalkSummary()
         summary.header = header
         summary.session_id = self._session_id

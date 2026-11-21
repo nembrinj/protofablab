@@ -1,6 +1,6 @@
 # Architecture
 
-Status: target design for the final proof of concept, revised on 2026-11-19 after a project session with the professors. Built so far, in [`ros2_ws/`](../ros2_ws/) and [`dashboard/`](../dashboard/): the LiDAR person tracker (position, speed and steps of the walker; for a driving robot so far only tested on made-up scans), and a first session loop with the LiDAR only (walks, stops, the spoken stop cue, and each walk's numbers on the dashboard). Also the offline camera prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/). Everything else is planned. Decisions are recorded in [`decisions/`](decisions/).
+Status: target design for the final proof of concept, revised on 2026-11-19 after a project session with the professors. Built so far, in [`ros2_ws/`](../ros2_ws/) and [`dashboard/`](../dashboard/): the LiDAR person tracker (position, speed and steps of the walker; for a driving robot so far only tested on made-up scans), and a first session loop with the LiDAR only (walks, stops, the spoken stop cue, and each walk's numbers on the dashboard), which can be watched in RViz. Also the offline camera prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/). Everything else is planned. Decisions are recorded in [`decisions/`](decisions/).
 
 ## Overview
 
@@ -58,7 +58,7 @@ The robot gives two outputs:
 | --- | --- | --- |
 | LiDAR person tracker | `lidar_person_tracker` (ours, built) | Number of people, position along the path, walking speed, steps. Two modes, chosen by hand: static, robot parked, compares each scan with the empty room ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)); driving, follows the walker's points from scan to scan with the odometry ([ADR 5](decisions/0005-follow-the-walker-with-the-odometry.md)), tested on made-up scans |
 | Gait monitor | `gait_monitor` (ours, planned) | Pose estimation per frame: are the legs in the picture, and steps from the video as a second opinion. Reuses `walk_analysis` |
-| Session manager | `walk_session` (ours, built with the LiDAR only) | Session flow, feedback rules, flagged moments, walk summaries. Built: walks, stops, the stop cue, walk summaries |
+| Session manager | `walk_session` (ours, built with the LiDAR only) | Session flow, feedback rules, flagged moments, walk summaries. Built: walks, stops, the stop cue, walk summaries, and a view of the session in RViz |
 | Cue speaker | `walk_session` (ours, built, stand-in) | Speaks the cues on the laptop until `audio_cues` speaks them on the robot |
 | Clip recorder | `clip_recorder` (ours, planned) | Records the camera stream during the session and cuts a clip for each flagged moment |
 | Walker follower | `walker_follower` (ours, planned, stage 2) | Drives beside the walker: matches their speed, keeps the gap and the side distance, stops when the walker is lost |
@@ -70,7 +70,7 @@ Our message types live in the `gait_interfaces` package.
 
 ## ROS 2 interfaces
 
-Built: `/scan`, `/odom`, `/person/state`, the relearn service, `/session/walk_summary` and `/session/cue`. The rest is planned; the topics marked *to agree* connect to Matin's part and are agreed with him first.
+Built: `/scan`, `/odom`, `/person/state`, the relearn service, `/session/walk_summary`, `/session/cue`, and the markers and `walking_path` frame for RViz. The rest is planned; the topics marked *to agree* connect to Matin's part and are agreed with him first.
 
 | Topic / action | Type | From → to | Content |
 | --- | --- | --- | --- |
@@ -84,6 +84,8 @@ Built: `/scan`, `/odom`, `/person/state`, the relearn service, `/session/walk_su
 | `/session/moment` | `gait_interfaces/Moment` | `walk_session` → `clip_recorder`, `session_reporter` | Time, what happened, the numbers, the note |
 | `/session/walk_summary` | `gait_interfaces/WalkSummary` | `walk_session` → `session_reporter` | Per walk: measured or not, duration, steps, steps per minute, stops, speed |
 | `/session/cue` | `std_msgs/String` | `walk_session` → `audio_cues`; for now the stand-in `cue_speaker` | *To agree*: text to speak |
+| `/lidar_person_tracker/markers`, `/walk_session/markers` | `visualization_msgs/MarkerArray` | `lidar_person_tracker`, `walk_session` → RViz | What the tracker and the session see, to watch a session |
+| `/tf_static`: `base_scan` → `walking_path` | `tf2_msgs/TFMessage` | `lidar_person_tracker` → RViz | The LiDAR's frame turned so that x runs along the path, for drawing |
 | `/cmd_vel` | `geometry_msgs/Twist` | `walker_follower` → `turtlebot3_bringup` | Speed commands while following (stage 2) |
 | `navigate_to_pose` | `nav2_msgs/action/NavigateToPose` | `walk_session` → Nav2 | Start of the path, and back (later) |
 

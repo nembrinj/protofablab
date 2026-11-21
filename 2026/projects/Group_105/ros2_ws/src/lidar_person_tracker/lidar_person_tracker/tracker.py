@@ -13,12 +13,13 @@ scan in a fixed frame, so the robot's own movement is taken out.
 In both modes the empty room is only used while the robot stands where it
 learned it; once the odometry shows that it has moved, the room must be
 learned again. The steps are counted from the walker's points (see steps.py).
+Each estimate also carries the points it was made from, to draw them (see view.py).
 
 This module has no ROS imports, so it can be tested without ROS.
 """
 
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 import math
 
 from lidar_person_tracker.odometry import Pose, PoseHistory
@@ -27,6 +28,10 @@ import numpy as np
 
 BINS = 360  # one direction per degree, all around the robot
 MODES = ('static', 'driving')
+
+
+def no_points():
+    return np.empty((0, 2))
 
 
 @dataclass(frozen=True)
@@ -98,6 +103,9 @@ class PersonEstimate:
     spread_m: float  # along the path, between the person's outermost points; NaN unless one person
     following: bool = False  # driving mode: following the walker's points
     moved: bool = False  # the robot moved since it learned the room, which is then not used
+    # The points the people were found from, one (along, across) row per
+    # point, from the robot, in metres.
+    points_m: np.ndarray = field(default_factory=no_points, compare=False, repr=False)
 
     @property
     def detected(self):
@@ -111,6 +119,7 @@ class _Person:
     position_m: float  # along the path, middle between the outermost points
     spread_m: float  # along the path, between the outermost points
     across_m: float  # across the path, the median of the points
+    points_m: np.ndarray = field(compare=False, repr=False)  # (along, across) rows
 
 
 class _Walker:
@@ -209,7 +218,9 @@ class PersonTracker:
 
         people = self._find_people(binned)
         if len(people) != 1:
-            return self._nobody(len(people))
+            points = np.concatenate([person.points_m for person in people]) if people \
+                else no_points()
+            return self._nobody(len(people), points_m=points)
         person = people[0]
         speed = self._speed(stamp_s, person.position_m)
         self._steps.update(person.spread_m, person.position_m)
@@ -217,14 +228,15 @@ class PersonTracker:
         if following:
             self._start_following(stamp_s, pose, person)
         return PersonEstimate(True, 1, person.position_m, speed, self._steps.steps,
-                              person.spread_m, following)
+                              person.spread_m, following, points_m=person.points_m)
 
-    def _nobody(self, people_count, following=False, moved=False):
+    def _nobody(self, people_count, following=False, moved=False, points_m=None):
         """Return an estimate without a position, and forget the walker's movement."""
         self._history.clear()
         self._steps.lose_walker()
         return PersonEstimate(True, people_count, math.nan, math.nan, self._steps.steps,
-                              math.nan, following, moved)
+                              math.nan, following, moved,
+                              no_points() if points_m is None else points_m)
 
     def _learn(self, binned):
         self._learning.append(binned)
@@ -273,7 +285,7 @@ class PersonTracker:
         # The middle between the outermost points is the middle between the
         # feet when they are apart, and the one visible leg when they cross.
         return [_Person(float(group[0] + group[-1]) / 2, float(group[-1] - group[0]),
-                        float(np.median(group_across)))
+                        float(np.median(group_across)), np.column_stack((group, group_across)))
                 for group, group_across in zip(np.split(along, splits), np.split(across, splits))
                 if group.size >= self._config.min_points]
 
@@ -312,7 +324,8 @@ class PersonTracker:
         walker.speed_mps = speed if math.isfinite(speed) else 0.0
         self._steps.update(person.spread_m, person.position_m)
         return PersonEstimate(True, 1, person.position_m - walker.along_from_robot(pose), speed,
-                              self._steps.steps, person.spread_m, following=True)
+                              self._steps.steps, person.spread_m, following=True,
+                              points_m=person.points_m)
 
     def _find_walker(self, stamp_s, binned, pose):
         """Return the walker as a _Person in odom-frame values, or None if no points are near."""
@@ -323,10 +336,16 @@ class PersonTracker:
         directions = pose.yaw_rad + np.radians(np.arange(BINS))[seen]
         points = np.column_stack((pose.x_m + binned[seen] * np.cos(directions),
                                   pose.y_m + binned[seen] * np.sin(directions)))
-        near = points[np.hypot(*(points - expected).T) <= self._config.follow_radius_m]
+        near = np.hypot(*(points - expected).T) <= self._config.follow_radius_m
         # Everything near the walker is taken to be the walker.
-        people = self._group(near @ walker.along_axis, near @ walker.across_axis, math.inf)
-        return people[0] if people else None
+        people = self._group(points[near] @ walker.along_axis, points[near] @ walker.across_axis,
+                             math.inf)
+        if not people:
+            return None
+        # The same points, from the robot instead of in the odom frame.
+        distances, angles = binned[seen][near], self._angles[seen][near]
+        return replace(people[0], points_m=np.column_stack((distances * np.sin(angles),
+                                                            distances * np.cos(angles))))
 
     def _speed(self, stamp_s, position):
         """Fit a line to the recent positions; its slope is the speed."""

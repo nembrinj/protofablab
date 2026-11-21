@@ -85,6 +85,16 @@ class Walk:
 
 
 @dataclass(frozen=True)
+class Progress:
+    """The walk that has not ended yet, so far."""
+
+    number: int
+    steps: int
+    stops: int
+    stopped: bool  # the walker is stopped now
+
+
+@dataclass(frozen=True)
 class Update:
     """What happened with one message."""
 
@@ -135,6 +145,14 @@ class WalkSession:
     def walk_in_progress(self):
         """Return the number of the walk that has not ended yet, or 0."""
         return self._walk.number if self._walk else 0
+
+    @property
+    def progress(self):
+        """Return the Progress of the walk that has not ended yet, or None."""
+        walk = self._walk
+        if walk is None:
+            return None
+        return Progress(walk.number, self._steps - walk.start.steps, walk.stops, walk.stopped)
 
     def forget_walk(self):
         """Drop the walk in progress, for example when the time went back."""

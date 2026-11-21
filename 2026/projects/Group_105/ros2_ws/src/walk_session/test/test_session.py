@@ -125,6 +125,22 @@ def test_a_stop_is_noticed_once_and_left_out_of_the_walking_time():
     assert walk.speed_mps == pytest.approx(0.8, abs=0.05)
 
 
+def test_the_walk_in_progress_so_far():
+    walker = Walker(position_m=-2.2)
+    assert walker.session.progress is None
+    walker.walk(0.8, 2.0)
+    progress = walker.session.progress
+    assert progress.number == 1
+    assert progress.steps == pytest.approx(STEPS_PER_S * 2.0, abs=1)
+    assert (progress.stops, progress.stopped) == (0, False)
+    walker.stand(4.0)
+    assert (walker.session.progress.stops, walker.session.progress.stopped) == (1, True)
+    walker.walk(0.8, 1.0)
+    assert (walker.session.progress.stops, walker.session.progress.stopped) == (1, False)
+    walker.away(3.0)
+    assert walker.session.progress is None
+
+
 def test_a_short_pause_is_not_a_stop():
     walker = Walker(position_m=-2.2)
     walker.walk(0.8, 2.0)

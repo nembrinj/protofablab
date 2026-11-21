@@ -1,0 +1,55 @@
+# The scan, the tracker and the session, seen from above in the walking_path
+# frame: the path runs across the screen below the robot, whichever way the
+# robot faces it.
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid (0.5 m)
+      Enabled: true
+      Cell Size: 0.5
+      Plane Cell Count: 20
+      Color: 80; 80; 90
+      Reference Frame: <Fixed Frame>
+    - Class: rviz_default_plugins/Axes
+      Name: Robot (red ahead, green left)
+      Enabled: true
+      Length: 0.3
+      Radius: 0.03
+      Reference Frame: base_scan
+    - Class: rviz_default_plugins/LaserScan
+      Name: Scan
+      Enabled: true
+      Color Transformer: FlatColor
+      Color: 190; 190; 190
+      Size (m): 0.03
+      Style: Flat Squares
+      Topic:
+        Value: /scan
+        Reliability Policy: Best Effort
+        Depth: 5
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Tracker
+      Enabled: true
+      Topic:
+        Value: /lidar_person_tracker/markers
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Session
+      Enabled: true
+      Topic:
+        Value: /walk_session/markers
+  Global Options:
+    Fixed Frame: walking_path
+    Background Color: 30; 30; 40
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Scale: 100
+      X: 0
+      Y: -1.4
+Window Geometry:
+  Width: 1200
+  Height: 760

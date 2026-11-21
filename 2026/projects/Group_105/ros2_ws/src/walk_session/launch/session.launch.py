@@ -1,4 +1,8 @@
-"""Everything on the laptop side of a session, LiDAR only: tracker, session, reporter, speaker."""
+"""
+Everything on the laptop side of a session, LiDAR only: tracker, session, reporter, speaker.
+
+With rviz:=true, RViz shows the scan and what the tracker and the session see.
+"""
 
 from pathlib import Path
 
@@ -18,6 +22,7 @@ def share(package):
 def generate_launch_description():
     session_params = str(share('walk_session') / 'config' / 'params.yaml')
     reporter_params = str(share('session_reporter') / 'config' / 'params.yaml')
+    rviz_config = str(share('walk_session') / 'rviz' / 'session.rviz')
     return LaunchDescription([
         DeclareLaunchArgument(
             'broker_host', default_value='localhost',
@@ -25,6 +30,9 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'speak_on_laptop', default_value='true',
             description='speak the cues on this computer'),
+        DeclareLaunchArgument(
+            'rviz', default_value='false',
+            description='show the scan, the tracker and the session in RViz'),
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
             str(share('lidar_person_tracker') / 'launch' / 'tracker.launch.py'))),
         Node(
@@ -48,5 +56,11 @@ def generate_launch_description():
             name='session_reporter',
             parameters=[reporter_params, {'broker_host': LaunchConfiguration('broker_host')}],
             output='screen',
+        ),
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            arguments=['-d', rviz_config],
+            condition=IfCondition(LaunchConfiguration('rviz')),
         ),
     ])

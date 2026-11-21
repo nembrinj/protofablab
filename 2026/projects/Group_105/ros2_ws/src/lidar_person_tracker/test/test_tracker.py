@@ -196,6 +196,25 @@ def test_steps_are_kept_when_the_walker_is_lost():
     assert after > before
 
 
+def test_the_points_of_the_walker_come_with_the_estimate():
+    robot = Robot()
+    robot.learn()
+    assert robot.scan().points_m.shape == (0, 2)
+    points = robot.scan(legs(0.5)).points_m
+    assert len(points) >= 2
+    assert np.all(np.abs(points[:, 0] - 0.5) < 0.1)  # along the path
+    assert np.all(np.abs(points[:, 1] - PATH_M) < 0.15)  # across it
+
+
+def test_the_points_of_two_people_come_with_the_estimate():
+    robot = Robot()
+    robot.learn()
+    estimate = robot.scan(legs(-1.0) + legs(1.0))
+    assert estimate.people_count == 2
+    along = estimate.points_m[:, 0]
+    assert np.any(np.abs(along + 1.0) < 0.1) and np.any(np.abs(along - 1.0) < 0.1)
+
+
 def test_relearn_starts_the_steps_again():
     robot = Robot()
     robot.learn()
@@ -361,6 +380,14 @@ def test_driving_mode_follows_the_walker_forward_and_backward(speed_mps):
     assert all(abs(estimate.position_m + 1.0) < 0.15 for estimate in seen)
     assert np.mean(known_speeds(seen)) == pytest.approx(speed_mps, abs=0.1)
     assert estimates[-1].steps == pytest.approx(steps_taken(1.8, 4.0), abs=1)
+
+
+def test_driving_mode_gives_the_walker_points_from_the_robot():
+    robot = driving_robot()
+    for estimate in followed(walk_beside(robot, start_m=-1.0, speed_mps=0.8, duration_s=3.0)):
+        along, across = estimate.points_m.T
+        assert np.all(np.abs(along - estimate.position_m) < 0.4)
+        assert np.all(np.abs(across - PATH_M) < 0.25)  # the legs are 8 cm off the line, and noisy
 
 
 def test_driving_mode_reports_the_gap_when_the_robot_is_slower():

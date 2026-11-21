@@ -7,12 +7,15 @@ Follows a walking session from what the LiDAR tracker says about the walker: whe
 | Reads | `/person/state` | `gait_interfaces/PersonState` |
 | Publishes | `/session/walk_summary` | `gait_interfaces/WalkSummary`, when a walk ends |
 | Publishes | `/session/cue` | `std_msgs/String`, the text to speak |
+| Publishes | `/walk_session/markers` | `visualization_msgs/MarkerArray`, the session's panel for RViz |
 
 - `walk_session/session.py`: the logic, without ROS.
 - `walk_session/session_node.py`: the ROS 2 node around it.
+- `walk_session/view.py`: the panel's text, without ROS.
 - `walk_session/cue_speaker.py`: speaks `/session/cue` on the laptop, until `audio_cues` speaks it on the robot.
 - `config/params.yaml`: all parameters, with their meaning.
-- `launch/session.launch.py`: the whole laptop side of a session, LiDAR only: `lidar_person_tracker`, this node, `cue_speaker` and `session_reporter`.
+- `launch/session.launch.py`: the whole laptop side of a session, LiDAR only: `lidar_person_tracker`, this node, `cue_speaker` and `session_reporter`; RViz with `rviz:=true`.
+- `rviz/session.rviz`: the RViz layout.
 
 ## Walks and stops
 
@@ -46,11 +49,21 @@ ros2 launch walk_session session.launch.py broker_host:=<IP of the computer with
 
 To try it without the robot, start the launch command, then replay a recording in a second terminal: `ros2 bag play ~/walk_test2 --topics /scan`. The tracker learns the empty room from the first 2 s of the recording.
 
+### In RViz
+
+Add `rviz:=true` to the launch command to watch the session. RViz shows it from above, in the `walking_path` frame of the [tracker](../lidar_person_tracker/README.md#in-rviz): the path lies across the screen, the robot in the middle above it.
+
+- The robot's axes (red ahead, green to its left) and the LiDAR's points, in grey.
+- From the tracker: the watched strip, the walker's points, and a status line under the strip.
+- From this node, a panel above the robot: the session ID, the walk in progress (walking or stopped, its steps and stops so far, the cue while the walker is stopped), and the numbers of the last walk.
+
+A walk that has ended can have a step or two fewer than the panel showed while it was in progress: a walk ends where the walker turned, so the steps after the turn go to the next walk.
+
 ## Tests
 
 `colcon test --packages-select walk_session` runs the tests and the lint. The tests use made-up tracker messages.
 
-Without ROS, from this folder: `PYTHONPATH=. python3 -m pytest test/test_session.py` (needs `pytest`).
+Without ROS, from this folder: `PYTHONPATH=. python3 -m pytest test/test_session.py test/test_view.py` (needs `pytest`).
 
 ## Replays of the first recordings (2026-11-20)
 
@@ -75,3 +88,4 @@ Setup: as in the [tracker's manual test](../lidar_person_tracker/README.md#manua
 7. Stop the broker (`docker compose stop mosquitto` in `dashboard/`), do a walk, then start it again. Expected: "No MQTT broker" warnings with 1 walk waiting, then "Walk ... sent to the dashboard" once the broker is back.
 8. Press Ctrl+C in the middle of a walk. Expected: "Walk ... had not ended; it is not sent".
 9. During a few walks, a second person counts the steps by hand and times the walk with a phone. Compare the hand count's steps per minute with the walk's.
+10. Start with `rviz:=true` and do steps 2 and 4 again. Expected: the path across the screen below the robot, the walker's points green and moving the same way as you, the status line's position going up as you walk to the robot's left, the steps going up as you walk, and the panel showing the walk, then "stopped" with the cue, then the last walk's numbers. With a second person: orange points. Then switch the tracker to driving mode and drive the robot beside you: the robot stays in the middle, and the status line says "following".

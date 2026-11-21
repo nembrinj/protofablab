@@ -73,7 +73,7 @@ source install/setup.bash
 colcon test && colcon test-result --verbose   # tests and lint
 ```
 
-How to run each package, and the test steps for the real robot, are in the package READMEs: [`lidar_person_tracker`](ros2_ws/src/lidar_person_tracker/README.md), [`walk_session`](ros2_ws/src/walk_session/README.md) (also starts a whole session) and [`session_reporter`](ros2_ws/src/session_reporter/README.md). The dashboard runs in Docker: see [`dashboard/`](dashboard/README.md). The offline video prototype has its own [README](walk_analysis_with_camera/README.md).
+How to run each package, and the test steps for the real robot, are in the package READMEs: [`lidar_person_tracker`](ros2_ws/src/lidar_person_tracker/README.md), [`walk_session`](ros2_ws/src/walk_session/README.md) (also starts a whole session, and RViz to watch it) and [`session_reporter`](ros2_ws/src/session_reporter/README.md). The dashboard runs in Docker: see [`dashboard/`](dashboard/README.md). The offline video prototype has its own [README](walk_analysis_with_camera/README.md).
 
 ## Hardware
 
