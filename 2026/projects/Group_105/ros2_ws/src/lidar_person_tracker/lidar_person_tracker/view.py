@@ -1,26 +1,33 @@
 """
-What the tracker draws in RViz: the watched strip, the people's points, and a status line.
+What the tracker shows in RViz: the watched strip, the people's points, and a status panel.
 
-Everything is drawn in the walking_path frame: the LiDAR's frame, turned so
-that x runs along the path, the same way as position_m, and y points away
-from the path. Seen from above with x to the right, the path then lies
-across the screen below the robot, whichever way the robot faces it.
+The strip and the points are drawn in the walking_path frame: the LiDAR's
+frame, turned so that x runs along the path, the same way as position_m, and
+y points away from the path. Seen from above with x to the right, the path
+then lies across the screen below the robot, whichever way the robot faces it.
+
+The status is a text panel fixed in the top right corner of the RViz view
+(rviz_2d_overlay_plugins): RViz's own text markers draw spaces far too wide.
 
 This module has no ROS imports, so it can be tested without ROS.
 """
 
+import html
 import math
 
 import numpy as np
 
 FRAME = 'walking_path'
-STATUS_GAP_M = 0.4  # from the far edge of the strip to the status line
-TEXT_HEIGHT_M = 0.16
 
 STRIP_RGB = (0.3, 0.6, 1.0)  # blue
 WALKER_RGB = (0.2, 0.9, 0.3)  # green: one person, measured
 CROWD_RGB = (1.0, 0.55, 0.1)  # orange: more than one person, not measured
-TEXT_RGB = (1.0, 1.0, 1.0)
+
+# The status panel, in pixels of the RViz view.
+PANEL_WIDTH_PX = 200
+PANEL_MARGIN_PX = 10  # from the edges of the view
+PANEL_LINE_PX = 20
+PANEL_TEXT_PT = 11
 
 
 def frame_yaw(facing_angle_rad):
@@ -42,33 +49,37 @@ def strip_outline(config):
     return [(-half, near), (half, near), (half, far), (-half, far), (-half, near)]
 
 
-def status_position(config):
-    """Return where the status line goes in walking_path: below the middle of the strip."""
-    return (0.0, -(config.path_distance_m + config.corridor_half_width_m + STATUS_GAP_M))
-
-
 def people_rgb(estimate):
     """Return the colour of the people's points."""
     return WALKER_RGB if estimate.people_count <= 1 else CROWD_RGB
 
 
-def status_text(estimate, mode):
-    """Return two lines on what the tracker sees in this scan."""
+def status_lines(estimate, mode):
+    """Return the lines of the status panel: what the tracker sees in this scan, in few words."""
     if not estimate.ready:
-        return 'Learning the empty room\nkeep the walking path clear'
+        return ['Learning the room']
     if estimate.moved:
-        return 'The robot has moved, so nobody is reported\npark it, clear the path, relearn'
+        return ['Robot moved: relearn']
     if estimate.people_count == 1:
-        speed = 'speed not known yet' if math.isnan(estimate.speed_mps) \
-            else f'{abs(estimate.speed_mps):.2f} m/s'
-        seen = f'Walker at {estimate.position_m:+.1f} m, {speed}'
+        seen = f'{estimate.position_m:+.1f} m'
+        if not math.isnan(estimate.speed_mps):
+            seen += f', {abs(estimate.speed_mps):.2f} m/s'
     elif estimate.people_count > 1:
-        seen = f'{estimate.people_count} people on the path, not measured'
+        seen = f'{estimate.people_count} people'
     elif estimate.following:
-        seen = 'Walker out of sight for a moment'
+        seen = 'Out of sight'
     else:
-        seen = 'Nobody on the path'
-    details = f'{estimate.steps} step{"" if estimate.steps == 1 else "s"}, {mode} mode'
-    if estimate.following:
-        details += ', following'
-    return f'{seen}\n{details}'
+        seen = 'Nobody'
+    lines = [seen, f'{estimate.steps} step{"" if estimate.steps == 1 else "s"} total']
+    if mode == 'driving':
+        lines.append('Driving, following' if estimate.following else 'Driving')
+    return lines
+
+
+def panel_text(lines):
+    """Join the lines for the panel, which reads its text as HTML."""
+    return '\n'.join(html.escape(line, quote=False) for line in lines)
+
+
+def panel_height_px(lines):
+    return len(lines) * PANEL_LINE_PX + PANEL_LINE_PX // 2

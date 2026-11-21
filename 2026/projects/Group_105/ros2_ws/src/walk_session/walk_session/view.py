@@ -1,53 +1,40 @@
 """
-The session panel drawn in RViz: the walk in progress and the last walk.
+The session panel shown in RViz: the walk in progress.
 
-The panel is drawn in the walking_path frame, which lidar_person_tracker
-publishes: x along the path, y away from it. It sits beside the robot, on the
-side away from the path, so it does not cover the walker.
+The panel is fixed in the top left corner of the RViz view
+(rviz_2d_overlay_plugins), one item per line: RViz's own text markers draw
+spaces far too wide.
 
 This module has no ROS imports, so it can be tested without ROS.
 """
 
-import math
+import html
 
-FRAME = 'walking_path'  # published by lidar_person_tracker
-POSITION_M = (0.0, 0.9)  # where the panel goes in FRAME
-TEXT_HEIGHT_M = 0.16
-TEXT_RGB = (1.0, 0.85, 0.4)  # yellow, apart from the tracker's white
+# The panel, in pixels of the RViz view.
+PANEL_WIDTH_PX = 200
+PANEL_MARGIN_PX = 10  # from the edges of the view
+PANEL_LINE_PX = 20
+PANEL_TEXT_PT = 11
 
 
-def panel_text(session_id, progress, last_walk, stop_cue):
-    """Return the panel's lines; progress and last_walk are None when there is none."""
-    lines = [f'Session {session_id}']
+def panel_lines(progress, walks):
+    """Return the panel's lines: the walk in progress, or how many walks are done."""
     if progress is None:
-        lines.append('Waiting for a walk to start')
-    else:
-        state = 'stopped' if progress.stopped else 'walking'
-        lines.append(f'Walk {progress.number}: {state}, {count(progress.steps, "step")}, '
-                     f'{count(progress.stops, "stop")}')
-        if progress.stopped:
-            lines.append(f'Said: "{stop_cue}"')
-    if last_walk is not None:
-        lines.append(f'Last walk ({last_walk.number}): {walk_numbers(last_walk)}')
-    return '\n'.join(lines)
+        return ['No walk yet'] if walks == 0 else [f'{count(walks, "walk")} done']
+    return [
+        f'Walk {progress.number}: {"stopped" if progress.stopped else "walking"}',
+        f'{count(progress.steps, "step")}, {count(progress.stops, "stop")}',
+    ]
 
 
-def walk_numbers(walk):
-    """Return the numbers of a walk that has ended, on one line."""
-    if not walk.measured:
-        return f'not measured, {walk.duration_s:.1f} s'
-    return ', '.join([
-        f'{walk.duration_s:.1f} s',
-        count(walk.steps, 'step'),
-        known(walk.cadence_spm, '.0f', 'steps/min'),
-        known(walk.speed_mps, '.2f', 'm/s'),
-        count(walk.stops, 'stop'),
-    ])
+def panel_text(lines):
+    """Join the lines for the panel, which reads its text as HTML."""
+    return '\n'.join(html.escape(line, quote=False) for line in lines)
+
+
+def panel_height_px(lines):
+    return len(lines) * PANEL_LINE_PX + PANEL_LINE_PX // 2
 
 
 def count(number, thing):
     return f'{number} {thing}' + ('' if number == 1 else 's')
-
-
-def known(value, spec, unit):
-    return f'? {unit}' if math.isnan(value) else f'{value:{spec}} {unit}'

@@ -1,7 +1,8 @@
 """
 ROS 2 node: LiDAR scans and odometry in, the state of the person on the walking path out.
 
-Also draws what it sees for RViz, in the walking_path frame (see view.py).
+Also shows what it sees in RViz: markers in the walking_path frame, and a status panel
+(see view.py).
 """
 
 from dataclasses import fields
@@ -17,6 +18,7 @@ import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
+from rviz_2d_overlay_msgs.msg import OverlayText
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import ColorRGBA
 from std_srvs.srv import Trigger
@@ -58,6 +60,7 @@ class TrackerNode(Node):
 
         self._publisher = self.create_publisher(PersonState, '/person/state', 10)
         self._markers = self.create_publisher(MarkerArray, '~/markers', 10)
+        self._panel = self.create_publisher(OverlayText, '~/panel', 10)
         self._frames = StaticTransformBroadcaster(self)
         self.create_subscription(LaserScan, '/scan', self._on_scan, qos_profile_sensor_data)
         self.create_subscription(Odometry, '/odom', self._on_odometry, qos_profile_sensor_data)
@@ -103,6 +106,8 @@ class TrackerNode(Node):
         self._publish_frame(scan.header.frame_id)
         if self._markers.get_subscription_count() > 0:
             self._markers.publish(self._draw(scan.header.stamp, estimate))
+        if self._panel.get_subscription_count() > 0:
+            self._panel.publish(self._status_panel(estimate))
         if not estimate.ready:
             self.get_logger().info(
                 'Learning the empty room, keep the walking path clear',
@@ -155,11 +160,19 @@ class TrackerNode(Node):
                          for x, y in view.to_frame(estimate.points_m)]
         if not people.points:
             people.action = Marker.DELETE
-        status = self._marker(stamp, 'status', Marker.TEXT_VIEW_FACING, view.TEXT_RGB)
-        status.scale.z = view.TEXT_HEIGHT_M
-        status.pose.position.x, status.pose.position.y = view.status_position(self._config)
-        status.text = view.status_text(estimate, self._tracker.mode)
-        return MarkerArray(markers=[strip, people, status])
+        return MarkerArray(markers=[strip, people])
+
+    def _status_panel(self, estimate):
+        """Return the status panel, in the top right corner of the RViz view."""
+        lines = view.status_lines(estimate, self._tracker.mode)
+        return OverlayText(
+            action=OverlayText.ADD,
+            width=view.PANEL_WIDTH_PX, height=view.panel_height_px(lines),
+            horizontal_alignment=OverlayText.RIGHT, vertical_alignment=OverlayText.TOP,
+            horizontal_distance=view.PANEL_MARGIN_PX, vertical_distance=view.PANEL_MARGIN_PX,
+            bg_color=ColorRGBA(r=0.0, g=0.0, b=0.0, a=0.7),
+            fg_color=ColorRGBA(r=1.0, g=1.0, b=1.0, a=1.0),
+            text_size=float(view.PANEL_TEXT_PT), text=view.panel_text(lines))
 
     @staticmethod
     def _marker(stamp, name, kind, rgb):

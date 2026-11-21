@@ -34,7 +34,6 @@ def test_the_strip_lies_below_the_robot():
     assert outline[0] == outline[-1]
     assert {x for x, _ in outline} == {-2.5, 2.5}
     assert {y for _, y in outline} == {-0.5, -3.5}
-    assert view.status_position(TrackerConfig())[1] < -3.5
 
 
 def estimate(people_count=1, position_m=0.4, speed_mps=0.72, steps=26, ready=True,
@@ -43,28 +42,29 @@ def estimate(people_count=1, position_m=0.4, speed_mps=0.72, steps=26, ready=Tru
                           moved)
 
 
-@pytest.mark.parametrize('seen, mode, text', [
-    (estimate(), 'static', 'Walker at +0.4 m, 0.72 m/s\n26 steps, static mode'),
-    (estimate(speed_mps=-0.72), 'static', 'Walker at +0.4 m, 0.72 m/s\n26 steps, static mode'),
-    (estimate(speed_mps=math.nan), 'static',
-     'Walker at +0.4 m, speed not known yet\n26 steps, static mode'),
-    (estimate(people_count=2), 'static',
-     '2 people on the path, not measured\n26 steps, static mode'),
-    (estimate(people_count=0), 'static', 'Nobody on the path\n26 steps, static mode'),
-    (estimate(people_count=0, steps=1), 'static', 'Nobody on the path\n1 step, static mode'),
+@pytest.mark.parametrize('seen, mode, lines', [
+    (estimate(), 'static', ['+0.4 m, 0.72 m/s', '26 steps total']),
+    (estimate(speed_mps=-0.72), 'static', ['+0.4 m, 0.72 m/s', '26 steps total']),
+    (estimate(speed_mps=math.nan), 'static', ['+0.4 m', '26 steps total']),
+    (estimate(people_count=2), 'static', ['2 people', '26 steps total']),
+    (estimate(people_count=0), 'static', ['Nobody', '26 steps total']),
+    (estimate(people_count=0, steps=1), 'static', ['Nobody', '1 step total']),
+    (estimate(people_count=0), 'driving', ['Nobody', '26 steps total', 'Driving']),
     (estimate(following=True), 'driving',
-     'Walker at +0.4 m, 0.72 m/s\n26 steps, driving mode, following'),
+     ['+0.4 m, 0.72 m/s', '26 steps total', 'Driving, following']),
     (estimate(people_count=0, following=True), 'driving',
-     'Walker out of sight for a moment\n26 steps, driving mode, following'),
+     ['Out of sight', '26 steps total', 'Driving, following']),
+    (estimate(ready=False), 'static', ['Learning the room']),
+    (estimate(people_count=0, moved=True), 'static', ['Robot moved: relearn']),
 ])
-def test_status_text(seen, mode, text):
-    assert view.status_text(seen, mode) == text
+def test_status_lines(seen, mode, lines):
+    assert view.status_lines(seen, mode) == lines
 
 
-def test_status_text_while_learning_and_after_a_move():
-    assert view.status_text(estimate(ready=False), 'static').startswith('Learning the empty room')
-    assert view.status_text(estimate(people_count=0, moved=True), 'static') \
-        .startswith('The robot has moved')
+def test_the_panel_has_a_line_per_item_and_is_read_as_html():
+    lines = ['a < b & c', 'second']
+    assert view.panel_text(lines) == 'a &lt; b &amp; c\nsecond'
+    assert view.panel_height_px(lines) > view.panel_height_px(lines[:1])
 
 
 def test_more_than_one_person_is_drawn_in_another_colour():

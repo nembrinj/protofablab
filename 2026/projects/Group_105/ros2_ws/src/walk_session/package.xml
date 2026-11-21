@@ -13,8 +13,9 @@
   <exec_depend>ros2launch</exec_depend>
   <exec_depend>lidar_person_tracker</exec_depend>
   <exec_depend>session_reporter</exec_depend>
-  <exec_depend>visualization_msgs</exec_depend>
+  <exec_depend>rviz_2d_overlay_msgs</exec_depend>
   <exec_depend>rviz2</exec_depend>
+  <exec_depend>rviz_2d_overlay_plugins</exec_depend>
 
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>

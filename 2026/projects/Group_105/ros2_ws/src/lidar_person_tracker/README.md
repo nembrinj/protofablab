@@ -8,6 +8,7 @@ Finds a walking person in the LiDAR scans and publishes where they are along the
 | Reads | `/odom` | `nav_msgs/Odometry` |
 | Publishes | `/person/state` | `gait_interfaces/PersonState` |
 | Publishes | `/lidar_person_tracker/markers` | `visualization_msgs/MarkerArray`, for RViz |
+| Publishes | `/lidar_person_tracker/panel` | `rviz_2d_overlay_msgs/OverlayText`, the status panel for RViz |
 | Publishes | `/tf_static`: the scan's frame → `walking_path` | `tf2_msgs/TFMessage`, for RViz |
 | Service | `/lidar_person_tracker/relearn_background` | `std_srvs/srv/Trigger` |
 
@@ -46,13 +47,14 @@ In both modes, the empty room is only used while `/odom` shows the robot within 
 
 ## In RViz
 
-While RViz (or anything else) listens to `/lidar_person_tracker/markers`, the node draws what it sees in each scan:
+While RViz (or anything else) listens, the node shows what it sees in each scan:
 
-- the watched strip, in blue;
-- the points it found people from: green for one person, orange when there are more (not measured);
-- a status line under the strip: where the walker is, how fast, the steps, and the mode. Or what it is waiting for: learning the empty room, nobody on the path, the robot has moved.
+- on `/lidar_person_tracker/markers`, the watched strip, in blue, and the points it found people from: green for one person, orange when there are more (not measured);
+- on `/lidar_person_tracker/panel`, a short status panel in the top right corner of the view: where the walker is along the path and how fast (or "Nobody", "2 people"), the steps counted since the room was learned, and in driving mode whether it follows the walker. While it learns the empty room, or once the robot has moved, it says so instead.
 
-It draws in the `walking_path` frame, which it places on the scan's frame (`base_scan` on the TurtleBot3): the same point, turned so that x runs along the path, the same way as `position_m`, and y points away from the path. Seen from above, the path then lies across the screen below the robot, whichever way the robot faces it.
+The panel needs `rviz_2d_overlay_plugins` (`rosdep install` installs it): RViz's own text markers draw every space several letters wide.
+
+It draws the strip and the points in the `walking_path` frame, which it places on the scan's frame (`base_scan` on the TurtleBot3): the same point, turned so that x runs along the path, the same way as `position_m`, and y points away from the path. Seen from above, the path then lies across the screen below the robot, whichever way the robot faces it.
 
 The RViz layout comes with `walk_session`, together with the session's panel: `ros2 launch walk_session session.launch.py rviz:=true`. For the tracker alone: `rviz2 -d $(ros2 pkg prefix walk_session)/share/walk_session/rviz/session.rviz`.
 

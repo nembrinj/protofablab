@@ -70,7 +70,7 @@ Our message types live in the `gait_interfaces` package.
 
 ## ROS 2 interfaces
 
-Built: `/scan`, `/odom`, `/person/state`, the relearn service, `/session/walk_summary`, `/session/cue`, and the markers and `walking_path` frame for RViz. The rest is planned; the topics marked *to agree* connect to Matin's part and are agreed with him first.
+Built: `/scan`, `/odom`, `/person/state`, the relearn service, `/session/walk_summary`, `/session/cue`, and the markers, panels and `walking_path` frame for RViz. The rest is planned; the topics marked *to agree* connect to Matin's part and are agreed with him first.
 
 | Topic / action | Type | From → to | Content |
 | --- | --- | --- | --- |
@@ -84,7 +84,8 @@ Built: `/scan`, `/odom`, `/person/state`, the relearn service, `/session/walk_su
 | `/session/moment` | `gait_interfaces/Moment` | `walk_session` → `clip_recorder`, `session_reporter` | Time, what happened, the numbers, the note |
 | `/session/walk_summary` | `gait_interfaces/WalkSummary` | `walk_session` → `session_reporter` | Per walk: measured or not, duration, steps, steps per minute, stops, speed |
 | `/session/cue` | `std_msgs/String` | `walk_session` → `audio_cues`; for now the stand-in `cue_speaker` | *To agree*: text to speak |
-| `/lidar_person_tracker/markers`, `/walk_session/markers` | `visualization_msgs/MarkerArray` | `lidar_person_tracker`, `walk_session` → RViz | What the tracker and the session see, to watch a session |
+| `/lidar_person_tracker/markers` | `visualization_msgs/MarkerArray` | `lidar_person_tracker` → RViz | The watched strip and the walker's points, to watch a session |
+| `/lidar_person_tracker/panel`, `/walk_session/panel` | `rviz_2d_overlay_msgs/OverlayText` | `lidar_person_tracker`, `walk_session` → RViz | Text panels: what the tracker sees, and the walk in progress |
 | `/tf_static`: `base_scan` → `walking_path` | `tf2_msgs/TFMessage` | `lidar_person_tracker` → RViz | The LiDAR's frame turned so that x runs along the path, for drawing |
 | `/cmd_vel` | `geometry_msgs/Twist` | `walker_follower` → `turtlebot3_bringup` | Speed commands while following (stage 2) |
 | `navigate_to_pose` | `nav2_msgs/action/NavigateToPose` | `walk_session` → Nav2 | Start of the path, and back (later) |

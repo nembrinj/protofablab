@@ -36,11 +36,16 @@ Visualization Manager:
       Enabled: true
       Topic:
         Value: /lidar_person_tracker/markers
-    - Class: rviz_default_plugins/MarkerArray
-      Name: Session
+    - Class: rviz_2d_overlay_plugins/TextOverlay
+      Name: Session panel
       Enabled: true
       Topic:
-        Value: /walk_session/markers
+        Value: /walk_session/panel
+    - Class: rviz_2d_overlay_plugins/TextOverlay
+      Name: Tracker panel
+      Enabled: true
+      Topic:
+        Value: /lidar_person_tracker/panel
   Global Options:
     Fixed Frame: walking_path
     Background Color: 30; 30; 40

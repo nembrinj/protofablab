@@ -7,7 +7,7 @@ Follows a walking session from what the LiDAR tracker says about the walker: whe
 | Reads | `/person/state` | `gait_interfaces/PersonState` |
 | Publishes | `/session/walk_summary` | `gait_interfaces/WalkSummary`, when a walk ends |
 | Publishes | `/session/cue` | `std_msgs/String`, the text to speak |
-| Publishes | `/walk_session/markers` | `visualization_msgs/MarkerArray`, the session's panel for RViz |
+| Publishes | `/walk_session/panel` | `rviz_2d_overlay_msgs/OverlayText`, the session's panel for RViz |
 
 - `walk_session/session.py`: the logic, without ROS.
 - `walk_session/session_node.py`: the ROS 2 node around it.
@@ -51,11 +51,11 @@ To try it without the robot, start the launch command, then replay a recording i
 
 ### In RViz
 
-Add `rviz:=true` to the launch command to watch the session. RViz shows it from above, in the `walking_path` frame of the [tracker](../lidar_person_tracker/README.md#in-rviz): the path lies across the screen, the robot in the middle above it.
+Add `rviz:=true` to the launch command to watch the session. RViz shows it from above, in the `walking_path` frame of the [tracker](../lidar_person_tracker/README.md#in-rviz): the path lies across the screen, the robot in the middle above it. The panels need `rviz_2d_overlay_plugins` (`rosdep install` installs it).
 
 - The robot's axes (red ahead, green to its left) and the LiDAR's points, in grey.
-- From the tracker: the watched strip, the walker's points, and a status line under the strip.
-- From this node, a panel above the robot: the session ID, the walk in progress (walking or stopped, its steps and stops so far, the cue while the walker is stopped), and the numbers of the last walk.
+- From the tracker: the watched strip, the walker's points, and its status panel in the top right corner.
+- From this node, a panel in the top left corner: the walk in progress, walking or stopped, with its steps and stops so far. Between walks, how many are done.
 
 A walk that has ended can have a step or two fewer than the panel showed while it was in progress: a walk ends where the walker turned, so the steps after the turn go to the next walk.
 
@@ -88,4 +88,4 @@ Setup: as in the [tracker's manual test](../lidar_person_tracker/README.md#manua
 7. Stop the broker (`docker compose stop mosquitto` in `dashboard/`), do a walk, then start it again. Expected: "No MQTT broker" warnings with 1 walk waiting, then "Walk ... sent to the dashboard" once the broker is back.
 8. Press Ctrl+C in the middle of a walk. Expected: "Walk ... had not ended; it is not sent".
 9. During a few walks, a second person counts the steps by hand and times the walk with a phone. Compare the hand count's steps per minute with the walk's.
-10. Start with `rviz:=true` and do steps 2 and 4 again. Expected: the path across the screen below the robot, the walker's points green and moving the same way as you, the status line's position going up as you walk to the robot's left, the steps going up as you walk, and the panel showing the walk, then "stopped" with the cue, then the last walk's numbers. With a second person: orange points. Then switch the tracker to driving mode and drive the robot beside you: the robot stays in the middle, and the status line says "following".
+10. Start with `rviz:=true` and do steps 2 and 4 again. Expected: the path across the screen below the robot, the walker's points green and moving the same way as you, the position in the tracker's panel going up as you walk to the robot's left, the steps going up as you walk, and the left panel showing "Walk 1: walking", then "stopped", then "1 walk done". With a second person: orange points. Then switch the tracker to driving mode and drive the robot beside you: the robot stays in the middle, and the tracker's panel says "following".
