@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Robot Control</title>
+  <script src="roslib.min.js"></script>
+
+  <!--DO NOT TOUCH THE IMG OR PAY THE PRICE OF A SEGFAULT!-->
+  <style>
+    body { font-family: sans-serif; text-align: center; }
+    img { width: 100%; max-width: 640px; background: black; } 
+    button { width: 80px; height: 60px; font-size: 20px; margin: 4px; }
+  </style>
+</head>
+<body>
+  <h2>Robot Control</h2>
+  <p id="status">Connecting....</p>
+
+  <img id="video">
+
+  <!-- The control buttons are below ←↑→↓ (these may *are* be fucked) -->
+  <div>
+    <button id="forward">'→'</button><br>
+    <button id="left">'→'</button>
+    <button id="stop">'!'</button>
+    <button id="right">'→'</button><br>
+    <button id="backward">'↓'</button>
+  </div>
+
+  <p>
+    <button id="circle_left">"circle left"</button>
+    <button id="circle_right">"circle right" </button>
+  </p>
+
+    <p>
+    <button id="lift_up">Camera ▲</button>
+    <button id="lift_down">Camera ▼</button>
+  </p>
+  <!-- the above buttons are quite disgustingly placed right now so ill adjust later-->
+
+
+  <script>
+    var robot = window.location.hostname;
+
+    // camera stream from web_video_server
+    document.getElementById("video").src =
+      "http://" + robot + ":8080/stream?topic=/image_raw&type=ros_compressed";
+
+    // connect to rosbridge
+    var ros = new ROSLIB.Ros({ url: "ws://" + robot + ":9090" });
+    ros.on("connection", function () { document.getElementById("status").innerText = "Connected"; });
+    ros.on("close", function () { document.getElementById("status").innerText = "Disconnected"; });
+
+    var cmdTopic = new ROSLIB.Topic({
+      ros: ros,
+      name: "/web/cmd",
+      messageType: "std_msgs/msg/String"
+    });
+
+    var command = "stop";
+
+    // send the current command 10 times per second
+    setInterval(function () {
+      cmdTopic.publish({ data: command });
+    }, 100);
+
+    /*
+       drive buttons: move while pressed, stop when released
+       drive buttons: click to start moving, click stop to stop
+      */
+    ["forward", "backward", "left", "right"].forEach(function (name) {
+      document.getElementById(name).onclick = function () { command = name; };
+    });
+
+    // keyboard: space bar also stops the robot
+    document.onkeydown = function (event) {
+      if (event.key === " ") { command = "stop"; }
+    };
+
+    // circle buttons keep going until stop is pressed
+    document.getElementById("circle_left").onclick = function () { command = "circle_left"; };
+    document.getElementById("circle_right").onclick = function () { command = "circle_right"; };
+    document.getElementById("stop").onclick = function () { command = "stop"; };
+
+    // camera lift: each click raises or lowers the camera one step
+    var liftTopic = new ROSLIB.Topic({
+      ros: ros,
+      name: "/web/lift",
+      messageType: "std_msgs/msg/String"
+    });
+    document.getElementById("lift_up").onclick = function () { liftTopic.publish({ data: "up" }); };
+    document.getElementById("lift_down").onclick = function () { liftTopic.publish({ data: "down" }); };
+  </script>
+</body>
+</html>
