@@ -1,0 +1,618 @@
+[
+    {
+        "id": "c617bcffbb494d8c",
+        "type": "tab",
+        "label": "LIVE TRAINING - ROS 2",
+        "disabled": false,
+        "info": "Real-data-ready live dashboard. Add ros2-suite Subscribe nodes and connect them to the Normalize ROS 2 messages function. No live simulation is included."
+    },
+    {
+        "id": "58a0e72224ad4a4c",
+        "type": "tab",
+        "label": "TRAINING HISTORY - DEMO",
+        "disabled": false,
+        "info": "Independent demo history page. It does not receive data from the live training flow."
+    },
+    {
+        "id": "7eef98e333a54ddd",
+        "type": "ui-base",
+        "name": "Adaptive Training Dashboard ",
+        "path": "/adaptive-training",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 5,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "3b7a9eb49c51459a",
+        "type": "ui-theme",
+        "name": "Adaptive Lab Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#1976D2",
+            "bgPage": "#f4f6f8",
+            "groupBg": "#ffffff",
+            "groupOutline": "#d9e0e7"
+        },
+        "sizes": {
+            "density": "comfortable",
+            "pagePadding": "16px",
+            "groupGap": "16px",
+            "groupBorderRadius": "12px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "6bfd359ff07f4106",
+        "type": "ui-page",
+        "name": "Live Training",
+        "ui": "7eef98e333a54ddd",
+        "path": "/live",
+        "icon": "monitor_heart",
+        "layout": "grid",
+        "theme": "3b7a9eb49c51459a",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Tablet",
+                "px": 576,
+                "cols": 6
+            },
+            {
+                "name": "Small Desktop",
+                "px": 768,
+                "cols": 9
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "tabs": [],
+        "order": 1,
+        "className": "",
+        "visible": true,
+        "disabled": false
+    },
+    {
+        "id": "ea2cf276d9074606",
+        "type": "ui-page",
+        "name": "Training History",
+        "ui": "7eef98e333a54ddd",
+        "path": "/history",
+        "icon": "history",
+        "layout": "grid",
+        "theme": "3b7a9eb49c51459a",
+        "order": 2,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "d51f359a028e4b6c",
+        "type": "ui-group",
+        "name": "Live exercise metrics",
+        "page": "6bfd359ff07f4106",
+        "width": "6",
+        "height": "1",
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "db321f25d5d84d91",
+        "type": "ui-group",
+        "name": "Live feedback and trends",
+        "page": "6bfd359ff07f4106",
+        "width": "6",
+        "height": "1",
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "65ff4b572ebc4c80",
+        "type": "ui-group",
+        "name": "Previous sessions · sample data",
+        "page": "ea2cf276d9074606",
+        "width": "6",
+        "height": "1",
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "d7d6c5fd5b954bac",
+        "type": "comment",
+        "z": "c617bcffbb494d8c",
+        "name": "ROS 2 via rosbridge (ws://localhost:9090)",
+        "info": "Start in this order (all with ROS_DOMAIN_ID=102):\n1. pixi run ros2 launch rosbridge_server rosbridge_websocket_launch.xml\n2. node-red\n3. pixi run ros2 launch adaptive-trainning-assistance training_assistant.launch.py\n\nTopics:\n/exercise/rep_event (std_msgs/String, JSON: repetitions, repetition_duration_seconds, pace_reps_per_minute, exercise_duration_seconds)\n/training/status (std_msgs/String)\n/training/feedback (std_msgs/String)\n/heart_rate (std_msgs/Float32, bpm)",
+        "x": 260,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "ec9bea203def4bea",
+        "type": "function",
+        "z": "c617bcffbb494d8c",
+        "name": "Normalize ROS 2 messages",
+        "func": "// All ROS 2 Subscribe nodes connect here.\n// ros2-suite sends the topic name in msg.topic and the ROS message in msg.payload.\n// std_msgs messages normally look like { data: <value> }.\nconst topic = String(msg.topic || msg.ros?.topic || \"\");\nconst raw = (msg.payload && Object.prototype.hasOwnProperty.call(msg.payload, \"data\"))\n    ? msg.payload.data : msg.payload;\n\nconst num = Number(raw);\nconst output = [null, null, null, null, null, null, null];\nconst state = context;\n\nfunction sendText(index, value, topicName) {\n    const out = { ...msg, topic: topicName, payload: value, timestamp: Date.now() };\n    output[index] = out;\n}\n\nif (topic === \"/exercise/repetitions\") {\n    if (!Number.isFinite(num)) return null;\n    state.set(\"repetitions\", num);\n    sendText(0, num, \"Repetitions\");\n    const duration = Number(state.get(\"durationSeconds\"));\n    if (duration > 0) sendText(2, (num / duration * 60).toFixed(1), \"Pace\");\n} else if (topic === \"/exercise/duration\") {\n    if (!Number.isFinite(num)) return null;\n    state.set(\"durationSeconds\", num);\n    const mins = Math.floor(num / 60);\n    const secs = Math.floor(num % 60);\n    sendText(1, `${String(mins).padStart(2,\"0\")}:${String(secs).padStart(2,\"0\")}`, \"Duration\");\n    const reps = Number(state.get(\"repetitions\"));\n    if (num > 0 && Number.isFinite(reps)) sendText(2, (reps / num * 60).toFixed(1), \"Pace\");\n} else if (topic === \"/exercise/repetition_duration\") {\n    if (!Number.isFinite(num)) return null;\n    sendText(3, `${num.toFixed(2)} s`, \"Last repetition\");\n} else if (topic === \"/exercise/rep_event\") {\n    // One JSON message per repetition from exercise_counter.\n    let e;\n    try { e = JSON.parse(raw); } catch (err) { return null; }\n    const secs = Number(e.exercise_duration_seconds) || 0;\n    sendText(0, e.repetitions, \"Repetitions\");\n    sendText(1, `${String(Math.floor(secs / 60)).padStart(2, \"0\")}:${String(Math.floor(secs % 60)).padStart(2, \"0\")}`, \"Duration\");\n    sendText(2, Number(e.pace_reps_per_minute).toFixed(1), \"Pace\");\n    sendText(3, `${Number(e.repetition_duration_seconds).toFixed(2)} s`, \"Last repetition\");\n} else if (topic === \"/training/status\") {\n    sendText(4, String(raw), \"Training status\");\n} else if (topic === \"/training/feedback\" || topic === \"/exercise/feedback\") {\n    sendText(5, String(raw), \"Coach feedback\");\n} else if (/heart.?rate|heartrate|bpm/i.test(topic)) {\n    // Connect the real HR subscribe node here once its actual topic is confirmed.\n    if (!Number.isFinite(num)) return null;\n    sendText(6, Math.round(num), \"Heart rate\");\n}\nreturn output;",
+        "outputs": 7,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "context.set('repetitions', 0);\ncontext.set('durationSeconds', 0);",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 320,
+        "wires": [
+            [
+                "0deb76ee176e46f2",
+                "953e0a6f49b44f98"
+            ],
+            [
+                "b254fbddc18b40c0"
+            ],
+            [
+                "d67e2447da5149b4"
+            ],
+            [
+                "1756b65342bc49ea"
+            ],
+            [
+                "0bc7c6cf8bfe48ec"
+            ],
+            [
+                "77166ca152424ca1"
+            ],
+            [
+                "dd68c7d1fb4f4305",
+                "87851c52e4924dbb"
+            ]
+        ]
+    },
+    {
+        "id": "0deb76ee176e46f2",
+        "type": "ui-text",
+        "z": "c617bcffbb494d8c",
+        "group": "d51f359a028e4b6c",
+        "order": 1,
+        "width": "3",
+        "height": "1",
+        "name": "Repetitions",
+        "label": "REPETITIONS",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 34,
+        "color": "",
+        "wrapText": true,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 1090,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "b254fbddc18b40c0",
+        "type": "ui-text",
+        "z": "c617bcffbb494d8c",
+        "group": "d51f359a028e4b6c",
+        "order": 2,
+        "width": "3",
+        "height": "1",
+        "name": "Exercise duration",
+        "label": "DURATION",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 28,
+        "color": "",
+        "wrapText": true,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 1110,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "d67e2447da5149b4",
+        "type": "ui-text",
+        "z": "c617bcffbb494d8c",
+        "group": "d51f359a028e4b6c",
+        "order": 3,
+        "width": "3",
+        "height": "1",
+        "name": "Pace",
+        "label": "PACE · reps/min",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 28,
+        "color": "",
+        "wrapText": true,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 1070,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "1756b65342bc49ea",
+        "type": "ui-text",
+        "z": "c617bcffbb494d8c",
+        "group": "d51f359a028e4b6c",
+        "order": 4,
+        "width": "3",
+        "height": "1",
+        "name": "Last repetition duration",
+        "label": "LAST REP · SEC",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 22,
+        "color": "",
+        "wrapText": true,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 1130,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "dd68c7d1fb4f4305",
+        "type": "ui-text",
+        "z": "c617bcffbb494d8c",
+        "group": "d51f359a028e4b6c",
+        "order": 5,
+        "width": "6",
+        "height": "2",
+        "name": "Live heart rate",
+        "label": "♥ HEART RATE · BPM",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 48,
+        "color": "#D32F2F",
+        "wrapText": true,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 1100,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "0bc7c6cf8bfe48ec",
+        "type": "ui-text",
+        "z": "c617bcffbb494d8c",
+        "group": "db321f25d5d84d91",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "name": "Training status",
+        "label": "TRAINING STATUS",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 20,
+        "color": "",
+        "wrapText": true,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 1100,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "77166ca152424ca1",
+        "type": "ui-text",
+        "z": "c617bcffbb494d8c",
+        "group": "db321f25d5d84d91",
+        "order": 2,
+        "width": "6",
+        "height": "2",
+        "name": "Coach feedback",
+        "label": "COACH FEEDBACK",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 18,
+        "color": "",
+        "wrapText": true,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 1100,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "953e0a6f49b44f98",
+        "type": "ui-chart",
+        "z": "c617bcffbb494d8c",
+        "group": "db321f25d5d84d91",
+        "name": "Repetition trend",
+        "label": "Repetition trend",
+        "order": 3,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "Time",
+        "xAxisProperty": "timestamp",
+        "xAxisPropertyType": "msg",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "Repetitions",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "0",
+        "ymax": "20",
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "circle",
+        "pointRadius": 3,
+        "showLegend": false,
+        "removeOlder": "1",
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#1976D2"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "width": "6",
+        "height": "4",
+        "className": "",
+        "x": 1100,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "87851c52e4924dbb",
+        "type": "ui-chart",
+        "z": "c617bcffbb494d8c",
+        "group": "db321f25d5d84d91",
+        "name": "Heart rate trend",
+        "label": "Heart rate trend · BPM",
+        "order": 4,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "Time",
+        "xAxisProperty": "timestamp",
+        "xAxisPropertyType": "msg",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "BPM",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "50",
+        "ymax": "180",
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "circle",
+        "pointRadius": 3,
+        "showLegend": false,
+        "removeOlder": "1",
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#D32F2F"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "width": "6",
+        "height": "4",
+        "className": "",
+        "x": 1100,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "22b0e3e027a544c6",
+        "type": "inject",
+        "z": "58a0e72224ad4a4c",
+        "name": "Load sample history on startup",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 180,
+        "wires": [
+            [
+                "d946e03a371b4590"
+            ]
+        ]
+    },
+    {
+        "id": "d946e03a371b4590",
+        "type": "function",
+        "z": "58a0e72224ad4a4c",
+        "name": "Generate isolated demo history",
+        "func": "const demo = [\n {id:\"demo-01\",date:\"18 Nov 2026 · 18:10\",exercise:\"Arm raises\",repetitions:20,duration:\"04:32\",averageHeartRate:112,maxHeartRate:128,pace:\"4.4\"},\n {id:\"demo-02\",date:\"17 Nov 2026 · 17:25\",exercise:\"Arm raises\",repetitions:18,duration:\"04:08\",averageHeartRate:109,maxHeartRate:124,pace:\"4.4\"},\n {id:\"demo-03\",date:\"16 Nov 2026 · 11:40\",exercise:\"Arm raises\",repetitions:15,duration:\"03:51\",averageHeartRate:106,maxHeartRate:121,pace:\"3.9\"},\n {id:\"demo-04\",date:\"14 Nov 2026 · 16:05\",exercise:\"Arm raises\",repetitions:22,duration:\"05:02\",averageHeartRate:115,maxHeartRate:132,pace:\"4.4\"},\n {id:\"demo-05\",date:\"12 Nov 2026 · 10:15\",exercise:\"Arm raises\",repetitions:12,duration:\"03:20\",averageHeartRate:102,maxHeartRate:116,pace:\"3.6\"}\n];\nmsg.payload=demo;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 180,
+        "wires": [
+            [
+                "ef7edb157b524b1e"
+            ]
+        ]
+    },
+    {
+        "id": "ef7edb157b524b1e",
+        "type": "ui-template",
+        "z": "58a0e72224ad4a4c",
+        "group": "65ff4b572ebc4c80",
+        "name": "Independent sample history cards",
+        "order": 1,
+        "width": "6",
+        "height": "10",
+        "format": "<template>\n <div class=\"history\">\n  <header><div><div class=\"eyebrow\">YOUR TRAINING JOURNEY · SAMPLE DATA</div><h2>Training history</h2><p>Previous exercise sessions and performance.</p></div><div class=\"count\"><b>{{(msg.payload||[]).length}}</b><span>SESSIONS</span></div></header>\n  <section class=\"summary\">\n   <div><label>TOTAL REPETITIONS</label><b>{{(msg.payload||[]).reduce((a,s)=>a+Number(s.repetitions||0),0)}}</b><small>Across all sessions</small></div>\n   <div><label>AVERAGE HEART RATE</label><b>{{(msg.payload||[]).length?Math.round((msg.payload||[]).reduce((a,s)=>a+Number(s.averageHeartRate||0),0)/(msg.payload||[]).length):0}} <small>BPM</small></b><small>Across all sessions</small></div>\n   <div><label>COMPLETED SESSIONS</label><b>{{(msg.payload||[]).length}}</b><small>Example records</small></div>\n  </section>\n  <article v-for=\"(s,i) in (msg.payload||[])\" :key=\"s.id\" class=\"session\">\n   <div class=\"top\"><div class=\"exercise\"><span class=\"symbol\">✦</span><div><h3>{{s.exercise}}</h3><small>{{s.date}}</small></div></div><span class=\"done\">✓ COMPLETED</span></div>\n   <div class=\"metrics\">\n    <div><span class=\"blue\">↗</span><b>{{s.repetitions}}</b><small>Repetitions</small></div>\n    <div><span class=\"purple\">◷</span><b>{{s.duration}}</b><small>Duration</small></div>\n    <div><span class=\"red\">♥</span><b>{{s.averageHeartRate}} <small>BPM</small></b><small>Average HR</small></div>\n    <div><span class=\"orange\">⌁</span><b>{{s.maxHeartRate}} <small>BPM</small></b><small>Peak HR</small></div>\n   </div>\n   <footer><span>AVERAGE PACE</span><b>{{s.pace}} <small>reps/min</small></b><em>SESSION {{String(i+1).padStart(2,'0')}}</em></footer>\n  </article>\n  <p class=\"disclaimer\">DEMO RECORDS ONLY · Independent from the live ROS 2 training flow.</p>\n </div>\n</template>\n<style>\n.history{padding:5px;color:var(--v-theme-on-surface)}\nheader{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 18px;gap:12px}\n.eyebrow{font-size:10px;letter-spacing:1.5px;color:#5784b8;font-weight:800;margin-bottom:6px}\nh2{font-size:24px;margin:0 0 4px;font-weight:800}header p{font-size:13px;opacity:.65;margin:0}\n.count{width:72px;height:72px;border-radius:18px;background:#e4efff;color:#205a9b;display:flex;flex-direction:column;align-items:center;justify-content:center}\n.count b{font-size:26px}.count span{font-size:9px;letter-spacing:1px;font-weight:800}\n.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}\n.summary>div{padding:14px;border:1px solid rgba(120,135,155,.2);border-radius:14px;background:var(--v-theme-surface)}\n.summary label{font-size:9px;letter-spacing:.7px;font-weight:800;opacity:.6;display:block}\n.summary b{display:block;font-size:25px;margin:7px 0 2px}.summary b small{font-size:11px}\n.summary small{font-size:10px;opacity:.6}\n.session{border:1px solid rgba(120,135,155,.2);border-radius:16px;padding:15px;margin-bottom:12px;background:var(--v-theme-surface);box-shadow:0 3px 12px rgba(30,50,80,.04)}\n.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px}\n.exercise{display:flex;gap:10px;align-items:center}.symbol{width:38px;height:38px;border-radius:12px;background:#eaf2ff;color:#2868ad;display:grid;place-items:center}\nh3{font-size:15px;margin:0 0 3px}.exercise small{font-size:11px;opacity:.62}\n.done{background:#e5f5ed;color:#217a4c;border-radius:20px;padding:6px 9px;font-size:9px;font-weight:850}\n.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 0;border-top:1px solid rgba(120,135,155,.14);border-bottom:1px solid rgba(120,135,155,.14)}\n.metrics>div{display:grid;grid-template-columns:28px auto;align-items:center;column-gap:6px}\n.metrics span{grid-row:span 2;width:27px;height:27px;border-radius:9px;display:grid;place-items:center}\n.metrics b{font-size:14px}.metrics b small{font-size:8px}.metrics div>small{font-size:9px;opacity:.62}\n.blue{background:#eaf2ff;color:#2868ad}.purple{background:#f0ebff;color:#7453b7}.red{background:#fff0f0;color:#d64d58}.orange{background:#fff4e5;color:#b87522}\nfooter{display:flex;align-items:center;gap:7px;padding-top:10px;font-size:9px;letter-spacing:.6px;font-weight:750;opacity:.75}\nfooter b{font-size:12px;color:#3979bd;letter-spacing:0}footer b small{font-size:9px}footer em{margin-left:auto;font-style:normal;opacity:.55}\n.disclaimer{text-align:center;font-size:9px;letter-spacing:.5px;opacity:.5;margin-top:14px}\n@media(max-width:600px){.summary{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr);row-gap:12px}h2{font-size:21px}}\n</style>",
+        "storeOutMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 820,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a7a1c0nn0000ros2",
+        "type": "ros2-connection",
+        "name": "rosbridge (Mac)",
+        "host": "localhost",
+        "port": 9090,
+        "tls": false,
+        "path": "",
+        "url": "",
+        "reconnectMin": 1,
+        "reconnectMax": 30,
+        "serviceTimeout": 10
+    },
+    {
+        "id": "a7a1sub000000000",
+        "type": "ros2-subscribe",
+        "z": "c617bcffbb494d8c",
+        "name": "",
+        "connection": "a7a1c0nn0000ros2",
+        "topic": "/exercise/rep_event",
+        "rosType": "std_msgs/msg/String",
+        "throttle": 0,
+        "queue": 1,
+        "qos": "auto",
+        "qosReliability": "reliable",
+        "qosDurability": "volatile",
+        "qosDepth": 10,
+        "compression": "none",
+        "buffers": false,
+        "x": 330,
+        "y": 240,
+        "wires": [
+            [
+                "ec9bea203def4bea"
+            ]
+        ]
+    },
+    {
+        "id": "a7a1sub000000001",
+        "type": "ros2-subscribe",
+        "z": "c617bcffbb494d8c",
+        "name": "",
+        "connection": "a7a1c0nn0000ros2",
+        "topic": "/training/status",
+        "rosType": "std_msgs/msg/String",
+        "throttle": 0,
+        "queue": 1,
+        "qos": "auto",
+        "qosReliability": "reliable",
+        "qosDurability": "volatile",
+        "qosDepth": 10,
+        "compression": "none",
+        "buffers": false,
+        "x": 330,
+        "y": 290,
+        "wires": [
+            [
+                "ec9bea203def4bea"
+            ]
+        ]
+    },
+    {
+        "id": "a7a1sub000000002",
+        "type": "ros2-subscribe",
+        "z": "c617bcffbb494d8c",
+        "name": "",
+        "connection": "a7a1c0nn0000ros2",
+        "topic": "/training/feedback",
+        "rosType": "std_msgs/msg/String",
+        "throttle": 0,
+        "queue": 1,
+        "qos": "auto",
+        "qosReliability": "reliable",
+        "qosDurability": "volatile",
+        "qosDepth": 10,
+        "compression": "none",
+        "buffers": false,
+        "x": 330,
+        "y": 340,
+        "wires": [
+            [
+                "ec9bea203def4bea"
+            ]
+        ]
+    },
+    {
+        "id": "a7a1sub000000003",
+        "type": "ros2-subscribe",
+        "z": "c617bcffbb494d8c",
+        "name": "",
+        "connection": "a7a1c0nn0000ros2",
+        "topic": "/heart_rate",
+        "rosType": "std_msgs/msg/Float32",
+        "throttle": 0,
+        "queue": 1,
+        "qos": "auto",
+        "qosReliability": "reliable",
+        "qosDurability": "volatile",
+        "qosDepth": 10,
+        "compression": "none",
+        "buffers": false,
+        "x": 330,
+        "y": 390,
+        "wires": [
+            [
+                "ec9bea203def4bea"
+            ]
+        ]
+    }
+]

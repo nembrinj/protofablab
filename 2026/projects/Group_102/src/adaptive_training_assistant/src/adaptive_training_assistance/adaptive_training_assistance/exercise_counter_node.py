@@ -1,386 +1,136 @@
 #!/usr/bin/env python3
-"""Count bilateral arm-raise repetitions from the TurtleBot compressed camera feed."""
+"""Count bilateral arm-raise repetitions from the pose landmarks.
 
-from __future__ import annotations
+One repetition = both wrists go above the shoulders, then both come down.
+The landmarks come from person_detection on /person/landmarks, so this node
+does not run its own MediaPipe model.
+
+Inputs:  /person/landmarks, /exercise/enable (from training_logic)
+Outputs: /exercise/rep_event (JSON, one per repetition),
+         /exercise/feedback ("Arms raised", ... ; used by gesture)
+"""
 
 import json
-import shutil
 import time
-from pathlib import Path
-from urllib.request import urlopen
 
-import cv2
-import mediapipe as mp
-import numpy as np
 import rclpy
-from mediapipe.tasks import python as mp_python
-from mediapipe.tasks.python import vision
+from adaptive_training_assistant_msgs.msg import PoseLandmarks
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from rclpy.qos import HistoryPolicy, QoSProfile, ReliabilityPolicy
-from sensor_msgs.msg import CompressedImage
-from std_msgs.msg import Bool, Float32, Int32, String
+from std_msgs.msg import Bool, String
 
-MODEL_URL = (
-    "https://storage.googleapis.com/mediapipe-models/"
-    "pose_landmarker/pose_landmarker_lite/float16/latest/"
-    "pose_landmarker_lite.task"
-)
-
-# Configuration
-IMAGE_TOPIC = "/image_raw/compressed"
-ENABLE_TOPIC = "/exercise/enable"
-SHOW_PREVIEW = False  # The dashboard displays the shared annotated preview.
-RAISE_THRESHOLD = 0.08
-LOWER_THRESHOLD = 0.02
+RAISE_THRESHOLD = 0.08  # Wrist this far above the shoulder = arm up.
+LOWER_THRESHOLD = 0.02  # Wrist below (shoulder - this) = arm down.
 MIN_VISIBILITY = 0.50
-LANDMARK_LOST_RESET_SECONDS = 1.0
-MODEL_PATH = (
-    Path.home() / ".cache" / "adaptive_training_assistant" / "pose_landmarker_lite.task"
-)
+POSE_LOST_RESET_SECONDS = 1.0  # Forget a half-done repetition after this.
 
 LEFT_SHOULDER = 11
 RIGHT_SHOULDER = 12
 LEFT_WRIST = 15
 RIGHT_WRIST = 16
+ARMS = ((LEFT_SHOULDER, LEFT_WRIST), (RIGHT_SHOULDER, RIGHT_WRIST))
 
 
 class ExerciseCounterNode(Node):
-    """Detect both arms rising above the shoulders, then returning down.
-
-    One repetition is completed when both wrists return to the lowered position.
-    The repetition duration is measured from the detected raised transition until
-    the detected lowered transition (seconds per completed repetition).
-    """
-
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__("exercise_counter")
 
-        self.image_topic = IMAGE_TOPIC
-        self.enable_topic = ENABLE_TOPIC
-        self.show_preview = SHOW_PREVIEW
-        self.raise_threshold = RAISE_THRESHOLD
-        self.lower_threshold = LOWER_THRESHOLD
-        self.min_visibility = MIN_VISIBILITY
-        self.landmark_lost_reset_seconds = LANDMARK_LOST_RESET_SECONDS
-        self.model_path = MODEL_PATH
-
-        # Counting is disabled until Training Logic receives the user's start action.
-        self.exercise_enabled = False
+        self.enabled = False  # Counting only after training_logic enables it.
         self.repetitions = 0
         self.arms_raised = False
-        self.rep_start_time: float | None = None
-        self.exercise_start_time: float | None = None
-        self.exercise_end_time: float | None = None
-        self.last_rep_completed_time: float | None = None
-        self.last_rep_duration: float | None = None
-        self.last_valid_pose_time: float | None = None
-        self._last_feedback: str | None = None
-        self._monotonic_start = time.monotonic()
-        self._previous_timestamp_ms = -1
-        self._landmarker = None
+        self.raised_at = None  # When the current repetition went up.
+        self.started_at = None  # When counting was enabled.
+        self.last_rep_at = None  # When the previous repetition finished.
+        self.last_pose_at = None  # Last time all four points were visible.
+        self.feedback = None
 
-        # Completed-repetition event carries all three metrics to Training Logic.
-        self.rep_event_publisher = self.create_publisher(
-            String, "/exercise/rep_event", 10
-        )
+        self.rep_pub = self.create_publisher(String, "/exercise/rep_event", 10)
+        self.feedback_pub = self.create_publisher(String, "/exercise/feedback", 10)
+        self.create_subscription(PoseLandmarks, "/person/landmarks", self.landmarks_callback, 10)
+        self.create_subscription(Bool, "/exercise/enable", self.enable_callback, 10)
+        # Landmarks stop arriving when the camera stops, so also check here.
+        self.create_timer(0.5, lambda: self.forget_stale_raise(time.monotonic()))
 
-        # Individual topics are useful for monitoring and plotting.
-        self.repetitions_publisher = self.create_publisher(
-            Int32, "/exercise/repetitions", 10
-        )
-        self.rep_duration_publisher = self.create_publisher(
-            Float32, "/exercise/repetition_duration", 10
-        )
-        self.exercise_duration_publisher = self.create_publisher(
-            Float32, "/exercise/duration", 10
-        )
-        self.exercise_feedback_publisher = self.create_publisher(
-            String, "/exercise/feedback", 10
-        )
+        self.set_feedback("Waiting to start")
 
-        camera_qos = QoSProfile(
-            reliability=ReliabilityPolicy.BEST_EFFORT,
-            history=HistoryPolicy.KEEP_LAST,
-            depth=1,
-        )
-        self.image_subscription = self.create_subscription(
-            CompressedImage,
-            self.image_topic,
-            self.image_callback,
-            camera_qos,
-        )
-        self.enable_subscription = self.create_subscription(
-            Bool, self.enable_topic, self.enable_callback, 10
-        )
+    def set_feedback(self, text):
+        """Publish the detector state (only when it changes)."""
+        if text != self.feedback:
+            self.feedback = text
+            self.feedback_pub.publish(String(data=text))
 
-        self._ensure_model_exists()
-        options = vision.PoseLandmarkerOptions(
-            base_options=mp_python.BaseOptions(model_asset_path=str(self.model_path)),
-            running_mode=vision.RunningMode.VIDEO,
-            num_poses=1,
-            min_pose_detection_confidence=0.5,
-            min_pose_presence_confidence=0.5,
-            min_tracking_confidence=0.5,
-        )
-        self._landmarker = vision.PoseLandmarker.create_from_options(options)
-
-        self.duration_timer = self.create_timer(0.5, self.publish_exercise_duration)
-        self._set_feedback("Waiting to start")
-        self.get_logger().info(
-            f"Exercise Counter ready but DISABLED. It will count bilateral arm raises "
-            f"only after True on {self.enable_topic}. Camera: {self.image_topic}. "
-            f"MediaPipe model: {self.model_path}"
-        )
-
-    def enable_callback(self, msg: Bool) -> None:
-        requested = bool(msg.data)
-
-        if requested and not self.exercise_enabled:
-            # Every new start begins a clean set and starts the total-time clock.
-            self.exercise_enabled = True
+    def enable_callback(self, msg):
+        if msg.data and not self.enabled:
+            # Every start begins a clean set.
             self.repetitions = 0
-            self.arms_raised = False
-            self.rep_start_time = None
-            self.exercise_start_time = time.monotonic()
-            self.exercise_end_time = None
-            self.last_rep_completed_time = None
-            self.last_rep_duration = None
-            self.last_valid_pose_time = None
-            self._set_feedback("Ready")
-            self.get_logger().info("Exercise counting ENABLED by Training Logic.")
+            self.started_at = self.last_rep_at = time.monotonic()
+            self.last_pose_at = None
+            self.set_feedback("Ready")
+            self.get_logger().info("Counting enabled")
+        elif not msg.data and self.enabled:
+            self.set_feedback("Waiting to start")
+            self.get_logger().info("Counting disabled")
+        self.enabled = bool(msg.data)
+        self.arms_raised = False
 
-        elif not requested and self.exercise_enabled:
-            self.exercise_enabled = False
-            self.arms_raised = False
-            self.rep_start_time = None
-            self.exercise_end_time = time.monotonic()
-            self._set_feedback("Waiting to start")
-            self.get_logger().info("Exercise counting DISABLED by Training Logic.")
-
-    def _ensure_model_exists(self) -> None:
-        if self.model_path.is_file() and self.model_path.stat().st_size > 100_000:
-            self.get_logger().info(f"Using cached pose model: {self.model_path}")
+    def landmarks_callback(self, msg):
+        if not self.enabled:
             return
-
-        self.model_path.parent.mkdir(parents=True, exist_ok=True)
-        temporary_path = self.model_path.with_suffix(
-            self.model_path.suffix + ".download"
-        )
-        self.get_logger().info("MediaPipe pose model missing; downloading it...")
-
-        try:
-            with urlopen(MODEL_URL, timeout=90) as response:
-                with temporary_path.open("wb") as model_file:
-                    shutil.copyfileobj(response, model_file)
-            if temporary_path.stat().st_size < 100_000:
-                raise RuntimeError("Downloaded model file is unexpectedly small.")
-            temporary_path.replace(self.model_path)
-            self.get_logger().info(f"Pose model downloaded to {self.model_path}")
-        except Exception as exc:
-            temporary_path.unlink(missing_ok=True)
-            raise RuntimeError("Could not download pose_landmarker_lite.task") from exc
-
-    def _set_feedback(self, text: str) -> None:
-        if text == self._last_feedback:
-            return
-        self._last_feedback = text
-        message = String()
-        message.data = text
-        self.exercise_feedback_publisher.publish(message)
-
-    def _timestamp_ms(self) -> int:
-        timestamp_ms = int((time.monotonic() - self._monotonic_start) * 1000)
-        timestamp_ms = max(timestamp_ms, self._previous_timestamp_ms + 1)
-        self._previous_timestamp_ms = timestamp_ms
-        return timestamp_ms
-
-    def image_callback(self, msg: CompressedImage) -> None:
-        # Do not run pose inference or count repetitions before the user starts.
-        if not self.exercise_enabled:
-            return
-
-        encoded = np.frombuffer(msg.data, dtype=np.uint8)
-        frame = cv2.imdecode(encoded, cv2.IMREAD_COLOR)
-        if frame is None:
-            self.get_logger().warning("Could not decode compressed camera image.")
-            return
-
         now = time.monotonic()
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+        points = [i for arm in ARMS for i in arm]
 
-        try:
-            result = self._landmarker.detect_for_video(mp_image, self._timestamp_ms())
-        except Exception as exc:
-            self.get_logger().warning(f"MediaPipe inference failed: {exc}")
-            return
+        if not msg.pose_detected or len(msg.visibility) <= max(points):
+            self.set_feedback("No person detected")
+        elif any(msg.visibility[i] < MIN_VISIBILITY for i in points):
+            self.set_feedback("Move into view")
+        else:
+            self.last_pose_at = now
+            # Image y grows downward: "above" means a smaller y.
+            arms_up = all(msg.y[w] < msg.y[s] - RAISE_THRESHOLD for s, w in ARMS)
+            arms_down = all(msg.y[w] > msg.y[s] - LOWER_THRESHOLD for s, w in ARMS)
+            if not self.arms_raised and arms_up:
+                self.arms_raised = True
+                self.raised_at = now
+            elif self.arms_raised and arms_down:
+                self.arms_raised = False
+                self.repetitions += 1
+                self.publish_rep(now)
+            self.set_feedback("Arms raised" if self.arms_raised else "Ready")
 
-        status = "No person detected"
-        pose_valid = False
+        self.forget_stale_raise(now)
 
-        if result.pose_landmarks:
-            landmarks = result.pose_landmarks[0]
-            left_shoulder = landmarks[LEFT_SHOULDER]
-            right_shoulder = landmarks[RIGHT_SHOULDER]
-            left_wrist = landmarks[LEFT_WRIST]
-            right_wrist = landmarks[RIGHT_WRIST]
-            keypoints = (left_shoulder, right_shoulder, left_wrist, right_wrist)
-
-            pose_valid = all(
-                point.visibility >= self.min_visibility for point in keypoints
-            )
-
-            if pose_valid:
-                self.last_valid_pose_time = now
-
-                # Image y increases downward. Both wrists must rise above their
-                # corresponding shoulders to start a bilateral arm-raise rep.
-                arms_up = (
-                    left_wrist.y < left_shoulder.y - self.raise_threshold
-                    and right_wrist.y < right_shoulder.y - self.raise_threshold
-                )
-                arms_down = (
-                    left_wrist.y > left_shoulder.y - self.lower_threshold
-                    and right_wrist.y > right_shoulder.y - self.lower_threshold
-                )
-
-                if not self.arms_raised and arms_up:
-                    self.arms_raised = True
-                    self.rep_start_time = now
-                    status = "Arms raised"
-
-                elif self.arms_raised and arms_down:
-                    self.arms_raised = False
-                    if self.rep_start_time is not None:
-                        self.last_rep_duration = max(0.0, now - self.rep_start_time)
-                        self.repetitions += 1
-                        self._publish_completed_rep(now)
-                    self.rep_start_time = None
-                    status = "Rep completed"
-
-                else:
-                    status = "Arms raised" if self.arms_raised else "Ready"
-            else:
-                status = "Move into view"
-
-        # Do not leave an incomplete rep stuck in the raised state indefinitely
-        # if the person moves out of camera view.
-        if (
-            self.arms_raised
-            and self.last_valid_pose_time is not None
-            and now - self.last_valid_pose_time > self.landmark_lost_reset_seconds
-        ):
+    def forget_stale_raise(self, now):
+        """Drop a half-finished repetition if the pose has been lost too long."""
+        if (self.enabled and self.arms_raised and self.last_pose_at is not None
+                and now - self.last_pose_at > POSE_LOST_RESET_SECONDS):
             self.arms_raised = False
-            self.rep_start_time = None
-            status = "Move into view"
+            self.set_feedback("Move into view")
 
-        self._set_feedback(status)
-
-        if self.show_preview:
-            self._draw_preview(frame, status)
-            cv2.imshow("Exercise Counter - Arm Raises", frame)
-            if cv2.waitKey(1) & 0xFF == ord("q"):
-                self.get_logger().info("Preview closed by user.")
-                rclpy.shutdown()
-
-    def _publish_completed_rep(self, now: float) -> None:
-        duration = float(self.last_rep_duration or 0.0)
-        elapsed = self._elapsed_exercise_time(now)
-        # Cadence is based on the interval between completed repetitions.
-        # For the first repetition, the interval starts when the user pressed S.
-        cycle_start = (
-            self.last_rep_completed_time
-            if self.last_rep_completed_time is not None
-            else self.exercise_start_time
-        )
-        cycle_duration = (
-            max(0.001, now - cycle_start) if cycle_start is not None else 0.001
-        )
-        pace_reps_per_minute = 60.0 / cycle_duration
-        self.last_rep_completed_time = now
-
-        duration_msg = Float32()
-        duration_msg.data = duration
-        self.rep_duration_publisher.publish(duration_msg)
-
-        count_msg = Int32()
-        count_msg.data = self.repetitions
-        self.repetitions_publisher.publish(count_msg)
-
-        event_msg = String()
-        event_msg.data = json.dumps(
-            {
-                "event": "rep_completed",
-                "repetitions": self.repetitions,
-                "repetition_duration_seconds": round(duration, 3),
-                "pace_reps_per_minute": round(pace_reps_per_minute, 2),
-                "exercise_duration_seconds": round(elapsed, 3),
-            }
-        )
-        self.rep_event_publisher.publish(event_msg)
-
+    def publish_rep(self, now):
+        duration = now - self.raised_at  # Up -> down of this repetition.
+        pace = 60.0 / max(0.001, now - self.last_rep_at)  # From the previous one.
+        elapsed = now - self.started_at
+        self.last_rep_at = now
+        self.rep_pub.publish(String(data=json.dumps({
+            "event": "rep_completed",
+            "repetitions": self.repetitions,
+            "repetition_duration_seconds": round(duration, 3),
+            "pace_reps_per_minute": round(pace, 2),
+            "exercise_duration_seconds": round(elapsed, 3),
+        })))
         self.get_logger().info(
-            f"Rep {self.repetitions} completed | "
-            f"duration={duration:.2f}s/rep | "
-            f"pace={pace_reps_per_minute:.1f} reps/min | "
-            f"exercise_time={elapsed:.1f}s"
+            f"Rep {self.repetitions}: {duration:.2f} s, {pace:.1f} reps/min, "
+            f"total {elapsed:.1f} s"
         )
 
-    def _elapsed_exercise_time(self, now: float | None = None) -> float:
-        if self.exercise_start_time is None:
-            return 0.0
-        end_time = self.exercise_end_time
-        current_time = now if now is not None else time.monotonic()
-        if end_time is not None:
-            current_time = end_time
-        return max(0.0, current_time - self.exercise_start_time)
 
-    def publish_exercise_duration(self) -> None:
-        elapsed = self._elapsed_exercise_time()
-        message = Float32()
-        message.data = float(elapsed)
-        self.exercise_duration_publisher.publish(message)
-
-    def _draw_preview(self, frame, status: str) -> None:
-        elapsed = self._elapsed_exercise_time()
-        lines = [
-            f"Reps: {self.repetitions}",
-            (
-                f"Last rep: {self.last_rep_duration:.2f} s"
-                if self.last_rep_duration is not None
-                else "Last rep: --"
-            ),
-            f"Exercise time: {elapsed:.1f} s",
-            status,
-        ]
-        for index, line in enumerate(lines):
-            cv2.putText(
-                frame,
-                line,
-                (20, 35 + index * 35),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.75,
-                (0, 255, 0) if index == 0 else (255, 255, 255),
-                2,
-                cv2.LINE_AA,
-            )
-
-    def destroy_node(self):
-        if self._landmarker is not None:
-            self._landmarker.close()
-            self._landmarker = None
-        if self.show_preview:
-            cv2.destroyAllWindows()
-        return super().destroy_node()
-
-
-def main(args=None) -> None:
+def main(args=None):
     rclpy.init(args=args)
     node = None
     try:
         node = ExerciseCounterNode()
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):  # Ctrl+C
         pass
     finally:
         if node is not None:

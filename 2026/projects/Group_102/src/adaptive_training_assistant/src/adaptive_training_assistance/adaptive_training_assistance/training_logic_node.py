@@ -1,241 +1,291 @@
 #!/usr/bin/env python3
-"""Automatically start arm-raise counting when the trainer is centred."""
+"""The training session flow, and the short spoken-style feedback for it.
+
+SEARCHING -> CENTERING -> READY --start gesture--> IN_PROGRESS
+    --stop gesture, TARGET_REPETITIONS or a heart-rate break--> FINISHED
+    -> back to READY/...
+
+During the exercise the heart rate (/heart_rate) is compared with the user's
+previous responses to this exercise (see "User and exercise history"):
+  - at 50% of the target repetitions: did it rise too little, normally or
+    too much? Too little or too much ends the exercise with a break.
+  - at any time: above the maximum expected heart rate ends it with a break.
+
+Feedback levels: Training Logic decides which message fits each moment and
+gives it an importance; the user's FEEDBACK_LEVEL decides whether it is spoken:
+
+  importance   level 1 (detailed)  level 2 (moderate)  level 3 (minimal)
+  SAFETY              yes                 yes                 yes   (never disabled)
+  ESSENTIAL           yes                 yes                 yes
+  MILESTONE           yes                 yes                 -
+  DETAIL              yes                 -                   -
+
+/training/status carries the state name. /training/feedback carries the
+spoken sentences, so a speaker node can read every message aloud.
+"""
 
 from __future__ import annotations
 
 import json
+import time
 
 import rclpy
+from adaptive_training_assistant_msgs.msg import PersonPosition
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from rclpy.qos import DurabilityPolicy, HistoryPolicy, QoSProfile, ReliabilityPolicy
+from rclpy.qos import DurabilityPolicy, QoSProfile
 from std_msgs.msg import Bool, Float32, Int32, String
 
-# Configuration
-TARGET_REPETITIONS = 10
-MIN_REPETITION_DURATION_SECONDS = 0.25
-MAX_REPETITION_DURATION_SECONDS = 4.0
+# Latched value: a node that starts later still receives the last message.
+LATCHED_QOS = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
+
+# --- User and exercise history (predefined for the prototype) -------------
+# Later these come from each user's previous sessions of each exercise, e.g.
+# also the heart-rate changes seen before and the recovery after exercise.
+TARGET_REPETITIONS = 10  # Maximum effort expected from the user for this exercise.
+EXPECTED_RISE_AT_HALF = 15.0  # bpm rise seen at 50% of the reps in previous sessions.
+SLOW_RISE_AT_HALF = 5.0  # Less than this at 50%: the body is not responding.
+FAST_RISE_AT_HALF = 30.0  # More than this at 50%: rising faster than usual.
+MAX_EXPECTED_HEART_RATE = 150.0  # Never expected above this during the exercise.
+# How much the robot talks: 1 = detailed, 2 = moderate, 3 = minimal.
+FEEDBACK_LEVEL = 2
+
+HEART_RATE_TIMEOUT_SECONDS = 5.0  # Older readings are ignored (sensor not sending).
+
+PERSON_LOST_GRACE_SECONDS = 2.0  # Same grace as the robot before searching again.
+FINISHED_HOLD_SECONDS = 5.0  # Show the result before asking for a new start.
+
+# Importance of a feedback message, and which levels speak it.
+SAFETY = "SAFETY"  # Health-related: spoken at every level, can never be turned off.
+ESSENTIAL = "ESSENTIAL"  # Start, end, instructions the user needs.
+MILESTONE = "MILESTONE"  # Important progress, e.g. halfway.
+DETAIL = "DETAIL"  # Encouragement and updates on every repetition.
+SPOKEN_AT_LEVEL = {
+    1: {SAFETY, ESSENTIAL, MILESTONE, DETAIL},
+    2: {SAFETY, ESSENTIAL, MILESTONE},
+    3: {SAFETY, ESSENTIAL},
+}
+
+SEARCHING = "SEARCHING"
+CENTERING = "CENTERING"
+READY = "READY"
+IN_PROGRESS = "IN_PROGRESS"
+FINISHED = "FINISHED"
+
+FEEDBACK = {
+    SEARCHING: "Searching for a person.",
+    CENTERING: "Centering.",
+    READY: "I am ready. Please show a thumbs up to start the exercise.",
+    IN_PROGRESS: "Let's start! Show a thumbs down to stop.",
+}
+
+
+def spoken_duration(seconds: float) -> str:
+    minutes, secs = divmod(max(0, round(seconds)), 60)
+    parts = []
+    if minutes:
+        parts.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
+    if secs or not minutes:
+        parts.append(f"{secs} second{'s' if secs != 1 else ''}")
+    return " ".join(parts)
+
+
+def summary(repetitions: int, seconds: float) -> str:
+    text = (
+        f"You did {repetitions} repetition{'s' if repetitions != 1 else ''} "
+        f"in {spoken_duration(seconds)}"
+    )
+    if repetitions > 0 and seconds > 0.0:
+        pace = round(repetitions * 60.0 / seconds)
+        text += f", at {pace} repetition{'s' if pace != 1 else ''} per minute"
+    return text + "."
 
 
 class TrainingLogicNode(Node):
-    """Enable the exercise counter automatically after stable person alignment."""
-
     def __init__(self) -> None:
         super().__init__("training_logic")
 
-        self.target_repetitions = TARGET_REPETITIONS
-        self.min_duration = MIN_REPETITION_DURATION_SECONDS
-        self.max_duration = MAX_REPETITION_DURATION_SECONDS
-
+        self.state = None
         self.person_ready = False
-        self.exercise_started = False
-        self.set_complete = False
-        self.current_repetitions = 0
-        self.exercise_duration_seconds = 0.0
-        self.last_repetition_duration_seconds = None
-        self.last_pace_reps_per_minute = None
-        self._last_status = None
-        self._last_feedback = None
+        self.last_seen = None  # Last time a person was detected.
+        self.repetitions = 0
+        self.started_at = None
+        self.finished_at = None
+        self.heart_rate = None  # Latest /heart_rate reading (bpm).
+        self.heart_rate_time = None
+        self.start_heart_rate = None  # Heart rate when the exercise started.
+        self.half_checked = False
 
-        self.training_feedback_publisher = self.create_publisher(
-            String, "/training/feedback", 10
-        )
-        self.training_status_publisher = self.create_publisher(
-            String, "/training/status", 10
-        )
-        self.set_complete_publisher = self.create_publisher(
-            Bool, "/training/set_complete", 10
-        )
-        self.vision_status_publisher = self.create_publisher(
-            String, "/training/vision_status", 10
-        )
-        self.exercise_enable_publisher = self.create_publisher(
-            Bool, "/exercise/enable", 10
-        )
-        # Latched target value lets the dashboard start after Training Logic.
-        target_qos = QoSProfile(
-            history=HistoryPolicy.KEEP_LAST,
-            depth=1,
-            reliability=ReliabilityPolicy.RELIABLE,
-            durability=DurabilityPolicy.TRANSIENT_LOCAL,
-        )
-        self.target_repetitions_publisher = self.create_publisher(
-            Int32, "/training/target_repetitions", target_qos
+        self.feedback_pub = self.create_publisher(String, "/training/feedback", 10)
+        # Latched so a node that starts later still learns the current state.
+        self.status_pub = self.create_publisher(String, "/training/status", LATCHED_QOS)
+        self.exercise_enable_pub = self.create_publisher(Bool, "/exercise/enable", 10)
+        # Latched, so the dashboard can show the level even if it starts later.
+        self.feedback_level_pub = self.create_publisher(
+            Int32, "/training/feedback_level", LATCHED_QOS
         )
 
-        ready_qos = QoSProfile(
-            history=HistoryPolicy.KEEP_LAST,
-            depth=1,
-            reliability=ReliabilityPolicy.RELIABLE,
-            durability=DurabilityPolicy.TRANSIENT_LOCAL,
-        )
-        self.person_ready_subscription = self.create_subscription(
-            Bool, "/person/ready", self.person_ready_callback, ready_qos
-        )
-        self.rep_event_subscription = self.create_subscription(
-            String, "/exercise/rep_event", self.rep_event_callback, 10
-        )
-        self.exercise_duration_subscription = self.create_subscription(
-            Float32, "/exercise/duration", self.exercise_duration_callback, 10
-        )
-        self.exercise_feedback_subscription = self.create_subscription(
-            String, "/exercise/feedback", self.exercise_feedback_callback, 10
-        )
+        self.create_subscription(PersonPosition, "/person/position", self.position_callback, 10)
+        self.create_subscription(Bool, "/person/ready", self.ready_callback, LATCHED_QOS)
+        self.create_subscription(String, "/gesture", self.gesture_callback, 10)
+        self.create_subscription(String, "/exercise/rep_event", self.rep_event_callback, 10)
+        self.create_subscription(Float32, "/heart_rate", self.heart_rate_callback, 10)
+        self.create_timer(0.1, self.update_positioning_state)
 
-        self._publish_exercise_enable(False)
-        target_msg = Int32()
-        target_msg.data = self.target_repetitions
-        self.target_repetitions_publisher.publish(target_msg)
-        complete = Bool()
-        complete.data = False
-        self.set_complete_publisher.publish(complete)
-        self._publish_status("WAITING_FOR_PERSON")
-        self._publish_feedback(
-            "Searching for a person. Please stand in front of the robot."
-        )
-        self.get_logger().info(
-            "Training Logic ready. Waiting for stable /person/ready; exercise will "
-            f"start automatically. Target={self.target_repetitions} arm raises."
-        )
+        self.exercise_enable_pub.publish(Bool(data=False))
+        self.feedback_level_pub.publish(Int32(data=FEEDBACK_LEVEL))
+        self.set_state(SEARCHING)
 
-    def _publish_exercise_enable(self, enabled: bool) -> None:
-        message = Bool()
-        message.data = bool(enabled)
-        self.exercise_enable_publisher.publish(message)
+    # --- Publishing -------------------------------------------------------
 
-    def _publish_feedback(self, text: str) -> None:
-        if text == self._last_feedback:
+    def say(self, text: str, importance: str = ESSENTIAL) -> None:
+        """Speak `text` if the user's feedback level includes its importance.
+        Safety messages are always spoken."""
+        if importance != SAFETY and importance not in SPOKEN_AT_LEVEL[FEEDBACK_LEVEL]:
+            self.get_logger().info(f"Not spoken at level {FEEDBACK_LEVEL}: {text}")
             return
-        self._last_feedback = text
-        message = String()
-        message.data = text
-        self.training_feedback_publisher.publish(message)
+        self.feedback_pub.publish(String(data=text))
+        self.get_logger().info(f"Feedback: {text}")
 
-    def _publish_status(self, status: str) -> None:
-        if status == self._last_status:
+    def set_state(self, state: str, feedback: str | None = None) -> None:
+        if state == self.state:
             return
-        self._last_status = status
-        message = String()
-        message.data = status
-        self.training_status_publisher.publish(message)
+        self.state = state
+        self.status_pub.publish(String(data=state))
+        self.say(feedback or FEEDBACK[state])
 
-    def person_ready_callback(self, msg: Bool) -> None:
+    # --- Inputs -----------------------------------------------------------
+
+    def position_callback(self, msg: PersonPosition) -> None:
+        if msg.person_detected:
+            self.last_seen = time.monotonic()
+
+    def ready_callback(self, msg: Bool) -> None:
         self.person_ready = bool(msg.data)
 
-        # /person/ready is only asserted after the shoulders are centred and
-        # alignment has remained stable. Start the exercise exactly once.
-        if self.person_ready and not self.exercise_started and not self.set_complete:
-            self.exercise_started = True
-            self.current_repetitions = 0
-            self.exercise_duration_seconds = 0.0
-            self._publish_exercise_enable(True)
-            self._publish_status("IN_PROGRESS")
-            self._publish_feedback(
-                f"Person found and centred. Exercise started automatically. "
-                f"Complete {self.target_repetitions} bilateral arm raises."
+    def gesture_callback(self, msg: String) -> None:
+        if msg.data == "start" and self.state == READY:
+            self.start_exercise()
+        elif msg.data == "stop" and self.state == IN_PROGRESS:
+            self.say("Stop exercise gesture was detected.")
+            self.finish_exercise()
+
+    def heart_rate_callback(self, msg: Float32) -> None:
+        self.heart_rate = float(msg.data)
+        self.heart_rate_time = time.monotonic()
+        # Safety at any time during the exercise, not only at the halfway check.
+        if self.state == IN_PROGRESS and self.heart_rate > MAX_EXPECTED_HEART_RATE:
+            self.take_break(
+                "Your heart rate is higher than expected. "
+                "Let's take a break and recover before continuing."
             )
-            self.get_logger().info(
-                "Person alignment confirmed; exercise counter enabled automatically."
-            )
-            return
 
-        # Before the set starts, remain in the waiting state until alignment is
-        # confirmed. Once the exercise has started, brief person-loss status
-        # changes must not overwrite the active exercise state.
-        if (
-            not self.person_ready
-            and not self.exercise_started
-            and not self.set_complete
-        ):
-            self._publish_status("WAITING_FOR_PERSON")
-            self._publish_feedback("Searching for a person and centring the shoulders.")
-
-    def exercise_duration_callback(self, msg: Float32) -> None:
-        if msg.data >= 0.0:
-            self.exercise_duration_seconds = float(msg.data)
-
-    def exercise_feedback_callback(self, msg: String) -> None:
-        vision_message = String()
-        vision_message.data = msg.data
-        self.vision_status_publisher.publish(vision_message)
-        if not self.exercise_started or self.set_complete:
-            return
-
-        if msg.data == "Arms raised":
-            self._publish_status("MOVEMENT_IN_PROGRESS")
-        elif msg.data in {"Ready", "Rep completed"}:
-            self._publish_status("IN_PROGRESS")
+    def current_heart_rate(self) -> float | None:
+        """The latest heart rate, or None if the sensor has not sent one recently."""
+        if self.heart_rate_time is None:
+            return None
+        if time.monotonic() - self.heart_rate_time > HEART_RATE_TIMEOUT_SECONDS:
+            return None
+        return self.heart_rate
 
     def rep_event_callback(self, msg: String) -> None:
-        if not self.exercise_started or self.set_complete:
+        if self.state != IN_PROGRESS:
             return
         try:
-            event = json.loads(msg.data)
-            if event.get("event") != "rep_completed":
-                return
-            repetitions = int(event["repetitions"])
-            repetition_seconds = float(event["repetition_duration_seconds"])
-            exercise_seconds = float(event["exercise_duration_seconds"])
-            pace = float(event["pace_reps_per_minute"])
-        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
-            self.get_logger().warning(f"Ignoring invalid exercise event: {exc}")
+            self.repetitions = int(json.loads(msg.data)["repetitions"])
+        except (ValueError, KeyError, TypeError) as exc:
+            self.get_logger().warning(f"Ignoring invalid rep event: {exc}")
             return
+        if self.repetitions >= TARGET_REPETITIONS:
+            self.say("Your target repetitions are complete.", ESSENTIAL)
+            self.finish_exercise()
+            return
+        if not self.half_checked and self.repetitions >= TARGET_REPETITIONS // 2:
+            self.half_checked = True
+            self.check_heart_rate_at_half()
+            return
+        self.say_progress()
 
-        if repetitions <= self.current_repetitions:
-            return
-        if repetition_seconds <= 0.0 or exercise_seconds < 0.0 or pace < 0.0:
-            self.get_logger().warning("Ignoring exercise event with invalid metrics.")
-            return
+    def say_progress(self) -> None:
+        """Encouragement and updates after a normal repetition (level 1 only)."""
+        heart_rate = self.current_heart_rate()
+        if self.repetitions == 1:
+            text = "Your first repetition is great!"
+        elif self.repetitions % 3 == 0 and heart_rate is not None:
+            text = f"Your heart rate is currently {round(heart_rate)} beats per minute."
+        else:
+            text = (
+                f"Keep going! You have completed {self.repetitions} "
+                f"out of {TARGET_REPETITIONS} repetitions."
+            )
+        self.say(text, DETAIL)
 
-        self.current_repetitions = repetitions
-        self.exercise_duration_seconds = exercise_seconds
-        self.last_repetition_duration_seconds = repetition_seconds
-        self.last_pace_reps_per_minute = pace
-        self.get_logger().info(
-            f"Rep {repetitions}/{self.target_repetitions} | "
-            f"raised-phase={repetition_seconds:.2f}s | "
-            f"pace={pace:.1f} reps/min | total={exercise_seconds:.1f}s"
+    # --- Heart rate ---------------------------------------------------------
+
+    def check_heart_rate_at_half(self) -> None:
+        """At 50% of the reps, compare the heart-rate rise with previous sessions."""
+        remaining = TARGET_REPETITIONS - self.repetitions
+        keep_going = (
+            f"Halfway there! Keep going for {remaining} more "
+            f"repetition{'s' if remaining != 1 else ''}!"
         )
-
-        if repetitions >= self.target_repetitions:
-            self.set_complete = True
-            self._publish_exercise_enable(False)
-            self._publish_status("SET_COMPLETE")
-            self._publish_feedback(
-                f"Goal reached: {repetitions}/{self.target_repetitions} arm raises. "
-                f"Total exercise time: {exercise_seconds:.1f} seconds. Set complete."
-            )
-            complete = Bool()
-            complete.data = True
-            self.set_complete_publisher.publish(complete)
-            self.get_logger().info(
-                "Training goal completed; exercise counter disabled."
-            )
+        heart_rate = self.current_heart_rate()
+        if heart_rate is None or self.start_heart_rate is None:
+            self.get_logger().warning("No heart-rate data: skipping the halfway check.")
+            self.say(keep_going, MILESTONE)
             return
-
-        if repetition_seconds < self.min_duration:
-            feedback = (
-                f"Rep {repetitions}/{self.target_repetitions}. Raised phase: "
-                f"{repetition_seconds:.2f}s. Pace: {pace:.1f} reps/min. "
-                "Try a more controlled movement."
+        rise = heart_rate - self.start_heart_rate
+        self.get_logger().info(
+            f"Halfway: heart rate {self.start_heart_rate:.0f} -> {heart_rate:.0f} bpm "
+            f"(rise {rise:+.0f}, usually about +{EXPECTED_RISE_AT_HALF:.0f})"
+        )
+        if rise < SLOW_RISE_AT_HALF:
+            self.take_break(
+                "Your body doesn't seem to be responding as expected. "
+                "Let's take a short break and check how you're feeling."
             )
-        elif repetition_seconds > self.max_duration:
-            feedback = (
-                f"Rep {repetitions}/{self.target_repetitions}. Raised phase: "
-                f"{repetition_seconds:.2f}s. Pace: {pace:.1f} reps/min. "
-                "Keep a comfortable, steady rhythm."
+        elif rise > FAST_RISE_AT_HALF:
+            self.take_break(
+                "Your heart rate is rising faster than usual. "
+                "Let's take a break and recover before continuing."
             )
         else:
-            feedback = (
-                f"Rep {repetitions}/{self.target_repetitions} completed. "
-                f"Raised phase: {repetition_seconds:.2f}s; pace: {pace:.1f} reps/min; "
-                f"total time: {exercise_seconds:.1f}s."
-            )
-        self._publish_status("IN_PROGRESS")
-        self._publish_feedback(feedback)
+            self.say(f"You're doing great! {keep_going}", MILESTONE)
 
-    def destroy_node(self):
-        self._publish_exercise_enable(False)
-        super().destroy_node()
+    def take_break(self, message: str) -> None:
+        """End the exercise because of the heart rate (always spoken)."""
+        self.say(message, SAFETY)
+        self.finish_exercise()
+
+    # --- Flow -------------------------------------------------------------
+
+    def update_positioning_state(self) -> None:
+        """Before and after an exercise, follow what the robot is doing."""
+        now = time.monotonic()
+        if self.state == IN_PROGRESS:
+            return
+        if self.state == FINISHED and now - self.finished_at < FINISHED_HOLD_SECONDS:
+            return
+
+        if self.person_ready:
+            self.set_state(READY)
+        elif self.last_seen is not None and now - self.last_seen < PERSON_LOST_GRACE_SECONDS:
+            self.set_state(CENTERING)
+        else:
+            self.set_state(SEARCHING)
+
+    def start_exercise(self) -> None:
+        self.repetitions = 0
+        self.started_at = time.monotonic()
+        self.start_heart_rate = self.current_heart_rate()
+        self.half_checked = False
+        self.exercise_enable_pub.publish(Bool(data=True))
+        self.set_state(IN_PROGRESS)
+
+    def finish_exercise(self) -> None:
+        self.exercise_enable_pub.publish(Bool(data=False))
+        self.finished_at = time.monotonic()
+        self.set_state(FINISHED, summary(self.repetitions, self.finished_at - self.started_at))
 
 
 def main(args=None) -> None:
@@ -244,7 +294,7 @@ def main(args=None) -> None:
     try:
         node = TrainingLogicNode()
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):  # Ctrl+C
         pass
     finally:
         if node is not None:

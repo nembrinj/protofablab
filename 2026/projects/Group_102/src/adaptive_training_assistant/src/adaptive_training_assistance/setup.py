@@ -32,11 +32,13 @@ setup(
     entry_points={
         "console_scripts": [
             "person_detection = adaptive_training_assistance.person_detection_node:main",
-            "positioning_controller = adaptive_training_assistance.positioning_controller_node:main",
+            "servo_tilt = adaptive_training_assistance.servo_tilt_node:main",
+            "robot_base = adaptive_training_assistance.robot_base_node:main",
             "servo_driver = adaptive_training_assistance.servo_driver_node:main",
-            "robot_search_controller = adaptive_training_assistance.robot_search_controller:main",
             "exercise_counter = adaptive_training_assistance.exercise_counter_node:main",
+            "gesture = adaptive_training_assistance.gesture_node:main",
             "training_logic = adaptive_training_assistance.training_logic_node:main",
+            "heart_rate_simulator = adaptive_training_assistance.heart_rate_simulator_node:main",
             "training_dashboard = adaptive_training_assistance.training_dashboard_node:main",
         ],
     },

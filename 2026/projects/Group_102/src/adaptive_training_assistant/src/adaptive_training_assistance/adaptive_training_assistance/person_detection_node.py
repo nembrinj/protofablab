@@ -3,219 +3,187 @@
 
 import time
 from pathlib import Path
+from urllib.request import urlretrieve
 
 import cv2
 import mediapipe as mp
 import numpy as np
 import rclpy
-from adaptive_training_assistant_msgs.msg import PersonPosition
+from adaptive_training_assistant_msgs.msg import PersonPosition, PoseLandmarks
 from mediapipe.tasks import python as mp_python
 from mediapipe.tasks.python import vision
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from rclpy.qos import DurabilityPolicy, HistoryPolicy, QoSProfile, ReliabilityPolicy
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import CompressedImage
-from std_msgs.msg import Bool, String
 
-MODEL_PATH = (
-    Path.home() / ".cache" / "adaptive_training_assistant" / "pose_landmarker_lite.task"
-)
+CAMERA_QOS = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, depth=1)
+
+
+def ensure_model(logger):
+    """Return the path of the MediaPipe pose model, downloading it the first time."""
+    path = (
+        Path.home()
+        / ".cache"
+        / "adaptive_training_assistant"
+        / "pose_landmarker_lite.task"
+    )
+    if not path.is_file():
+        logger.info("Downloading the pose model...")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        urlretrieve(
+            "https://storage.googleapis.com/mediapipe-models/"
+            "pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task",
+            path,
+        )
+    return path
+
 
 # Configuration
 IMAGE_TOPIC = "/image_raw/compressed"
-SHOW_PREVIEW = False
-PUBLISH_PREVIEW = True
 PREVIEW_TOPIC = "/person/preview/compressed"
-MIN_VISIBILITY = 0.5
-CAMERA_TIMEOUT_SECONDS = 0.75
+LANDMARKS_TOPIC = "/person/landmarks"
+POSE_DETECTION_CONFIDENCE = 0.6  # MediaPipe: how sure that a person is in the image.
+POSE_PRESENCE_CONFIDENCE = 0.6  # MediaPipe: how sure that the found pose is real.
+TRACKING_CONFIDENCE = 0.6  # MediaPipe: how sure to keep tracking between frames.
+MIN_VISIBILITY = 0.8  # A body point counts as seen only above this score.
+MIN_VISIBLE_LANDMARKS = 3  # Fewer seen body points than this = not a person.
 TRACKING_FILTER_ALPHA = 0.35  # Lower = smoother, higher = more responsive.
 
 # MediaPipe Pose indices used as person tracking anchors.
 NOSE = 0
 LEFT_SHOULDER = 11
 RIGHT_SHOULDER = 12
-LEFT_ELBOW = 13
-RIGHT_ELBOW = 14
-LEFT_WRIST = 15
-RIGHT_WRIST = 16
-LEFT_HIP = 23
-RIGHT_HIP = 24
-LEFT_KNEE = 25
-RIGHT_KNEE = 26
-LEFT_ANKLE = 27
-RIGHT_ANKLE = 28
-
 TRACKING_LANDMARKS = (
-    NOSE,
-    LEFT_SHOULDER,
-    RIGHT_SHOULDER,
-    LEFT_ELBOW,
-    RIGHT_ELBOW,
-    LEFT_WRIST,
-    RIGHT_WRIST,
-    LEFT_HIP,
-    RIGHT_HIP,
-    LEFT_KNEE,
-    RIGHT_KNEE,
-    LEFT_ANKLE,
-    RIGHT_ANKLE,
+    0,  # nose
+    11, 12,  # shoulders
+    13, 14,  # elbows
+    15, 16,  # wrists
+    23, 24,  # hips
+    25, 26,  # knees
+    27, 28,  # ankles
 )
+
+
+def is_visible(point):
+    return (
+        point.visibility >= MIN_VISIBILITY
+        and 0.0 <= point.x <= 1.0
+        and 0.0 <= point.y <= 1.0
+    )
 
 
 class PersonDetectionNode(Node):
     def __init__(self):
+
         super().__init__("person_detection")
 
-        self.image_topic = IMAGE_TOPIC
-        self.show_preview = SHOW_PREVIEW
-        self.publish_preview = PUBLISH_PREVIEW
-        self.preview_topic = PREVIEW_TOPIC
-        self.tracking_filter_alpha = TRACKING_FILTER_ALPHA
-        self.filtered_tracking_x = None
-        self.filtered_tracking_y = None
-
-        if not MODEL_PATH.is_file():
-            raise FileNotFoundError(f"MediaPipe model not found: {MODEL_PATH}")
+        model_path = ensure_model(self.get_logger())
 
         options = vision.PoseLandmarkerOptions(
-            base_options=mp_python.BaseOptions(model_asset_path=str(MODEL_PATH)),
+            base_options=mp_python.BaseOptions(model_asset_path=str(model_path)),
             running_mode=vision.RunningMode.VIDEO,
             num_poses=1,
-            min_pose_detection_confidence=0.5,
-            min_pose_presence_confidence=0.5,
-            min_tracking_confidence=0.5,
+            min_pose_detection_confidence=POSE_DETECTION_CONFIDENCE,
+            min_pose_presence_confidence=POSE_PRESENCE_CONFIDENCE,
+            min_tracking_confidence=TRACKING_CONFIDENCE,
         )
+
         self.detector = vision.PoseLandmarker.create_from_options(options)
 
-        qos = QoSProfile(
-            reliability=ReliabilityPolicy.BEST_EFFORT,
-            history=HistoryPolicy.KEEP_LAST,
-            depth=1,
+        self.filtered_point = None  # Smoothed (x, y, shoulder width).
+        self.start_time = time.monotonic()
+        self.last_timestamp_ms = -1
+
+        self.create_subscription(
+            CompressedImage, IMAGE_TOPIC, self.image_callback, CAMERA_QOS
         )
 
-        self.image_sub = self.create_subscription(
-            CompressedImage,
-            self.image_topic,
-            self.image_callback,
-            qos,
-        )
         self.position_pub = self.create_publisher(
             PersonPosition, "/person/position", 10
         )
-        # Publish the already-annotated frame for the dedicated dashboard node.
-        # This avoids running a second MediaPipe model just for visualization.
-        self.preview_pub = self.create_publisher(CompressedImage, self.preview_topic, 1)
 
-        # Readiness and training state are shown in the preview. Starting is
-        # automatic when Training Logic receives /person/ready=True.
-        self.person_ready = False
-        self.training_status = "WAITING_FOR_PERSON"
-        ready_qos = QoSProfile(
-            history=HistoryPolicy.KEEP_LAST,
-            depth=1,
-            reliability=ReliabilityPolicy.RELIABLE,
-            durability=DurabilityPolicy.TRANSIENT_LOCAL,
-        )
-        self.person_ready_sub = self.create_subscription(
-            Bool, "/person/ready", self.person_ready_callback, ready_qos
-        )
-        self.training_status_sub = self.create_subscription(
-            String, "/training/status", self.training_status_callback, 10
-        )
-
-        self.start_time = time.monotonic()
-        self.last_timestamp_ms = -1
-        self.last_frame_time = None
-        self.timeout_reported = False
-
-        self.watchdog_timer = self.create_timer(0.2, self.check_camera_timeout)
+        self.landmarks_pub = self.create_publisher(PoseLandmarks, LANDMARKS_TOPIC, 10)
+        self.preview_pub = self.create_publisher(CompressedImage, PREVIEW_TOPIC, 1)
 
         self.get_logger().info(
-            f"Person detection started on {self.image_topic}; "
-            f"annotated preview publishing on {self.preview_topic}"
+            f"Person detection started on {IMAGE_TOPIC}; "
+            f"annotated preview publishing on {PREVIEW_TOPIC}"
         )
-
-    def person_ready_callback(self, msg):
-        self.person_ready = bool(msg.data)
-
-    def training_status_callback(self, msg):
-        self.training_status = msg.data
 
     def timestamp_ms(self):
+        # MediaPipe VIDEO mode needs strictly increasing timestamps.
         timestamp = int((time.monotonic() - self.start_time) * 1000)
-        timestamp = max(timestamp, self.last_timestamp_ms + 1)
-        self.last_timestamp_ms = timestamp
-        return timestamp
+        self.last_timestamp_ms = max(timestamp, self.last_timestamp_ms + 1)
+        return self.last_timestamp_ms
 
-    @staticmethod
-    def is_visible(point):
-        return (
-            point.visibility >= MIN_VISIBILITY
-            and 0.0 <= point.x <= 1.0
-            and 0.0 <= point.y <= 1.0
-        )
-
-    def publish_not_detected(self):
-        self.filtered_tracking_x = None
-        self.filtered_tracking_y = None
+    def publish_position(self, detected, upper_body_detected, x, y, shoulder_width=0.0):
         msg = PersonPosition()
-        msg.header.stamp = self.get_clock().now().to_msg()
-        msg.person_detected = False
-        msg.upper_body_detected = False
-        msg.tracking_x = 0.0
-        msg.tracking_y = 0.0
+        msg.person_detected = detected
+        msg.upper_body_detected = upper_body_detected
+        msg.tracking_x = x
+        msg.tracking_y = y
+        msg.shoulder_width = shoulder_width
         self.position_pub.publish(msg)
 
-    def get_tracking_point(self, landmarks):
-        visible = {
-            index: landmarks[index]
-            for index in TRACKING_LANDMARKS
-            if self.is_visible(landmarks[index])
-        }
+    def publish_landmarks(self, landmarks):
+        msg = PoseLandmarks()
+        msg.pose_detected = bool(landmarks)
+        if landmarks:
+            msg.x = [float(p.x) for p in landmarks]
+            msg.y = [float(p.y) for p in landmarks]
+            msg.visibility = [float(p.visibility) for p in landmarks]
+        self.landmarks_pub.publish(msg)
 
-        if not visible:
-            return False, False, 0.0, 0.0
+    def publish_not_detected(self):
+        self.filtered_point = None
+        self.publish_position(False, False, 0.0, 0.0)
+        self.publish_landmarks(None)
 
-        left_shoulder = visible.get(LEFT_SHOULDER)
-        right_shoulder = visible.get(RIGHT_SHOULDER)
+    @staticmethod
+    def get_tracking_point(landmarks):
+        """Return (detected, upper_body_detected, x, y, shoulder_width)."""
+        visible = [landmarks[i] for i in TRACKING_LANDMARKS if is_visible(landmarks[i])]
+        if len(visible) < MIN_VISIBLE_LANDMARKS:
+            return False, False, 0.0, 0.0, 0.0
 
-        upper_body_detected = left_shoulder is not None and right_shoulder is not None
+        # The upper body needs both shoulders AND the face (nose)
+        left, right = landmarks[LEFT_SHOULDER], landmarks[RIGHT_SHOULDER]
+        if is_visible(left) and is_visible(right) and is_visible(landmarks[NOSE]):
+            # The camera's target is the shoulder midpoint; robot_base and
+            # servo_tilt move it to the image centre (0.50, 0.50).
+            x = (left.x + right.x) / 2.0
+            y = (left.y + right.y) / 2.0
+            return True, True, x, y, abs(left.x - right.x)
 
-        # The camera's target is the trainer's shoulder midpoint, not the torso
-        # centre. The positioning controller moves this point to image centre
-        # (x=0.50, y=0.50). This keeps the trainer's shoulders centred in view.
-        if upper_body_detected:
-            tracking_x = (left_shoulder.x + right_shoulder.x) / 2.0
-            tracking_y = (left_shoulder.y + right_shoulder.y) / 2.0
+        # Before both shoulders are visible, use partial landmarks only to
+        # help the robot acquire the person. READY still requires shoulders.
+        x = sum(p.x for p in visible) / len(visible)
+        y = sum(p.y for p in visible) / len(visible)
+        return True, False, x, y, 0.0
+
+    def smooth(self, *values):
+        """Low-pass filter the shoulder midpoint and width to ignore jitter."""
+        if self.filtered_point is None:
+            self.filtered_point = values
         else:
-            # Before both shoulders are visible, use partial landmarks only to
-            # help the robot acquire the person. READY still requires shoulders.
-            tracking_x = sum(p.x for p in visible.values()) / len(visible)
-            tracking_y = sum(p.y for p in visible.values()) / len(visible)
-
-        return (
-            True,
-            upper_body_detected,
-            float(tracking_x),
-            float(tracking_y),
-        )
+            a = TRACKING_FILTER_ALPHA
+            self.filtered_point = tuple(
+                a * new + (1.0 - a) * old
+                for new, old in zip(values, self.filtered_point)
+            )
+        return self.filtered_point
 
     def image_callback(self, msg):
-        self.last_frame_time = time.monotonic()
-        self.timeout_reported = False
-
-        encoded = np.frombuffer(msg.data, dtype=np.uint8)
-        frame = cv2.imdecode(encoded, cv2.IMREAD_COLOR)
-
+        frame = cv2.imdecode(np.frombuffer(msg.data, dtype=np.uint8), cv2.IMREAD_COLOR)
         if frame is None:
             self.publish_not_detected()
             return
 
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         mp_image = mp.Image(
             image_format=mp.ImageFormat.SRGB,
-            data=rgb,
+            data=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB),
         )
-
         try:
             result = self.detector.detect_for_video(mp_image, self.timestamp_ms())
         except Exception as exc:
@@ -224,89 +192,34 @@ class PersonDetectionNode(Node):
             return
 
         landmarks = result.pose_landmarks[0] if result.pose_landmarks else None
+        self.publish_landmarks(landmarks)
 
         if landmarks:
-            (
-                detected,
-                upper_body_detected,
-                tracking_x,
-                tracking_y,
-            ) = self.get_tracking_point(landmarks)
+            detected, upper_body, x, y, width = self.get_tracking_point(landmarks)
         else:
-            detected = False
-            upper_body_detected = False
-            tracking_x = 0.0
-            tracking_y = 0.0
+            detected, upper_body, x, y, width = False, False, 0.0, 0.0, 0.0
 
-        # Smooth frame-to-frame pose jitter so the servo does not chase tiny
-        # landmark movements. When both shoulders are visible, these coordinates
-        # are specifically their midpoint. Reset on detection loss so a new
-        # person is not blended with the previous person's location.
-        if detected and upper_body_detected:
-            alpha = self.tracking_filter_alpha
-            if self.filtered_tracking_x is None or self.filtered_tracking_y is None:
-                self.filtered_tracking_x = tracking_x
-                self.filtered_tracking_y = tracking_y
-            else:
-                self.filtered_tracking_x = (
-                    alpha * tracking_x + (1.0 - alpha) * self.filtered_tracking_x
-                )
-                self.filtered_tracking_y = (
-                    alpha * tracking_y + (1.0 - alpha) * self.filtered_tracking_y
-                )
-            tracking_x = self.filtered_tracking_x
-            tracking_y = self.filtered_tracking_y
+        # Smooth only the shoulder midpoint and width. Reset when they are lost
+        # so a new person is not blended with the previous person's location.
+        if detected and upper_body:
+            x, y, width = self.smooth(x, y, width)
         else:
-            self.filtered_tracking_x = None
-            self.filtered_tracking_y = None
+            self.filtered_point = None
 
-        output = PersonPosition()
-        output.header.stamp = self.get_clock().now().to_msg()
-        output.person_detected = detected
-        output.upper_body_detected = upper_body_detected
-        output.tracking_x = tracking_x
-        output.tracking_y = tracking_y
-        self.position_pub.publish(output)
+        x, y = float(x), float(y)
+        self.publish_position(detected, upper_body, x, y, float(width))
 
-        # Draw the pose marks and shoulder-centre crosshair once, then publish
-        # this annotated frame for the dashboard to combine with exercise data.
-        self.draw_preview(
-            frame,
-            landmarks,
-            detected,
-            upper_body_detected,
-            tracking_x,
-            tracking_y,
-        )
-        if self.publish_preview:
-            ok, encoded_preview = cv2.imencode(
-                ".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85]
-            )
-            if ok:
-                preview_msg = CompressedImage()
-                preview_msg.header = msg.header
-                preview_msg.format = "jpeg"
-                preview_msg.data = encoded_preview.tobytes()
-                self.preview_pub.publish(preview_msg)
+        # Send the marked-up image to the dashboard.
+        self.draw_preview(frame, landmarks, detected, upper_body, x, y)
+        ok, encoded = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
+        if ok:
+            preview_msg = CompressedImage()
+            preview_msg.header = msg.header
+            preview_msg.format = "jpeg"
+            preview_msg.data = encoded.tobytes()
+            self.preview_pub.publish(preview_msg)
 
-        # Keep this only as an optional detector-debug window. The normal
-        # workflow uses training_dashboard as the single user-facing window.
-        if self.show_preview:
-            cv2.imshow("Person Detection Debug", frame)
-            key = cv2.waitKey(1) & 0xFF
-            if key in (ord("q"), ord("Q")):
-                self.get_logger().info("Detector debug preview closed.")
-                rclpy.shutdown()
-
-    def draw_preview(
-        self,
-        frame,
-        landmarks,
-        detected,
-        upper_body_detected,
-        tracking_x,
-        tracking_y,
-    ):
+    def draw_preview(self, frame, landmarks, detected, upper_body, x, y):
         height, width = frame.shape[:2]
 
         # Image centre guides.
@@ -316,75 +229,20 @@ class PersonDetectionNode(Node):
         if landmarks:
             for index in TRACKING_LANDMARKS:
                 point = landmarks[index]
-                if self.is_visible(point):
-                    cv2.circle(
-                        frame,
-                        (int(point.x * width), int(point.y * height)),
-                        4,
-                        (0, 255, 0),
-                        -1,
-                    )
+                if is_visible(point):
+                    centre = (int(point.x * width), int(point.y * height))
+                    cv2.circle(frame, centre, 4, (0, 255, 0), -1)
 
         if detected:
-            centre = (
-                int(tracking_x * width),
-                int(tracking_y * height),
-            )
-            cv2.circle(frame, centre, 9, (0, 0, 255), 2)
-            label = "SHOULDER CENTER" if upper_body_detected else "PERSON DETECTED"
+            cv2.circle(frame, (int(x * width), int(y * height)), 9, (0, 0, 255), 2)
+            label = "SHOULDER CENTER" if upper_body else "PERSON DETECTED"
             color = (0, 255, 0)
         else:
-            label = "SEARCHING"
-            color = (0, 165, 255)
-
+            label, color = "SEARCHING", (0, 165, 255)
         cv2.putText(frame, label, (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
-
-        # MOVEMENT_IN_PROGRESS is emitted while the trainer's arms are raised.
-        # It must keep the exercise banner visible rather than falling through
-        # to the generic person-positioning message.
-        if self.training_status == "SET_COMPLETE":
-            prompt = "EXERCISE COMPLETE"
-            prompt_color = (0, 255, 0)
-        elif self.training_status in {"IN_PROGRESS", "MOVEMENT_IN_PROGRESS"}:
-            prompt = "EXERCISE IN PROGRESS"
-            prompt_color = (0, 255, 255)
-        elif self.person_ready:
-            prompt = "PERSON CENTRED - EXERCISE STARTING"
-            prompt_color = (0, 255, 0)
-        elif detected:
-            prompt = "PERSON DETECTED - CENTRING..."
-            prompt_color = (0, 200, 255)
-        else:
-            prompt = "SEARCHING FOR A PERSON..."
-            prompt_color = (0, 165, 255)
-
-        cv2.putText(
-            frame,
-            prompt,
-            (15, height - 25),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.65,
-            prompt_color,
-            2,
-            cv2.LINE_AA,
-        )
-
-    def check_camera_timeout(self):
-        if self.last_frame_time is None:
-            return
-
-        if (
-            not self.timeout_reported
-            and time.monotonic() - self.last_frame_time > CAMERA_TIMEOUT_SECONDS
-        ):
-            self.timeout_reported = True
-            self.publish_not_detected()
-            self.get_logger().warning("Camera timeout")
 
     def destroy_node(self):
         self.detector.close()
-        if self.show_preview:
-            cv2.destroyAllWindows()
         super().destroy_node()
 
 
@@ -394,7 +252,7 @@ def main(args=None):
     try:
         node = PersonDetectionNode()
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):  # Ctrl+C
         pass
     finally:
         if node is not None:

@@ -7,3 +7,5 @@ date;person;contribution
 2026-11-04;Andriana;Updated mid-term presentation worked on person detection and Arduino servo basic integration.
 2026-11-08;Andriana;Designed the servo mount and camera holder in Fusion 360 and prepared the 3D models for printing.
 2026-11-12;Andriana;Integrated the ROS 2 workflow, connected robot components, implemented launch files, debugged communication, and documented the system.
+2026-11-18;Andriana;Worked on the training dashboard and designed the Node-RED dashboard for the live training metrics and the training history.
+2026-11-25;Andriana;"Reworked robot positioning (separate servo_tilt and robot_base nodes, 1 m distance from the shoulder width, added thumbs up/down gestures to start and stop the exercise, a heart-rate simulator with heart-rate checks and feedback levels in the training logic, connected the Node-RED dashboard to ROS 2 through rosbridge."

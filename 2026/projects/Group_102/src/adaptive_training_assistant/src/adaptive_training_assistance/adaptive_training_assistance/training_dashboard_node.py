@@ -1,482 +1,282 @@
 #!/usr/bin/env python3
-"""Single camera dashboard for person tracking and arm-raise training metrics."""
+"""OpenCV window: annotated camera view and live training information.
 
-from __future__ import annotations
+Inputs: /person/preview/compressed, /training/status, /training/feedback,
+        /training/feedback_level, /exercise/rep_event, /heart_rate,
+        /person/distance
+"""
 
 import json
+import textwrap
 import time
-from typing import Optional
 
 import cv2
 import numpy as np
 import rclpy
-from adaptive_training_assistant_msgs.msg import PersonPosition
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from rclpy.qos import (
-    DurabilityPolicy,
-    HistoryPolicy,
-    QoSProfile,
-    ReliabilityPolicy,
-)
+from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import CompressedImage
-from std_msgs.msg import Bool, Float32, Int32, String
+from std_msgs.msg import Float32, Int32, String
 
-# Configuration
-PREVIEW_TOPIC = "/person/preview/compressed"
+
+# Camera frames: only the newest frame matters, dropping old ones is fine.
+CAMERA_QOS = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, depth=1)
+# Latched value: a node that starts later still receives the last message.
+LATCHED_QOS = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
+
 WINDOW_NAME = "Adaptive Training Assistant"
 PANEL_WIDTH = 370
+PANEL_HEIGHT = 800  # Tall enough that the feedback lines never overlap the rows above.
 RENDER_RATE_HZ = 20.0
 CAMERA_TIMEOUT_SECONDS = 1.0
+HEART_RATE_TIMEOUT_SECONDS = 5.0  # Older readings show as "--".
+HEART_RATE_COLOR = (90, 90, 255)  # BGR: red-ish.
+FEEDBACK_SCALE = 0.6  # Size of the training feedback text.
+FEEDBACK_CHARS_PER_LINE = 36
+FEEDBACK_MAX_LINES = 5
+FEEDBACK_LEVEL_NAMES = {1: "Detailed", 2: "Moderate", 3: "Minimal"}
+TARGET_REPETITIONS = 10  # Must match TARGET_REPETITIONS in training_logic_node.py.
+
+# Colours (BGR)
+LABEL_COLOR = (160, 175, 190)
+VALUE_COLOR = (245, 245, 245)
+TEXT_COLOR = (235, 240, 245)
+LINE_COLOR = (85, 95, 110)
+
+# Text and colour of the state box, per training state.
+STATUS_LABELS = {
+    "SEARCHING": ("SEARCHING FOR PERSON", (0, 150, 255)),
+    "CENTERING": ("CENTRING PERSON", (0, 180, 255)),
+    "READY": ("READY - THUMBS UP", (70, 210, 100)),
+    "IN_PROGRESS": ("EXERCISE IN PROGRESS", (0, 210, 255)),
+    "FINISHED": ("EXERCISE FINISHED", (70, 210, 100)),
+}
+
+
+def put_text(image, text, x, y, scale=0.58, color=TEXT_COLOR, thickness=1):
+    cv2.putText(
+        image, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX, scale, color, thickness, cv2.LINE_AA
+    )
+
+
+def format_time(seconds):
+    total = max(0, int(seconds))
+    return f"{total // 60:02d}:{total % 60:02d}"
 
 
 class TrainingDashboardNode(Node):
-    """Display the annotated camera view and live exercise information."""
-
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__("training_dashboard")
 
-        preview_topic = PREVIEW_TOPIC
-        self.window_name = WINDOW_NAME
-        self.panel_width = PANEL_WIDTH
-        self.camera_timeout = CAMERA_TIMEOUT_SECONDS
-        render_rate = RENDER_RATE_HZ
-
-        self.latest_frame: Optional[np.ndarray] = None
-        self.last_frame_time: Optional[float] = None
-        self.last_position_time: Optional[float] = None
-        self.person_detected = False
-        self.upper_body_detected = False
-        self.tracking_x: Optional[float] = None
-        self.tracking_y: Optional[float] = None
-        self.person_ready = False
-        self.exercise_enabled = False
-        self.training_status = "WAITING_FOR_PERSON"
-        self.training_feedback = "Searching for a person and centring the shoulders."
-        self.exercise_feedback = "Waiting for person"
-        self.set_complete = False
+        self.latest_frame = None
+        self.last_frame_time = None
+        self.distance = None
+        self.heart_rate = None
+        self.heart_rate_time = None
+        self.feedback_level = None
+        self.training_status = "SEARCHING"
+        self.training_feedback = "Searching for a person."
 
         self.repetitions = 0
-        self.target_repetitions = 10
-        self.last_rep_duration: Optional[float] = None
-        self.pace_reps_per_minute: Optional[float] = None
+        self.last_rep_duration = None
+        self.pace_reps_per_minute = None
         self.exercise_duration = 0.0
+        self.exercise_started_at = None
 
-        camera_qos = QoSProfile(
-            reliability=ReliabilityPolicy.BEST_EFFORT,
-            history=HistoryPolicy.KEEP_LAST,
-            depth=1,
+        self.create_subscription(
+            CompressedImage, "/person/preview/compressed", self.image_callback, CAMERA_QOS
         )
-        self.image_sub = self.create_subscription(
-            CompressedImage, preview_topic, self.image_callback, camera_qos
+        self.create_subscription(String, "/exercise/rep_event", self.rep_event_callback, 10)
+        self.create_subscription(Float32, "/person/distance", self.distance_callback, 10)
+        self.create_subscription(Float32, "/heart_rate", self.heart_rate_callback, 10)
+        self.create_subscription(
+            Int32, "/training/feedback_level", self.feedback_level_callback, LATCHED_QOS
         )
-        self.position_sub = self.create_subscription(
-            PersonPosition, "/person/position", self.position_callback, 10
-        )
-        self.ready_sub = self.create_subscription(
-            Bool, "/person/ready", self.ready_callback, 10
-        )
-        self.enable_sub = self.create_subscription(
-            Bool, "/exercise/enable", self.enable_callback, 10
-        )
-        self.training_status_sub = self.create_subscription(
-            String, "/training/status", self.training_status_callback, 10
-        )
-        self.training_feedback_sub = self.create_subscription(
-            String, "/training/feedback", self.training_feedback_callback, 10
-        )
-        self.exercise_feedback_sub = self.create_subscription(
-            String, "/exercise/feedback", self.exercise_feedback_callback, 10
-        )
-        self.repetitions_sub = self.create_subscription(
-            Int32, "/exercise/repetitions", self.repetitions_callback, 10
-        )
-        self.rep_duration_sub = self.create_subscription(
-            Float32, "/exercise/repetition_duration", self.rep_duration_callback, 10
-        )
-        self.exercise_duration_sub = self.create_subscription(
-            Float32, "/exercise/duration", self.duration_callback, 10
-        )
-        self.rep_event_sub = self.create_subscription(
-            String, "/exercise/rep_event", self.rep_event_callback, 10
-        )
-        self.set_complete_sub = self.create_subscription(
-            Bool, "/training/set_complete", self.set_complete_callback, 10
-        )
+        self.create_subscription(String, "/training/status", self.status_callback, LATCHED_QOS)
+        self.create_subscription(String, "/training/feedback", self.feedback_callback, 10)
 
-        # Training Logic publishes its target with transient-local durability so
-        # the dashboard receives it even if the dashboard starts a little later.
-        target_qos = QoSProfile(
-            history=HistoryPolicy.KEEP_LAST,
-            depth=1,
-            reliability=ReliabilityPolicy.RELIABLE,
-            durability=DurabilityPolicy.TRANSIENT_LOCAL,
-        )
-        self.target_sub = self.create_subscription(
-            Int32,
-            "/training/target_repetitions",
-            self.target_callback,
-            target_qos,
-        )
+        cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
+        cv2.resizeWindow(WINDOW_NAME, 1100, 650)
+        self.create_timer(1.0 / RENDER_RATE_HZ, self.render_callback)
 
-        cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
-        cv2.resizeWindow(self.window_name, 1100, 650)
-        self.timer = self.create_timer(1.0 / render_rate, self.render_callback)
-        self.get_logger().info(
-            f"Training dashboard ready. Subscribing to annotated camera {preview_topic}"
-        )
-
-    def image_callback(self, msg: CompressedImage) -> None:
-        encoded = np.frombuffer(msg.data, dtype=np.uint8)
-        frame = cv2.imdecode(encoded, cv2.IMREAD_COLOR)
-        if frame is None:
-            self.get_logger().warning("Dashboard could not decode preview image.")
-            return
-        self.latest_frame = frame
-        self.last_frame_time = time.monotonic()
-
-    def position_callback(self, msg: PersonPosition) -> None:
-        self.person_detected = bool(msg.person_detected)
-        self.upper_body_detected = bool(msg.upper_body_detected)
-        self.tracking_x = float(msg.tracking_x) if msg.person_detected else None
-        self.tracking_y = float(msg.tracking_y) if msg.person_detected else None
-        self.last_position_time = time.monotonic()
-
-    def ready_callback(self, msg: Bool) -> None:
-        self.person_ready = bool(msg.data)
-
-    def enable_callback(self, msg: Bool) -> None:
-        self.exercise_enabled = bool(msg.data)
-
-    def training_status_callback(self, msg: String) -> None:
+    def status_callback(self, msg):
+        # A new exercise starts with clean numbers and a running clock; the
+        # clock stops (keeps its value) when the exercise ends.
+        if msg.data == "IN_PROGRESS" and self.training_status != "IN_PROGRESS":
+            self.repetitions = 0
+            self.last_rep_duration = None
+            self.pace_reps_per_minute = None
+            self.exercise_duration = 0.0
+            self.exercise_started_at = time.monotonic()
+        elif msg.data != "IN_PROGRESS":
+            self.exercise_started_at = None
         self.training_status = msg.data
 
-    def training_feedback_callback(self, msg: String) -> None:
+    def feedback_callback(self, msg):
         self.training_feedback = msg.data
 
-    def exercise_feedback_callback(self, msg: String) -> None:
-        self.exercise_feedback = msg.data
+    def image_callback(self, msg):
+        frame = cv2.imdecode(np.frombuffer(msg.data, dtype=np.uint8), cv2.IMREAD_COLOR)
+        if frame is not None:
+            self.latest_frame = frame
+            self.last_frame_time = time.monotonic()
 
-    def repetitions_callback(self, msg: Int32) -> None:
-        self.repetitions = max(0, int(msg.data))
+    def feedback_level_callback(self, msg):
+        self.feedback_level = msg.data
 
-    def rep_duration_callback(self, msg: Float32) -> None:
-        if msg.data >= 0.0:
-            self.last_rep_duration = float(msg.data)
+    def heart_rate_callback(self, msg):
+        self.heart_rate = msg.data
+        self.heart_rate_time = time.monotonic()
 
-    def duration_callback(self, msg: Float32) -> None:
-        if msg.data >= 0.0:
-            self.exercise_duration = float(msg.data)
+    def distance_callback(self, msg):
+        # robot_base publishes -1 when the distance is unknown.
+        self.distance = msg.data if msg.data >= 0.0 else None
 
-    def target_callback(self, msg: Int32) -> None:
-        self.target_repetitions = max(1, int(msg.data))
-
-    def set_complete_callback(self, msg: Bool) -> None:
-        self.set_complete = bool(msg.data)
-
-    def rep_event_callback(self, msg: String) -> None:
+    def rep_event_callback(self, msg):
         try:
             event = json.loads(msg.data)
-            if event.get("event") != "rep_completed":
-                return
-            self.repetitions = max(0, int(event.get("repetitions", self.repetitions)))
-            self.last_rep_duration = float(
-                event.get("repetition_duration_seconds", self.last_rep_duration or 0.0)
-            )
-            self.pace_reps_per_minute = float(
-                event.get("pace_reps_per_minute", self.pace_reps_per_minute or 0.0)
-            )
-            self.exercise_duration = float(
-                event.get("exercise_duration_seconds", self.exercise_duration)
-            )
-        except (json.JSONDecodeError, TypeError, ValueError) as exc:
-            self.get_logger().warning(f"Invalid repetition event for dashboard: {exc}")
+            self.repetitions = int(event["repetitions"])
+            self.last_rep_duration = float(event["repetition_duration_seconds"])
+            self.pace_reps_per_minute = float(event["pace_reps_per_minute"])
+            self.exercise_duration = float(event["exercise_duration_seconds"])
+        except (ValueError, KeyError, TypeError) as exc:
+            self.get_logger().warning(f"Ignoring invalid rep event: {exc}")
 
-    @staticmethod
-    def _put_text(
-        image: np.ndarray,
-        text: str,
-        x: int,
-        y: int,
-        scale: float = 0.58,
-        color=(235, 240, 245),
-        thickness: int = 1,
-    ) -> None:
-        cv2.putText(
-            image,
-            text,
-            (x, y),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            scale,
-            color,
-            thickness,
-            cv2.LINE_AA,
-        )
-
-    def _wrap_text(self, text: str, max_chars: int = 39) -> list[str]:
-        words = text.split()
-        lines: list[str] = []
-        current = ""
-        for word in words:
-            candidate = f"{current} {word}".strip()
-            if len(candidate) > max_chars and current:
-                lines.append(current)
-                current = word
-            else:
-                current = candidate
-        if current:
-            lines.append(current)
-        return lines[:4]
-
-    @staticmethod
-    def _format_time(seconds: float) -> str:
-        total = max(0, int(seconds))
-        return f"{total // 60:02d}:{total % 60:02d}"
-
-    def _status_label(self, camera_ok: bool) -> tuple[str, tuple[int, int, int]]:
-        if not camera_ok:
-            return "CAMERA FEED LOST", (0, 100, 255)
-        if self.set_complete or self.training_status == "SET_COMPLETE":
-            return "SET COMPLETE", (70, 210, 100)
-        if self.training_status == "MOVEMENT_IN_PROGRESS":
-            return "ARMS RAISED", (0, 210, 255)
-        if self.exercise_enabled:
-            return "EXERCISE IN PROGRESS", (0, 210, 255)
-        if self.person_ready:
-            return "PERSON CENTRED", (70, 210, 100)
-        if self.person_detected:
-            return "CENTRING PERSON", (0, 180, 255)
-        return "SEARCHING FOR PERSON", (0, 150, 255)
-
-    def render_callback(self) -> None:
-        now = time.monotonic()
+    def render_callback(self):
+        if self.exercise_started_at is not None:
+            self.exercise_duration = time.monotonic() - self.exercise_started_at
         camera_ok = (
-            self.latest_frame is not None
-            and self.last_frame_time is not None
-            and now - self.last_frame_time <= self.camera_timeout
+            self.last_frame_time is not None
+            and time.monotonic() - self.last_frame_time <= CAMERA_TIMEOUT_SECONDS
         )
 
         if self.latest_frame is None:
             video = np.zeros((960, 540, 3), dtype=np.uint8)
-            self._put_text(video, "WAITING FOR CAMERA PREVIEW...", 35, 280, 0.8)
+            put_text(video, "WAITING FOR CAMERA PREVIEW...", 35, 280, 0.8)
         else:
             video = self.latest_frame.copy()
 
-        # Keep the information panel tall enough for all metrics while limiting
-        # the camera width so the combined window fits comfortably on a laptop.
+        # Keep the panel tall enough for all metrics while limiting the camera
+        # width so the combined window fits comfortably on a laptop.
         original_h, original_w = video.shape[:2]
         scale = min(1050.0 / max(1, original_w), 720.0 / max(1, original_h))
-        display_w = max(1, int(original_w * scale))
+        width = max(1, int(original_w * scale))
         display_h = max(1, int(original_h * scale))
-        video = cv2.resize(video, (display_w, display_h), interpolation=cv2.INTER_AREA)
-        height = max(720, display_h)
-        width = display_w
+        video = cv2.resize(video, (width, display_h), interpolation=cv2.INTER_AREA)
+        height = max(PANEL_HEIGHT, display_h)
         video_y = (height - display_h) // 2
-        panel = np.zeros((height, self.panel_width, 3), dtype=np.uint8)
-        canvas = np.zeros((height, width + self.panel_width, 3), dtype=np.uint8)
+        canvas = np.zeros((height, width + PANEL_WIDTH, 3), dtype=np.uint8)
         canvas[video_y : video_y + display_h, :width] = video
-        canvas[:, width:] = panel
-        panel_x = width
 
-        # If camera preview is stale, make that explicit instead of showing
-        # apparently live information over a frozen frame.
+        # If the preview is stale, say so instead of showing apparently live
+        # information over a frozen frame.
         if not camera_ok:
-            overlay = canvas[:, :width].copy()
-            cv2.rectangle(overlay, (0, 0), (width, height), (0, 0, 0), -1)
-            canvas[:, :width] = cv2.addWeighted(
-                overlay, 0.60, canvas[:, :width], 0.40, 0
-            )
-            self._put_text(
-                canvas, "CAMERA FEED LOST", 25, height // 2, 0.9, (0, 120, 255), 2
-            )
+            canvas[:, :width] = cv2.convertScaleAbs(canvas[:, :width], alpha=0.40)
+            put_text(canvas, "CAMERA FEED LOST", 25, height // 2, 0.9, (0, 120, 255), 2)
 
-        status, status_color = self._status_label(camera_ok)
-        self._put_text(
-            canvas, "ADAPTIVE TRAINING", panel_x + 22, 34, 0.72, (255, 255, 255), 2
-        )
-        self._put_text(canvas, "ASSISTANT", panel_x + 22, 61, 0.58, (150, 190, 220), 1)
-        cv2.line(
-            canvas,
-            (panel_x + 18, 82),
-            (panel_x + self.panel_width - 18, 82),
-            (85, 95, 110),
-            1,
-        )
+        self._draw_panel(canvas, width, height, camera_ok)
 
-        self._put_text(
-            canvas, "CURRENT STATE", panel_x + 22, 113, 0.48, (160, 175, 190), 1
-        )
-        cv2.rectangle(
-            canvas,
-            (panel_x + 18, 126),
-            (panel_x + self.panel_width - 18, 166),
-            status_color,
-            -1,
-        )
-        self._put_text(canvas, status, panel_x + 29, 152, 0.55, (15, 20, 25), 2)
+        cv2.imshow(WINDOW_NAME, canvas)
+        if (cv2.waitKey(1) & 0xFF) in (ord("q"), ord("Q")):
+            rclpy.shutdown()
+
+    def _draw_panel(self, canvas, panel_x, height, camera_ok):
+        x = panel_x + 22
+        right = panel_x + PANEL_WIDTH - 18
+
+        def label(text, y):
+            put_text(canvas, text, x, y, 0.48, LABEL_COLOR)
+
+        def value(text, y, scale=0.67, color=VALUE_COLOR, thickness=2):
+            put_text(canvas, text, x, y, scale, color, thickness)
+
+        def separator(y):
+            cv2.line(canvas, (panel_x + 18, y), (right, y), LINE_COLOR, 1)
+
+        put_text(canvas, "ADAPTIVE TRAINING", x, 34, 0.72, (255, 255, 255), 2)
+        put_text(canvas, "ASSISTANT", x, 61, 0.58, (150, 190, 220), 1)
+        level = self.feedback_level
+        level_text = ("Feedback: --" if level is None else
+                      f"Feedback: {level} {FEEDBACK_LEVEL_NAMES.get(level, '')}".rstrip())
+        put_text(canvas, level_text, x + 150, 61, 0.5, (150, 190, 220), 1)
+        separator(82)
+
+        if camera_ok:
+            status, status_color = STATUS_LABELS.get(
+                self.training_status, STATUS_LABELS["SEARCHING"]
+            )
+        else:
+            status, status_color = "CAMERA FEED LOST", (0, 100, 255)
+        label("CURRENT STATE", 113)
+        cv2.rectangle(canvas, (panel_x + 18, 126), (right, 166), status_color, -1)
+        put_text(canvas, status, panel_x + 29, 152, 0.55, (15, 20, 25), 2)
 
         # Repetition progress.
-        reps_text = f"{self.repetitions:02d} / {self.target_repetitions:02d}"
-        self._put_text(
-            canvas, "REPETITIONS", panel_x + 22, 205, 0.48, (160, 175, 190), 1
-        )
-        self._put_text(canvas, reps_text, panel_x + 22, 246, 1.05, (90, 220, 130), 2)
-        bar_x1, bar_y1 = panel_x + 22, 263
-        bar_x2, bar_y2 = panel_x + self.panel_width - 22, 276
-        cv2.rectangle(canvas, (bar_x1, bar_y1), (bar_x2, bar_y2), (65, 72, 82), -1)
-        progress = min(1.0, self.repetitions / max(1, self.target_repetitions))
-        cv2.rectangle(
-            canvas,
-            (bar_x1, bar_y1),
-            (bar_x1 + int((bar_x2 - bar_x1) * progress), bar_y2),
-            (70, 200, 120),
-            -1,
-        )
+        label("REPETITIONS", 205)
+        reps_text = f"{self.repetitions:02d} / {TARGET_REPETITIONS:02d}"
+        value(reps_text, 246, 1.05, (90, 220, 130))
+        bar_x2 = panel_x + PANEL_WIDTH - 22
+        cv2.rectangle(canvas, (x, 263), (bar_x2, 276), (65, 72, 82), -1)
+        progress = min(1.0, self.repetitions / TARGET_REPETITIONS)
+        bar_end = x + int((bar_x2 - x) * progress)
+        cv2.rectangle(canvas, (x, 263), (bar_end, 276), (70, 200, 120), -1)
 
         # Pace and timings.
         row_y = 317
-        self._put_text(canvas, "PACE", panel_x + 22, row_y, 0.48, (160, 175, 190), 1)
-        pace = (
-            "--"
-            if self.pace_reps_per_minute is None
-            else f"{self.pace_reps_per_minute:.1f} reps/min"
-        )
-        self._put_text(canvas, pace, panel_x + 22, row_y + 30, 0.67, (245, 245, 245), 2)
+        label("PACE", row_y)
+        value("--" if self.pace_reps_per_minute is None
+              else f"{self.pace_reps_per_minute:.1f} reps/min", row_y + 30)
+        label("LAST REP DURATION", row_y + 75)
+        value("--" if self.last_rep_duration is None
+              else f"{self.last_rep_duration:.2f} s", row_y + 105)
+        label("TOTAL EXERCISE TIME", row_y + 150)
+        value(format_time(self.exercise_duration), row_y + 180, 0.75)
 
-        self._put_text(
-            canvas,
-            "LAST REP DURATION",
-            panel_x + 22,
-            row_y + 75,
-            0.48,
-            (160, 175, 190),
-            1,
-        )
-        rep_time = (
-            "--"
-            if self.last_rep_duration is None
-            else f"{self.last_rep_duration:.2f} s"
-        )
-        self._put_text(
-            canvas, rep_time, panel_x + 22, row_y + 105, 0.67, (245, 245, 245), 2
-        )
-
-        self._put_text(
-            canvas,
-            "TOTAL EXERCISE TIME",
-            panel_x + 22,
-            row_y + 150,
-            0.48,
-            (160, 175, 190),
-            1,
-        )
-        self._put_text(
-            canvas,
-            self._format_time(self.exercise_duration),
-            panel_x + 22,
-            row_y + 180,
-            0.75,
-            (245, 245, 245),
-            2,
-        )
-
-        # Shoulder midpoint and alignment.
+        # Heart rate and estimated distance (for calibration), side by side.
         sep_y = row_y + 211
-        cv2.line(
-            canvas,
-            (panel_x + 18, sep_y),
-            (panel_x + self.panel_width - 18, sep_y),
-            (85, 95, 110),
-            1,
+        separator(sep_y)
+        heart_rate_ok = (
+            self.heart_rate_time is not None
+            and time.monotonic() - self.heart_rate_time <= HEART_RATE_TIMEOUT_SECONDS
         )
-        self._put_text(
-            canvas,
-            "SHOULDER CENTRE",
-            panel_x + 22,
-            sep_y + 29,
-            0.48,
-            (160, 175, 190),
-            1,
-        )
-        if self.tracking_x is not None and self.tracking_y is not None:
-            pos = f"x: {self.tracking_x:.2f}   y: {self.tracking_y:.2f}"
-        else:
-            pos = "not detected"
-        self._put_text(canvas, pos, panel_x + 22, sep_y + 58, 0.57, (245, 245, 245), 1)
-        self._put_text(
-            canvas,
-            f"Person: {'YES' if self.person_detected else 'NO'}   Ready: {'YES' if self.person_ready else 'NO'}",
-            panel_x + 22,
-            sep_y + 86,
-            0.43,
-            (190, 205, 215),
-            1,
-        )
+        label("HEART RATE", sep_y + 29)
+        value(f"{self.heart_rate:.0f} bpm" if heart_rate_ok else "--", sep_y + 64, 0.85,
+              HEART_RATE_COLOR)
+        put_text(canvas, "DISTANCE", x + 190, sep_y + 29, 0.48, LABEL_COLOR)
+        put_text(canvas, "--" if self.distance is None else f"{self.distance:.2f} m",
+                 x + 190, sep_y + 64, 0.67, VALUE_COLOR, 2)
 
         # Latest feedback from Training Logic, wrapped to fit the panel.
-        feedback_y = min(height - 105, sep_y + 115)
-        cv2.line(
-            canvas,
-            (panel_x + 18, feedback_y - 22),
-            (panel_x + self.panel_width - 18, feedback_y - 22),
-            (85, 95, 110),
-            1,
-        )
-        self._put_text(
-            canvas,
-            "TRAINING FEEDBACK",
-            panel_x + 22,
-            feedback_y,
-            0.48,
-            (160, 175, 190),
-            1,
-        )
-        for idx, line in enumerate(self._wrap_text(self.training_feedback)):
-            self._put_text(
-                canvas,
-                line,
-                panel_x + 22,
-                feedback_y + 25 + idx * 22,
-                0.43,
-                (235, 240, 245),
-                1,
-            )
+        feedback_y = sep_y + 105
+        separator(feedback_y - 22)
+        label("TRAINING FEEDBACK", feedback_y)
+        lines = textwrap.wrap(
+            self.training_feedback, FEEDBACK_CHARS_PER_LINE,
+            break_long_words=False, break_on_hyphens=False,
+        )[:FEEDBACK_MAX_LINES]
+        for index, line in enumerate(lines):
+            put_text(canvas, line, x, feedback_y + 32 + index * 29, FEEDBACK_SCALE,
+                     TEXT_COLOR, 2)
 
-        # A compact footer shows the raw exercise detector state.
-        self._put_text(
-            canvas,
-            f"VISION: {self.exercise_feedback[:42]}",
-            14,
-            height - 12,
-            0.42,
-            (255, 255, 255),
-            1,
-        )
-
-        cv2.imshow(self.window_name, canvas)
-        key = cv2.waitKey(1) & 0xFF
-        if key in (ord("q"), ord("Q")):
-            self.get_logger().info("Dashboard closed by user.")
-            rclpy.shutdown()
-
-    def destroy_node(self) -> None:
-        cv2.destroyWindow(self.window_name)
+    def destroy_node(self):
+        cv2.destroyWindow(WINDOW_NAME)
         super().destroy_node()
 
 
-def main(args=None) -> None:
+def main(args=None):
     rclpy.init(args=args)
     node = None
     try:
         node = TrainingDashboardNode()
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):  # Ctrl+C
         pass
     finally:
         if node is not None:
             node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
-
 
 if __name__ == "__main__":
     main()
