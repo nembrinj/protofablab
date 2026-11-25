@@ -11,7 +11,7 @@ IMPORTANT!!!!: start this node with the camera at the BOTTOM. That position coun
 '''
 
 # NOTE: if this program running in the back messes 
-# with the blocking beetween ros2 or website either rework blocking priorities or add threading (if thats even possible here) 
+# with the blocking beetween ros2 or website either rework blocking priorities or add threading (if thats even possible here)   
 
 import time                          # used for the short pause between motor steps 
 import rclpy                         # ROS 2 Python library: starts ROS and runs our node
@@ -30,10 +30,12 @@ MAX_HEIGHT = 8192         # halfsteps from bottom to top
 
 UP_IS_CLOCKWISE = True    #NOTE: Adjust based on motor mounting flip False != clckwise
 
-# Halfstep sequence for the stepper motor (8 phases)
+# Fullstep sequence for the stepper motor  (4 phases)
 SEQ = [
-    [1, 0, 0, 0], [1, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 0],
-    [0, 0, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1], [1, 0, 0, 1],
+    [1, 1, 0, 0],
+    [0, 1, 1, 0],
+    [0, 0, 1, 1],
+    [1, 0, 0, 1],
 ]
 
 
@@ -102,7 +104,7 @@ class CameraLift(Node):
 
         # 2. Do the half-steps one by one
         for i in range(abs(steps)):
-            phase = seq[i % 8]               # which of the 8 rows to use now (repeats 0-7)
+            phase = seq[i % 4]               # which of the 4 rows to use now (repeats 0-4)
 
             # switch each of the 4 coils on (1) or off (0) for this row
             for coil in range(4):
