@@ -3,7 +3,7 @@
 
 States:
   SCAN    robot still, servo_tilt sweeps the camera up/down
-  ROTATE  robot turns to the next search heading (centre -> left -> right)
+  ROTATE  robot turns ~30° further round (a full circle in ~12 steps)
   TRACK   person visible: turn to centre them, then drive to 1.5 m
 
 Inputs:  /person/position, /odom, /training/status,
@@ -42,8 +42,10 @@ READY_ON_SECONDS = 0.5
 FROZEN_STATUSES = {"READY", "IN_PROGRESS", "FINISHED"}
 NO_SEARCH_STATUSES = {"IN_PROGRESS", "FINISHED"}
 
-# Search: centre, left, right (radians from where the search started).
-SEARCH_OFFSETS = (0.0, 0.25, -0.25)
+# Search: turn this far (radians, ~30°) after each up/down sweep, always the
+# same way, so the robot looks all around in about 12 steps. Smaller than the
+# camera's 60° field of view, so the views overlap and nobody is missed.
+SEARCH_STEP = 0.5
 ROTATION_KP = 0.8
 MAX_ROTATION_SPEED = 0.20
 ROTATION_TOLERANCE = 0.04
@@ -57,7 +59,7 @@ ANGULAR_DIRECTION = -1.0  # Verify physical direction on the real robot.
 # Distance from the shoulder width in the image.
 # Calibrate: let the robot stop, measure the real distance, then set
 #   SHOULDER_WIDTH_M = 0.38 * real_distance / 1.5   and rebuild.
-TARGET_DISTANCE_M = 1
+TARGET_DISTANCE_M = 1.3
 DISTANCE_TOLERANCE_M = 0.15
 SHOULDER_WIDTH_M = 0.38  # Typical adult distance between the shoulder joints.
 CAMERA_HFOV_DEG = 60.0  # Horizontal field of view of the USB camera.
@@ -99,9 +101,7 @@ class RobotBaseNode(Node):
         super().__init__("robot_base")
 
         self.state = "SCAN"
-        self.stage = 0  # Index into SEARCH_OFFSETS.
-        self.origin_yaw = None  # Heading where the search started.
-        self.target_yaw = None
+        self.target_yaw = None  # Heading to turn to (ROTATE).
 
         self.yaw = None
         self.last_odom_time = None
@@ -268,20 +268,15 @@ class RobotBaseNode(Node):
         """Sweep the camera up/down, then turn to the next heading, and repeat."""
         self.set_ready(False)
 
-        if self.state == "TRACK":  # Start a new search from the current heading.
-            self.state, self.stage, self.origin_yaw = "SCAN", 0, self.yaw
+        if self.state == "TRACK":  # Start a new search where the robot is.
+            self.state = "SCAN"
             self.scan_complete = False
-        if self.origin_yaw is None:
-            self.origin_yaw = self.yaw
 
         if self.state == "SCAN":
             self.drive(0.0)
             self.set_sweep(True)
-            if self.scan_complete:  # Sweep done: turn to the next heading.
-                self.stage = (self.stage + 1) % len(SEARCH_OFFSETS)
-                self.target_yaw = normalize_angle(
-                    self.origin_yaw + SEARCH_OFFSETS[self.stage]
-                )
+            if self.scan_complete:  # Sweep done: turn one step further round.
+                self.target_yaw = normalize_angle(self.yaw + SEARCH_STEP)
                 self.state = "ROTATE"
                 self.set_sweep(False)
                 self.scan_complete = False

@@ -11,8 +11,8 @@
 // 1. WI-FI CONFIGURATION
 // ==========================================
 
-const char* ssid = "WIFI";
-const char* password = "PASSWORD";
+const char* ssid = "WIFI";          // Put your Wi-Fi name here before uploading (do not commit it).
+const char* password = "PASSWORD";  // Put your Wi-Fi password here before uploading (do not commit it).
 
 WiFiUDP udp;
 const int localPort = 4210;

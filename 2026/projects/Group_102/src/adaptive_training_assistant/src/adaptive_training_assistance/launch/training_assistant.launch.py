@@ -49,7 +49,7 @@ def generate_launch_description():
             ),
             Node(
                 package="adaptive-trainning-assistance",
-                executable="training_dashboard",
+                executable="camera_view",
                 output="screen",
             ),
         ]

@@ -39,7 +39,7 @@ setup(
             "gesture = adaptive_training_assistance.gesture_node:main",
             "training_logic = adaptive_training_assistance.training_logic_node:main",
             "heart_rate_simulator = adaptive_training_assistance.heart_rate_simulator_node:main",
-            "training_dashboard = adaptive_training_assistance.training_dashboard_node:main",
+            "camera_view = adaptive_training_assistance.camera_view_node:main",
         ],
     },
 )

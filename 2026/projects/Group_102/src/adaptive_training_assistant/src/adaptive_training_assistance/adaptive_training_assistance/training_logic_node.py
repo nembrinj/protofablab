@@ -8,8 +8,10 @@ SEARCHING -> CENTERING -> READY --start gesture--> IN_PROGRESS
 During the exercise the heart rate (/heart_rate) is compared with the user's
 previous responses to this exercise (see "User and exercise history"):
   - at 50% of the target repetitions: did it rise too little, normally or
-    too much? Too little or too much ends the exercise with a break.
-  - at any time: above the maximum expected heart rate ends it with a break.
+    too much? Too little ends the exercise with a break; too much only
+    warns the user, who can stop with a thumbs down.
+  - at any time: above the maximum expected heart rate warns the user once
+    (the exercise goes on).
 
 Feedback levels: Training Logic decides which message fits each moment and
 gives it an importance; the user's FEEDBACK_LEVEL decides whether it is spoken:
@@ -72,6 +74,9 @@ READY = "READY"
 IN_PROGRESS = "IN_PROGRESS"
 FINISHED = "FINISHED"
 
+# Added to a high heart-rate warning: the exercise goes on, the user decides.
+BE_CAREFUL = "Please be careful. If you feel you need to stop, show a thumbs down."
+
 FEEDBACK = {
     SEARCHING: "Searching for a person.",
     CENTERING: "Centering.",
@@ -115,6 +120,7 @@ class TrainingLogicNode(Node):
         self.heart_rate_time = None
         self.start_heart_rate = None  # Heart rate when the exercise started.
         self.half_checked = False
+        self.high_warned = False  # Warned about a very high heart rate already.
 
         self.feedback_pub = self.create_publisher(String, "/training/feedback", 10)
         # Latched so a node that starts later still learns the current state.
@@ -147,12 +153,13 @@ class TrainingLogicNode(Node):
         self.feedback_pub.publish(String(data=text))
         self.get_logger().info(f"Feedback: {text}")
 
-    def set_state(self, state: str, feedback: str | None = None) -> None:
+    def set_state(self, state: str, feedback: str | None = None,
+                  importance: str = ESSENTIAL) -> None:
         if state == self.state:
             return
         self.state = state
         self.status_pub.publish(String(data=state))
-        self.say(feedback or FEEDBACK[state])
+        self.say(feedback or FEEDBACK[state], importance)
 
     # --- Inputs -----------------------------------------------------------
 
@@ -167,18 +174,16 @@ class TrainingLogicNode(Node):
         if msg.data == "start" and self.state == READY:
             self.start_exercise()
         elif msg.data == "stop" and self.state == IN_PROGRESS:
-            self.say("Stop exercise gesture was detected.")
-            self.finish_exercise()
+            self.finish_exercise("Stop exercise gesture was detected.")
 
     def heart_rate_callback(self, msg: Float32) -> None:
         self.heart_rate = float(msg.data)
         self.heart_rate_time = time.monotonic()
-        # Safety at any time during the exercise, not only at the halfway check.
-        if self.state == IN_PROGRESS and self.heart_rate > MAX_EXPECTED_HEART_RATE:
-            self.take_break(
-                "Your heart rate is higher than expected. "
-                "Let's take a break and recover before continuing."
-            )
+        # Safety at any time during the exercise: warn once, the user decides.
+        if (self.state == IN_PROGRESS and not self.high_warned
+                and self.heart_rate > MAX_EXPECTED_HEART_RATE):
+            self.high_warned = True
+            self.say(f"Your heart rate is higher than ever before. {BE_CAREFUL}", SAFETY)
 
     def current_heart_rate(self) -> float | None:
         """The latest heart rate, or None if the sensor has not sent one recently."""
@@ -197,8 +202,7 @@ class TrainingLogicNode(Node):
             self.get_logger().warning(f"Ignoring invalid rep event: {exc}")
             return
         if self.repetitions >= TARGET_REPETITIONS:
-            self.say("Your target repetitions are complete.", ESSENTIAL)
-            self.finish_exercise()
+            self.finish_exercise("Your target repetitions are complete.")
             return
         if not self.half_checked and self.repetitions >= TARGET_REPETITIONS // 2:
             self.half_checked = True
@@ -245,17 +249,16 @@ class TrainingLogicNode(Node):
                 "Let's take a short break and check how you're feeling."
             )
         elif rise > FAST_RISE_AT_HALF:
-            self.take_break(
-                "Your heart rate is rising faster than usual. "
-                "Let's take a break and recover before continuing."
-            )
+            # Warn, but let the user decide whether to stop.
+            self.say(f"Your heart rate is rising faster than usual. {BE_CAREFUL}", SAFETY)
+        elif self.high_warned:  # Already warned: no "doing great" now.
+            self.say(keep_going, MILESTONE)
         else:
             self.say(f"You're doing great! {keep_going}", MILESTONE)
 
     def take_break(self, message: str) -> None:
         """End the exercise because of the heart rate (always spoken)."""
-        self.say(message, SAFETY)
-        self.finish_exercise()
+        self.finish_exercise(message, SAFETY)
 
     # --- Flow -------------------------------------------------------------
 
@@ -279,13 +282,17 @@ class TrainingLogicNode(Node):
         self.started_at = time.monotonic()
         self.start_heart_rate = self.current_heart_rate()
         self.half_checked = False
+        self.high_warned = False
         self.exercise_enable_pub.publish(Bool(data=True))
         self.set_state(IN_PROGRESS)
 
-    def finish_exercise(self) -> None:
+    def finish_exercise(self, reason: str, importance: str = ESSENTIAL) -> None:
+        """End the exercise. The reason and the result go out as ONE message,
+        so a display that shows only the latest message shows both."""
         self.exercise_enable_pub.publish(Bool(data=False))
         self.finished_at = time.monotonic()
-        self.set_state(FINISHED, summary(self.repetitions, self.finished_at - self.started_at))
+        result = summary(self.repetitions, self.finished_at - self.started_at)
+        self.set_state(FINISHED, f"{reason} {result}", importance)
 
 
 def main(args=None) -> None:

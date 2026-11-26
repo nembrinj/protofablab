@@ -10,4 +10,4 @@
 
 - [ ] **Camera protective housing / enclosure** — Protects the camera from physical damage during operation.
 
-- [x] **Servo motor (SG90)** — Allows the camera to rotate or change its orientation to follow the user's movements.
+- [ ] **Servo motor (SG90)** — Allows the camera to rotate or change its orientation to follow the user's movements.
