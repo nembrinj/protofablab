@@ -39,11 +39,11 @@ The `mode` setting chooses how the walker is found. It can also be changed while
 | Mode | Robot | How the walker is found |
 | --- | --- | --- |
 | `static` (default) | Parked | In every scan, against the empty room |
-| `driving` | Parked until the walker is found, then driving | Found against the empty room, then followed: in each scan, only the points within 0.6 m of where the walker should be, placed in the odom frame with the odometry |
+| `driving` | Parked until the walker is found, then driving | Found against the empty room, then followed: in each scan, only the points within 0.6 m of where the walker should be and not part of the empty room, placed in the odom frame with the odometry |
 
 In driving mode, `position_m` is from the robot and `speed_mps` is over the floor, so the walker's speed does not change when the robot drives. When the walker is not seen for 1 s, they are lost.
 
-Known problem: in driving mode, the points near the walker are not compared with the empty room. When the walker passes close to furniture or a wall, the track can stay on it while the walker walks on ([First driving recording](#first-driving-recording-2026-11-27), [ADR 5](../../../docs/decisions/0005-follow-the-walker-with-the-odometry.md)).
+The empty room is placed in the odom frame too, and its points (within `follow_room_margin_m`, 0.15 m) are left out, so the track does not move onto the furniture the walker passes ([First driving recording](#first-driving-recording-2026-11-27)). What the robot did not see when it learned the room, for example something moved in later or a part of the room it only sees once it has driven on, is not left out ([ADR 5](../../../docs/decisions/0005-follow-the-walker-with-the-odometry.md)). When no `/odom` arrives for 1 s, the walker is lost.
 
 In both modes, the empty room is only used while `/odom` shows the robot within 5 cm and about 6° of where it learned it (the heading in the odometry can drift a little while the robot stands still). Once it has moved, the node reports nobody and warns until the room is learned again (robot parked, path clear, `relearn_background`). Without any `/odom`, the robot is taken to be parked.
 
@@ -102,7 +102,8 @@ Setup: as above, with the camera side of the robot towards the path (`facing_ang
 3. Drive beside the walker at about their speed, forward, then backward on the walk back. Expected: `people_count: 1` all along; `position_m` changes only as much as the gap between the robot and the walker; `speed_mps` is the walker's speed, not the difference to the robot's.
 4. Stop the robot while the walker walks on. Expected: `position_m` grows; `speed_mps` stays the walker's speed.
 5. Let the walker step out of the LiDAR's view while the robot drives. Expected: within about 1 s "Walker lost", then the robot-moved warning.
-6. Record `ros2 bag record /scan /odom` during steps 3 and 4, and replay it with `--mode driving` to set `follow_radius_m` and `follow_lost_s`.
+6. With a chair standing right beside the path before the room is learned, drive beside the walker past it. Expected: in RViz, only the walker's points are green, the chair's stay grey, and `people_count: 1` follows the walker on past the chair.
+7. Record `ros2 bag record /scan /odom` during steps 3, 4 and 6, and replay it with `--mode driving` to set `follow_radius_m`, `follow_lost_s` and `follow_room_margin_m`.
 
 ### First results (2026-11-12)
 
@@ -127,10 +128,16 @@ Still to do: steps 1–9 above live on the robot with the current settings (so f
 
 ### First driving recording (2026-11-27)
 
-One recording in the lab: the path on the robot's left (`facing_angle_rad` 1.5708), the robot parked for 14 s, then driving straight along the path at 0.15 m/s. Replayed with `--mode driving`:
+One recording in the lab: the path on the robot's left (`facing_angle_rad` 1.5708), the robot parked for 14 s, then driving straight along the path at 0.15 m/s, the walker beside it. Replayed with `--mode driving`.
 
-- The walker was found at 4.7 s, while the robot was parked, walking along the path ahead of it at about 0.9 m/s.
-- At 5.4 s the track moved onto a corner of the room 2.4–3.0 m ahead, at the end of the watched strip, and stayed on it for about 20 s: while the robot was still parked, nearly all the points it followed lay within about 10 cm of the scan of the empty room. It reported one person standing still, while the walker had walked on.
-- While the robot drove towards the corner, the speed over the floor stayed at 0.00 ± 0.05 m/s: the odometry takes the robot's own movement out.
+Before the points of the empty room were left out:
 
-Still to do: the driving-mode steps 1–6 above, after the known problem is fixed.
+- At 5.4 s, as the walker passed a corner of the room 2.4–3.0 m ahead, the track moved onto the corner and stayed on it for about 20 s: while the robot was still parked, nearly all the points it followed lay within about 10 cm of the scan of the empty room. It reported one person standing still, while the walker had walked on.
+
+With them left out:
+
+- The walker is found at 4.7 s, comes up to the robot, and is followed until 29.2 s, when `/odom` stopped arriving for 2.5 s (Wi-Fi). From a margin of 3 cm up the result is the same.
+- While the robot drove (15–28 s), the walker stayed 0.1–0.4 m ahead of it, with a speed over the floor of 0.15 m/s on average, the robot's speed: the odometry takes the robot's own movement out.
+- 8 steps counted while walking beside the robot; there is no hand count for this recording.
+
+Still to do: the driving-mode steps 1–6 above, live on the robot.

@@ -34,6 +34,7 @@ lidar_person_tracker:
     # Driving mode.
     follow_radius_m: 0.6        # the walker's points are looked for this close to where the walker should be
     follow_lost_s: 1.0          # no points there for this long, and the walker is lost
+    follow_room_margin_m: 0.15  # points this close to the empty room are the room, not the walker
     # The empty room is only used while the robot is this close to where it learned it.
     # The heading in the odometry can drift a little while the robot stands still.
     parked_m: 0.05

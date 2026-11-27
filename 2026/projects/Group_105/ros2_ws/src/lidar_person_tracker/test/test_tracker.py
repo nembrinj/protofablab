@@ -316,6 +316,7 @@ def test_bad_scans_are_rejected():
     {'min_speed_span_s': 2.0, 'speed_window_s': 1.0},
     {'step_drop_m': 0.0},
     {'step_drop_m': 1.0, 'step_max_spread_m': 1.0},
+    {'follow_room_margin_m': 0.0},
 ])
 def test_bad_settings_are_rejected(settings):
     with pytest.raises(ValueError):
@@ -328,11 +329,13 @@ def test_bad_settings_are_rejected(settings):
 
 RIGHT_RAD = -math.pi / 2
 POSTS = [(3.22, 1.0, 0.05), (3.22, -2.5, 0.05), (3.22, 3.5, 0.05)]  # behind the path
+# Right behind the path, closer to the walker than follow_radius_m.
+POST_BY_THE_PATH = (2.95, 0.8, 0.05)
 
 
-def driving_robot(mode='driving'):
-    robot = Robot(TrackerConfig(facing_angle_rad=RIGHT_RAD), noise_m=0.02, furniture=POSTS,
-                  odometry=True)
+def driving_robot(mode='driving', furniture=()):
+    robot = Robot(TrackerConfig(facing_angle_rad=RIGHT_RAD), noise_m=0.02,
+                  furniture=POSTS + list(furniture), odometry=True)
     robot.tracker.set_mode(mode)
     robot.pose = (0.0, 0.0, math.pi / 2)
     robot.learn()
@@ -397,6 +400,26 @@ def test_driving_mode_reports_the_gap_when_the_robot_is_slower():
     seen = followed(estimates)
     assert seen[-1].position_m == pytest.approx(0.5 + 0.4 * 3.0, abs=0.2)
     assert np.mean(known_speeds(seen)[-10:]) == pytest.approx(0.8, abs=0.1)
+
+
+def test_driving_mode_leaves_out_furniture_the_walker_passes():
+    robot = driving_robot(furniture=[POST_BY_THE_PATH])
+    seen = followed(walk_beside(robot, start_m=-1.0, speed_mps=0.8, duration_s=4.0))
+    for estimate in seen:
+        across = estimate.points_m[:, 1]
+        assert np.all(np.abs(across - PATH_M) < 0.25)  # the post is 0.45 m off the line
+        assert abs(estimate.position_m + 1.0) < 0.15
+
+
+def test_driving_mode_does_not_stay_on_furniture_where_the_walker_disappears():
+    # On the first drive in the lab, the track stayed on a corner of the room
+    # after the walker had walked on, and reported a person standing still.
+    robot = driving_robot(furniture=[POST_BY_THE_PATH])
+    followed(walk_beside(robot, start_m=-1.5, speed_mps=0.8, duration_s=2.9, robot_speed_mps=0.0))
+    gone = walk_beside(robot, start_m=0.8, speed_mps=0.8, duration_s=2.0, robot_speed_mps=0.0,
+                       walker=False)
+    assert all(estimate.people_count == 0 for estimate in gone)
+    assert not gone[-1].following
 
 
 def test_a_short_gap_keeps_following():

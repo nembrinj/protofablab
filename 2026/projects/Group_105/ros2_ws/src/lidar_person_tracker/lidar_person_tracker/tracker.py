@@ -8,7 +8,9 @@ than the empty room, and lies on the walking path, belongs to a person.
 Driving mode: the walker is first found in the same way, while the robot is
 still parked. From then on the tracker follows the walker's points: in each
 scan it only looks near where the walker should be. The odometry places each
-scan in a fixed frame, so the robot's own movement is taken out.
+scan in a fixed frame, so the robot's own movement is taken out. The empty
+room is placed in the same frame, and its points are left out, so the track
+cannot move from the walker onto the furniture they pass.
 
 In both modes the empty room is only used while the robot stands where it
 learned it; once the odometry shows that it has moved, the room must be
@@ -59,9 +61,11 @@ class TrackerConfig:
     step_max_spread_m: float = 1.0
     # Driving mode: the walker's points are looked for within follow_radius_m
     # of where the walker should be; none for follow_lost_s and the walker
-    # is lost.
+    # is lost. Points within follow_room_margin_m of the empty room are the
+    # room, not the walker.
     follow_radius_m: float = 0.6
     follow_lost_s: float = 1.0
+    follow_room_margin_m: float = 0.15
     # The empty room is only used while the robot is within parked_m and
     # parked_rad of where it learned it. The heading in the odometry can
     # drift a little while the robot stands still, so the turn limit is wide.
@@ -73,7 +77,8 @@ class TrackerConfig:
             'path_distance_m', 'corridor_half_width_m', 'zone_half_length_m',
             'background_margin_m', 'person_gap_m', 'speed_window_s',
             'min_speed_span_s', 'max_jump_m', 'step_drop_m', 'step_min_move_m',
-            'step_max_spread_m', 'follow_radius_m', 'follow_lost_s', 'parked_m', 'parked_rad',
+            'step_max_spread_m', 'follow_radius_m', 'follow_lost_s', 'follow_room_margin_m',
+            'parked_m', 'parked_rad',
         ]
         for name in positive:
             value = getattr(self, name)
@@ -123,9 +128,9 @@ class _Person:
 
 
 class _Walker:
-    """The walker followed in driving mode, in the odom frame."""
+    """The walker followed in driving mode, and the empty room, in the odom frame."""
 
-    def __init__(self, stamp_s, pose, person, facing_angle_rad):
+    def __init__(self, stamp_s, pose, person, facing_angle_rad, room):
         # The path's directions stay fixed in the odom frame from now on.
         facing = pose.yaw_rad + facing_angle_rad
         self.across_axis = np.array([math.cos(facing), math.sin(facing)])
@@ -134,10 +139,19 @@ class _Walker:
             + self.along_axis * person.position_m
         self.seen_s = stamp_s
         self.speed_mps = 0.0
+        self.room = room  # (x, y) rows
 
     def along_from_robot(self, pose):
         """Return how far the odom frame's along-path values are from the robot's."""
         return float(np.dot([pose.x_m, pose.y_m], self.along_axis))
+
+
+def in_odom(binned, pose):
+    """Return the points of a binned scan taken at pose, as (x, y) rows in the odom frame."""
+    seen = np.isfinite(binned)
+    directions = pose.yaw_rad + np.radians(np.arange(BINS))[seen]
+    return np.column_stack((pose.x_m + binned[seen] * np.cos(directions),
+                            pose.y_m + binned[seen] * np.sin(directions)))
 
 
 def bin_scan(ranges, angle_min, angle_increment, range_min, range_max):
@@ -189,6 +203,7 @@ class PersonTracker:
         """Forget the empty room and learn it again from the next scans."""
         config = self._config
         self._background = None
+        self._room = None  # the nearest range in each direction, without the neighbours
         self._learning = []
         self._learned_pose = None
         self._walker = None
@@ -248,6 +263,9 @@ class PersonTracker:
         nearest = np.min(self._learning, axis=0)
         self._background = np.minimum(nearest, np.minimum(np.roll(nearest, 1),
                                                           np.roll(nearest, -1)))
+        # For the driving mode, each range stays in its own direction, so that
+        # the room's points land where its walls and furniture are.
+        self._room = nearest
         self._learning = []
         self._learned_pose = self._poses.latest()
 
@@ -290,7 +308,10 @@ class PersonTracker:
                 if group.size >= self._config.min_points]
 
     def _start_following(self, stamp_s, pose, person):
-        walker = _Walker(stamp_s, pose, person, self._config.facing_angle_rad)
+        # The robot still stands where it learned the room, so the room is
+        # placed with the same pose as this scan.
+        walker = _Walker(stamp_s, pose, person, self._config.facing_angle_rad,
+                         in_odom(self._room, pose))
         self._walker = walker
         # From now on the positions behind the speed are measured in the odom
         # frame, not from the robot.
@@ -333,11 +354,10 @@ class PersonTracker:
         expected = walker.position + walker.along_axis * walker.speed_mps \
             * (stamp_s - walker.seen_s)
         seen = np.isfinite(binned)
-        directions = pose.yaw_rad + np.radians(np.arange(BINS))[seen]
-        points = np.column_stack((pose.x_m + binned[seen] * np.cos(directions),
-                                  pose.y_m + binned[seen] * np.sin(directions)))
+        points = in_odom(binned, pose)
         near = np.hypot(*(points - expected).T) <= self._config.follow_radius_m
-        # Everything near the walker is taken to be the walker.
+        near[near] = self._off_the_room(points[near], walker.room)
+        # Everything else near the walker is taken to be the walker.
         people = self._group(points[near] @ walker.along_axis, points[near] @ walker.across_axis,
                              math.inf)
         if not people:
@@ -346,6 +366,14 @@ class PersonTracker:
         distances, angles = binned[seen][near], self._angles[seen][near]
         return replace(people[0], points_m=np.column_stack((distances * np.sin(angles),
                                                             distances * np.cos(angles))))
+
+    def _off_the_room(self, points, room):
+        """Return which points are further than follow_room_margin_m from all of the room."""
+        if points.size == 0 or room.size == 0:
+            return np.ones(len(points), dtype=bool)
+        gaps = np.hypot(points[:, None, 0] - room[None, :, 0],
+                        points[:, None, 1] - room[None, :, 1])
+        return gaps.min(axis=1) > self._config.follow_room_margin_m
 
     def _speed(self, stamp_s, position):
         """Fit a line to the recent positions; its slope is the speed."""

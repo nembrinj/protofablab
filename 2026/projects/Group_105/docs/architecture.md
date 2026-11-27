@@ -1,6 +1,6 @@
 # Architecture
 
-Status: target design for the final proof of concept, revised on 2026-11-19 after a project session with the professors. Built so far, in [`ros2_ws/`](../ros2_ws/) and [`dashboard/`](../dashboard/): the LiDAR person tracker (position, speed and steps of the walker; for a driving robot tested on one recording, with a known problem, see [ADR 5](decisions/0005-follow-the-walker-with-the-odometry.md)), and a first session loop with the LiDAR only (walks, stops, the spoken stop cue, and each walk's numbers on the dashboard), which can be watched in RViz. Also the offline camera prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/). Everything else is planned. Decisions are recorded in [`decisions/`](decisions/).
+Status: target design for the final proof of concept, revised on 2026-11-19 after a project session with the professors. Built so far, in [`ros2_ws/`](../ros2_ws/) and [`dashboard/`](../dashboard/): the LiDAR person tracker (position, speed and steps of the walker; for a driving robot checked on one recording, [ADR 5](decisions/0005-follow-the-walker-with-the-odometry.md)), and a first session loop with the LiDAR only (walks, stops, the spoken stop cue, and each walk's numbers on the dashboard), which can be watched in RViz. Also the offline camera prototype in [`walk_analysis_with_camera/`](../walk_analysis_with_camera/). Everything else is planned. Decisions are recorded in [`decisions/`](decisions/).
 
 ## Overview
 
@@ -56,7 +56,7 @@ The robot gives two outputs:
 
 | Component | Package | Role |
 | --- | --- | --- |
-| LiDAR person tracker | `lidar_person_tracker` (ours, built) | Number of people, position along the path, walking speed, steps. Two modes, chosen by hand: static, robot parked, compares each scan with the empty room ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)); driving, follows the walker's points from scan to scan with the odometry ([ADR 5](decisions/0005-follow-the-walker-with-the-odometry.md)); in its first recording, the track moved from the walker onto the room |
+| LiDAR person tracker | `lidar_person_tracker` (ours, built) | Number of people, position along the path, walking speed, steps. Two modes, chosen by hand: static, robot parked, compares each scan with the empty room ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)); driving, follows the walker's points from scan to scan with the odometry, leaving out the points of the empty room ([ADR 5](decisions/0005-follow-the-walker-with-the-odometry.md)); checked on one recording |
 | Gait monitor | `gait_monitor` (ours, planned) | Pose estimation per frame: are the legs in the picture, and steps from the video as a second opinion. Reuses `walk_analysis` |
 | Session manager | `walk_session` (ours, built with the LiDAR only) | Session flow, feedback rules, flagged moments, walk summaries. Built: walks, stops, the stop cue, walk summaries, and a view of the session in RViz |
 | Cue speaker | `walk_session` (ours, built, stand-in) | Speaks the cues on the laptop until `audio_cues` speaks them on the robot |
@@ -106,8 +106,8 @@ Built: the walk messages. Each walk is stored at the time it reaches the broker,
 
 | Measurement | Sensor | How | Status |
 | --- | --- | --- | --- |
-| Position along the path | LiDAR, odometry while driving | Parked: points nearer than the empty room, inside the watched strip ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)). Driving: the points near where the walker should be, in the odom frame ([ADR 5](decisions/0005-follow-the-walker-with-the-odometry.md)) | Built, stage 1; driving: one recording, known problem ([ADR 5](decisions/0005-follow-the-walker-with-the-odometry.md)) |
-| Walking speed | LiDAR, odometry while driving | Slope of a line fitted to the positions of the last second, over the floor | Built, stage 1; driving: one recording, known problem |
+| Position along the path | LiDAR, odometry while driving | Parked: points nearer than the empty room, inside the watched strip ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)). Driving: the points near where the walker should be, in the odom frame, without the points of the empty room ([ADR 5](decisions/0005-follow-the-walker-with-the-odometry.md)) | Built, stage 1; driving checked on one recording |
+| Walking speed | LiDAR, odometry while driving | Slope of a line fitted to the positions of the last second, over the floor | Built, stage 1; driving checked on one recording |
 | Steps, steps per minute | LiDAR; camera as a second opinion | LiDAR: each time the person's points spread out (feet apart) and close up again (legs passing), while the person moves on along the path ([ADR 4](decisions/0004-find-the-walker-against-the-empty-room.md)). Camera: the moment the feet are furthest apart | Built (LiDAR), stage 1; camera planned |
 | Stop | LiDAR, camera | During a walk, slower than 0.15 m/s and no new step for 3 s | Built (LiDAR), stage 1 |
 
