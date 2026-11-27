@@ -1,3 +1,4 @@
 mediapipe==1.1.1
 numpy==1.26.4
 opencv-contrib-python==4.11.0.86
+bleak

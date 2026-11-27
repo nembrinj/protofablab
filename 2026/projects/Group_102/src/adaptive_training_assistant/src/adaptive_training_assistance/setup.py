@@ -38,7 +38,7 @@ setup(
             "exercise_counter = adaptive_training_assistance.exercise_counter_node:main",
             "gesture = adaptive_training_assistance.gesture_node:main",
             "training_logic = adaptive_training_assistance.training_logic_node:main",
-            "heart_rate_simulator = adaptive_training_assistance.heart_rate_simulator_node:main",
+            "heart_rate = adaptive_training_assistance.heart_rate_node:main",
             "camera_view = adaptive_training_assistance.camera_view_node:main",
         ],
     },

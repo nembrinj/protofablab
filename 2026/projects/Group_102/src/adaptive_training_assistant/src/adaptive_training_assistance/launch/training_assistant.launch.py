@@ -40,11 +40,10 @@ def generate_launch_description():
                 executable="training_logic",
                 output="screen",
             ),
-            # Simulated heart rate until the real sensor is connected:
-            # replace this node with the sensor node (same /heart_rate topic).
+            # Heart rate from the Polar chest strap (Bluetooth).
             Node(
                 package="adaptive-trainning-assistance",
-                executable="heart_rate_simulator",
+                executable="heart_rate",
                 output="screen",
             ),
             Node(

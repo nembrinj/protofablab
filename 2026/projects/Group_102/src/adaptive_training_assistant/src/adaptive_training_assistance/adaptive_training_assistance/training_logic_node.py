@@ -50,7 +50,7 @@ SLOW_RISE_AT_HALF = 5.0  # Less than this at 50%: the body is not responding.
 FAST_RISE_AT_HALF = 30.0  # More than this at 50%: rising faster than usual.
 MAX_EXPECTED_HEART_RATE = 150.0  # Never expected above this during the exercise.
 # How much the robot talks: 1 = detailed, 2 = moderate, 3 = minimal.
-FEEDBACK_LEVEL = 2
+FEEDBACK_LEVEL = 1
 
 HEART_RATE_TIMEOUT_SECONDS = 5.0  # Older readings are ignored (sensor not sending).
 
@@ -131,10 +131,16 @@ class TrainingLogicNode(Node):
             Int32, "/training/feedback_level", LATCHED_QOS
         )
 
-        self.create_subscription(PersonPosition, "/person/position", self.position_callback, 10)
-        self.create_subscription(Bool, "/person/ready", self.ready_callback, LATCHED_QOS)
+        self.create_subscription(
+            PersonPosition, "/person/position", self.position_callback, 10
+        )
+        self.create_subscription(
+            Bool, "/person/ready", self.ready_callback, LATCHED_QOS
+        )
         self.create_subscription(String, "/gesture", self.gesture_callback, 10)
-        self.create_subscription(String, "/exercise/rep_event", self.rep_event_callback, 10)
+        self.create_subscription(
+            String, "/exercise/rep_event", self.rep_event_callback, 10
+        )
         self.create_subscription(Float32, "/heart_rate", self.heart_rate_callback, 10)
         self.create_timer(0.1, self.update_positioning_state)
 
@@ -153,8 +159,9 @@ class TrainingLogicNode(Node):
         self.feedback_pub.publish(String(data=text))
         self.get_logger().info(f"Feedback: {text}")
 
-    def set_state(self, state: str, feedback: str | None = None,
-                  importance: str = ESSENTIAL) -> None:
+    def set_state(
+        self, state: str, feedback: str | None = None, importance: str = ESSENTIAL
+    ) -> None:
         if state == self.state:
             return
         self.state = state
@@ -180,10 +187,15 @@ class TrainingLogicNode(Node):
         self.heart_rate = float(msg.data)
         self.heart_rate_time = time.monotonic()
         # Safety at any time during the exercise: warn once, the user decides.
-        if (self.state == IN_PROGRESS and not self.high_warned
-                and self.heart_rate > MAX_EXPECTED_HEART_RATE):
+        if (
+            self.state == IN_PROGRESS
+            and not self.high_warned
+            and self.heart_rate > MAX_EXPECTED_HEART_RATE
+        ):
             self.high_warned = True
-            self.say(f"Your heart rate is higher than ever before. {BE_CAREFUL}", SAFETY)
+            self.say(
+                f"Your heart rate is higher than ever before. {BE_CAREFUL}", SAFETY
+            )
 
     def current_heart_rate(self) -> float | None:
         """The latest heart rate, or None if the sensor has not sent one recently."""
@@ -250,7 +262,9 @@ class TrainingLogicNode(Node):
             )
         elif rise > FAST_RISE_AT_HALF:
             # Warn, but let the user decide whether to stop.
-            self.say(f"Your heart rate is rising faster than usual. {BE_CAREFUL}", SAFETY)
+            self.say(
+                f"Your heart rate is rising faster than usual. {BE_CAREFUL}", SAFETY
+            )
         elif self.high_warned:  # Already warned: no "doing great" now.
             self.say(keep_going, MILESTONE)
         else:
@@ -272,7 +286,10 @@ class TrainingLogicNode(Node):
 
         if self.person_ready:
             self.set_state(READY)
-        elif self.last_seen is not None and now - self.last_seen < PERSON_LOST_GRACE_SECONDS:
+        elif (
+            self.last_seen is not None
+            and now - self.last_seen < PERSON_LOST_GRACE_SECONDS
+        ):
             self.set_state(CENTERING)
         else:
             self.set_state(SEARCHING)

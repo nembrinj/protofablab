@@ -35,7 +35,7 @@ the annotated camera image.
 | USB camera at the **back** of the robot | Person, pose and gesture detection |
 | SG90 servo + ESP32 (UDP over Wi-Fi) | Tilts the camera up/down |
 | 3D-printed parts (`models/`) | Camera holder, camera pivot support, servo mount |
-| Heart-rate sensor *(planned)* | Simulated for now by `heart_rate_simulator` |
+| Polar H10 heart-rate chest strap (Bluetooth LE) | Heart rate, read on the Mac by `heart_rate` |
 | Speaker *(planned)* | Will read `/training/feedback` aloud |
 
 All processing (MediaPipe, ROS nodes) runs on a Mac; the robot only
@@ -68,7 +68,7 @@ flowchart TB
         direction LR
         ODOM["Odometry"]
         CAM["USB camera"]
-        HR["heart_rate_simulator<br/>(later: real sensor)"]
+        HR["heart_rate<br/>(Polar H10)"]
     end
 
     subgraph VISION["Vision (MediaPipe)"]
@@ -125,7 +125,7 @@ flowchart LR
     TILT["servo_tilt"]
     EX["exercise_counter"]
     PD["person_detection"]
-    HR["heart_rate_simulator"]
+    HR["heart_rate<br/>(Polar H10)"]
     CAMV["camera_view<br/>(OpenCV window)"]
     RB["rosbridge"]
     NR["Node-RED dashboard"]
@@ -134,7 +134,6 @@ flowchart LR
     STATUS --> GEST
     STATUS --> BASE
     STATUS --> TILT
-    STATUS --> HR
     EX -->|/exercise/feedback| GEST
 
     PD -->|/person/preview/compressed| CAMV
@@ -157,7 +156,7 @@ flowchart LR
 | `gesture` | MediaPipe Gesture Recognizer, only in `READY` and `IN_PROGRESS`: 👍 = `start`, 👎 = `stop`, each held 1 s. |
 | `exercise_counter` | Counts arm raises while enabled. Publishes one JSON `/exercise/rep_event` per repetition: `repetitions`, `repetition_duration_seconds`, `pace_reps_per_minute`, `exercise_duration_seconds`. |
 | `training_logic` | Session flow, heart-rate checks and feedback. Publishes `/training/status`, `/training/feedback`, `/training/feedback_level`. |
-| `heart_rate_simulator` | Stand-in sensor: `/heart_rate` (`std_msgs/Float32`, bpm) once per second. A real sensor only has to publish on the same topic. |
+| `heart_rate` | Finds the Polar strap over Bluetooth (`bleak`), publishes every value on `/heart_rate` (`std_msgs/Float32`, bpm), and keeps searching if it disconnects. |
 | `camera_view` | OpenCV window with the annotated camera image (`q` closes it). |
 
 **Custom messages** (`adaptive_training_assistant_msgs`): `PersonPosition`
@@ -197,7 +196,7 @@ chosen so such gaps do not change the state.
 
 ### Heart rate
 
-The sensor (or simulator) only sends bpm values; `training_logic` counts
+The sensor only sends bpm values; `training_logic` counts
 the repetitions and makes the decisions. The user's previous sessions are
 constants in `training_logic_node.py` (to be replaced by real history):
 
@@ -210,16 +209,6 @@ constants in `training_logic_node.py` (to be replaced by real history):
 
 The halfway check is skipped if no heart rate arrived in the last 5 s.
 When the exercise ends, the reason and the result are sent as one message.
-
-**Simulator.** In `heart_rate_simulator_node.py` keep one scenario active
-and comment out the other two. It sends the start value until the
-exercise starts (it reads `/training/status` only for that), then rises:
-
-| Scenario | Start | Rise | Max | Result |
-|----------|------:|-----:|----:|--------|
-| 1. Low, does not rise | 55 bpm | 0 bpm/s | 55 bpm | break at halfway (not responding) |
-| 2. Normal | 70 bpm | 0.5 bpm/s | 130 bpm | "doing great", all 10 repetitions |
-| 3. Much faster than usual | 70 bpm | 3 bpm/s | 180 bpm | warnings (rising too fast, then above 150), exercise goes on |
 
 ### Feedback levels
 
@@ -269,14 +258,17 @@ rosbridge (`ws://localhost:9090`) to `/exercise/rep_event`,
 `pixi add ros-jazzy-rosbridge-suite`, and the Node-RED palettes
 `@flowfuse/node-red-dashboard` and `node-red-contrib-ros2-suite`.
 
-**4. Start the assistant:**
+**4. Start the assistant** (wear the Polar strap first):
 
 ``` bash
 ros2 launch adaptive-trainning-assistance training_assistant.launch.py
 ```
 
 The MediaPipe models are downloaded on the first run to
-`~/.cache/adaptive_training_assistant/`.
+`~/.cache/adaptive_training_assistant/`. The heart-rate node needs the
+`bleak` package (once: `pixi add --pypi bleak`), and on macOS the terminal
+needs Bluetooth permission. Wear the strap before the launch; it connects
+after ~10 s ("Connected to Polar H10 …").
 
 ## Settings
 
@@ -287,7 +279,7 @@ Constants at the top of each node file; rebuild after a change.
 | `robot_base_node.py` | `TARGET_DISTANCE_M` (1.3 m) ± `DISTANCE_TOLERANCE_M` (0.15 m); `SHOULDER_WIDTH_M` (calibration: `0.38 × real_distance / TARGET_DISTANCE_M`); `LINEAR_DIRECTION`; `SEARCH_STEP` (0.5 rad ≈ 30°); speeds |
 | `servo_tilt_node.py` | `SERVO_MIN_ANGLE` / `SERVO_MAX_ANGLE` / `INITIAL_SERVO_ANGLE` (45° / 100° / 70°); `SEARCH_MIN_ANGLE` |
 | `training_logic_node.py` | `TARGET_REPETITIONS`, heart-rate history constants, `FEEDBACK_LEVEL` |
-| `heart_rate_simulator_node.py` | scenario |
+| `heart_rate_node.py` | `DEVICE_NAME` (part of the strap's Bluetooth name, `Polar`) |
 | `gesture_node.py` | `MIN_SCORE`, `HOLD_SECONDS`, `FRAME_STRIDE` |
 | `person_detection_node.py` | `MIN_VISIBILITY`, `MIN_VISIBLE_LANDMARKS`, … |
 | `servo_driver_node.py` | `SERVO_IP`, `SERVO_PORT` of the ESP32 |
@@ -298,18 +290,17 @@ Constants at the top of each node file; rebuild after a change.
 Readme.md
 docs/              presentations, demo videos, journal, deliverables, materials
 models/            3D-printed parts (STL)
-requirements.txt   Python packages (MediaPipe, OpenCV, NumPy)
+requirements.txt   Python packages (MediaPipe, OpenCV, NumPy, bleak)
 src/
   adaptive_training_assistant/src/
     adaptive-trainning-assistance_msg/   custom messages
-    adaptive_training_assistance/        the nine nodes and the launch file
+    adaptive_training_assistance/        the nodes and the launch file
   node_red/        Node-RED flow
   sketch_nov4b/    ESP32 servo sketch (receives the angle over UDP)
 ```
 
 ## Next steps
 
-- Real heart-rate sensor publishing on `/heart_rate`.
 - Speaker reading `/training/feedback` aloud.
 - Real session history instead of the predefined constants, shown on the
   Node-RED "Training History" page.
