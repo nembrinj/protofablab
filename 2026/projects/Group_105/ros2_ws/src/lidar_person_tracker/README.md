@@ -1,6 +1,6 @@
 # lidar_person_tracker
 
-Finds a walking person in the LiDAR scans and publishes where they are along the walking path, how fast they move, and how many steps they took. It works with the robot parked, and while it drives beside the walker. How it works and why: [ADR 4](../../../docs/decisions/0004-find-the-walker-against-the-empty-room.md) (parked) and [ADR 5](../../../docs/decisions/0005-follow-the-walker-with-the-odometry.md) (driving).
+Finds a walking person in the LiDAR scans and publishes where they are along the walking path, how fast they move, and how many steps they took. It works with the robot parked, and has a second mode for while it drives beside the walker. How it works and why: [ADR 4](../../../docs/decisions/0004-find-the-walker-against-the-empty-room.md) (parked) and [ADR 5](../../../docs/decisions/0005-follow-the-walker-with-the-odometry.md) (driving).
 
 | | Name | Type |
 | --- | --- | --- |
@@ -43,6 +43,8 @@ The `mode` setting chooses how the walker is found. It can also be changed while
 
 In driving mode, `position_m` is from the robot and `speed_mps` is over the floor, so the walker's speed does not change when the robot drives. When the walker is not seen for 1 s, they are lost.
 
+Known problem: in driving mode, the points near the walker are not compared with the empty room. When the walker passes close to furniture or a wall, the track can stay on it while the walker walks on ([First driving recording](#first-driving-recording-2026-11-27), [ADR 5](../../../docs/decisions/0005-follow-the-walker-with-the-odometry.md)).
+
 In both modes, the empty room is only used while `/odom` shows the robot within 5 cm and about 6° of where it learned it (the heading in the odometry can drift a little while the robot stands still). Once it has moved, the node reports nobody and warns until the room is learned again (robot parked, path clear, `relearn_background`). Without any `/odom`, the robot is taken to be parked.
 
 ## In RViz
@@ -74,7 +76,7 @@ Record `ros2 bag record -o walk_test /scan /odom /person/state` on the robot, th
 ros2 run lidar_person_tracker replay_bag ~/walk_test path_distance_m=1.2 facing_angle_rad=3.14159
 ```
 
-It prints what the tracker would have said every half second, how many scans showed 0, 1, 2 ... people, and how many steps it counted. Add `--csv walk_test.csv` to also write every scan (people, position, speed, spread of the feet, steps, following, robot moved) to a file, for plots. Add `--mode driving` to try the driving mode on a recording with `/odom`.
+It prints what the tracker would have said every half second, how many scans showed 0, 1, 2 ... people, and how many steps it counted. Add `--csv walk_test.csv` to also write every scan (people, position, speed, spread of the feet, steps, following, robot moved) to a file, for plots. Add `--mode driving` to try the driving mode on a recording with `/odom`. The options go after the settings.
 
 ## Manual test on the real robot
 
@@ -122,3 +124,13 @@ Steps, from the same replays (2026-11-20). There is no hand count for these reco
 - Scans where the points spread more than 1 m (a second person or an object right next to the walker) are skipped.
 
 Still to do: steps 1–9 above live on the robot with the current settings (so far only seen in replays), and walks with a hand step count.
+
+### First driving recording (2026-11-27)
+
+One recording in the lab: the path on the robot's left (`facing_angle_rad` 1.5708), the robot parked for 14 s, then driving straight along the path at 0.15 m/s. Replayed with `--mode driving`:
+
+- The walker was found at 4.7 s, while the robot was parked, walking along the path ahead of it at about 0.9 m/s.
+- At 5.4 s the track moved onto a corner of the room 2.4–3.0 m ahead, at the end of the watched strip, and stayed on it for about 20 s: while the robot was still parked, nearly all the points it followed lay within about 10 cm of the scan of the empty room. It reported one person standing still, while the walker had walked on.
+- While the robot drove towards the corner, the speed over the floor stayed at 0.00 ± 0.05 m/s: the odometry takes the robot's own movement out.
+
+Still to do: the driving-mode steps 1–6 above, after the known problem is fixed.
